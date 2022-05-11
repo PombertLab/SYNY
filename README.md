@@ -1,4 +1,4 @@
-The SYNY pipeline investigates genetic synteny between species by reconstructing protein clusters from gene pairs generated from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches.
+The SYNY pipeline investigates synteny between species by reconstructing protein clusters from gene pairs generated from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches.
 
 ## <b>Introduction</b>
 #### <b>What is synteny?</b>
