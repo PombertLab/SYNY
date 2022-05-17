@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 my $name = 'get_synteny.pl';
-my $version = '0.5';
-my $updated = '2022-05-06';
+my $version = '0.7';
+my $updated = '2022-05-17';
 
 use strict;
 use warnings;
@@ -52,10 +52,11 @@ GetOptions(
 	'o|outdir=s' => \$outdir,
 );
 
-my $cluster_dir = $outdir."/CLUSTERS";
 my $pair_dir = $outdir."/PAIRS";
+my $cluster_dir = $outdir."/CLUSTERS";
+my $neighbor_dir = $outdir."/NEIGHBORS";
 
-my @dirs = ($cluster_dir,$pair_dir);
+my @dirs = ($cluster_dir,$pair_dir,$neighbor_dir);
 
 foreach my $dir (@dirs){
 	unless (-d $dir){
@@ -66,6 +67,7 @@ foreach my $dir (@dirs){
 my $query_name = (fileparse($query_list,".list"))[0];
 my $sub_name = (fileparse($subject_list,".list"))[0];
 
+my $neighbor_file = ${query_name}."_vs_".${sub_name}.".neighbors";
 my $pair_file = ${query_name}."_vs_".${sub_name}.".pairs";
 my $cluster_file = ${query_name}."_vs_".${sub_name}.".clusters";
 
@@ -74,7 +76,6 @@ my $cluster_file = ${query_name}."_vs_".${sub_name}.".clusters";
 ###################################################################################################
 
 open QB, "<", $query_blast or die "Unable to read from $query_blast: $!\n";
-
 my %q_blast_hits;
 while (my $line = <QB>){
 	chomp($line);
@@ -89,13 +90,9 @@ while (my $line = <QB>){
 		@{$q_blast_hits{$s_locus}} = ($q_locus,$e_value);
 	}
 }
-
 close QB;
 
-
-
 open SB, "<", $subject_blast or die "Unable to read from $subject_blast: $!\n";
-
 my %s_blast_hits;
 while (my $line = <SB>){
 	chomp($line);
@@ -110,7 +107,6 @@ while (my $line = <SB>){
 		@{$s_blast_hits{$q_locus}} = ($s_locus,$e_value);
 	}
 }
-
 close QB;
 
 ###################################################################################################
@@ -160,7 +156,7 @@ while (my $line = <SL>){
 close SL;
 
 ###################################################################################################
-## Generate pairs file
+## Generate neighbors file
 ###################################################################################################
 
 ## Previous query locus
@@ -181,7 +177,7 @@ my $p_ss;
 ## Previous subject protein number
 my $p_sn;
 
-open OUT, ">", $pair_dir."/".$pair_file or die "Unable to write to $pair_dir/$pair_file: $!\n";
+open OUT, ">", $neighbor_dir."/".$neighbor_file or die "Unable to write to $neighbor_dir/$neighbor_file: $!\n";
 
 foreach my $q_locus (sort(keys(%q_bd_hits))){
 	
@@ -212,42 +208,35 @@ foreach my $q_locus (sort(keys(%q_bd_hits))){
 		$c_sn = $subject_info{$c_sl}[2];
 
 		if($p_ql && $p_sl){
-			## Genes must be located next to one another in the genome to be considered a pair
-			if (($c_qn - $p_qn)**2 == 1){
-				if (($c_sn - $p_sn)**2 == 1){
-					## Genes must be located on the same chromomsome to be considered a pair
-					if ($c_qc eq $p_qc){
-						if ($c_sc eq $p_sc){
-							
-							print OUT $p_ql."\t".$p_qn."\t";
-							print OUT $c_ql."\t".$c_qn."\t";
-							print OUT $c_qc."\t";
-							print OUT $p_sl."\t".$p_sn."\t";
-							print OUT $c_sl."\t".$c_sn."\t";
-							print OUT $c_sc."\t";
-							my $q_o = $p_qs.$c_qs;
-							my $s_o = $p_ss.$c_ss;
-							print OUT $q_o."/".$s_o;
+			## Genes must be located on the same chromomsome to be considered a pair
+			if ($c_qc eq $p_qc){
+				if ($c_sc eq $p_sc){
+					
+					print OUT $p_ql."\t".$p_qn."\t";
+					print OUT $c_ql."\t".$c_qn."\t";
+					print OUT $c_qc."\t";
+					print OUT $p_sl."\t".$p_sn."\t";
+					print OUT $c_sl."\t".$c_sn."\t";
+					print OUT $c_sc."\t";
+					my $q_o = $p_qs.$c_qs;
+					my $s_o = $p_ss.$c_ss;
+					print OUT $q_o."/".$s_o;
 
-							if ($q_o ne $s_o){
-								if ($q_o eq reverse($s_o)){
-									print OUT "\t"."Inversion";
-								}
-								elsif (substr($q_o,0,1) eq substr($q_o,1,1) && substr($s_o,0,1) eq substr($s_o,1,1)){
-									print OUT "\t"."Inversion";
-								}
-								else{
-									print OUT "\t"."Rearrangement";
-								}
-							}
-							print OUT "\n";
+					if ($q_o ne $s_o){
+						if ($q_o eq reverse($s_o)){
+							print OUT "\t"."Inversion";
 						}
-
+						elsif (substr($q_o,0,1) eq substr($q_o,1,1) && substr($s_o,0,1) eq substr($s_o,1,1)){
+							print OUT "\t"."Inversion";
+						}
+						else{
+							print OUT "\t"."Rearrangement";
+						}
 					}
+					print OUT "\n";
 				}
 			}
 		}
-
 	}
 
 	$p_ql = $c_ql;
@@ -267,7 +256,32 @@ close OUT;
 ## Generate clusters file
 ###################################################################################################
 
-open IN, "<", $pair_dir."/".$pair_file or die "Unable to read from $pair_dir/$pair_file: $!\n";
+open IN, "<", $neighbor_dir."/".$neighbor_file or die "Unable to read from $neighbor_dir/$neighbor_file: $!\n";
+open OUT, ">", $pair_dir."/".$pair_file or die "Unable to read from $pair_dir/$pair_file: $!\n";
+while (my $line = <IN>){
+	chomp($line);
+	my @data = split("\t",$line);
+
+	my $query_loc_1 = $data[1];
+	my $query_loc_2 = $data[3];
+
+	my $sub_loc_1 = $data[6];
+	my $sub_loc_2 = $data[8];
+
+	if ((((($query_loc_1 - $query_loc_2)**2)**(1/2))-1) <= $gap){
+		if ((((($sub_loc_1 - $sub_loc_2)**2)**(1/2))-1) <= $gap){
+			print OUT $line."\n";
+		}
+	}
+}
+close IN;
+close OUT;
+
+###################################################################################################
+## Generate clusters file
+###################################################################################################
+
+open IN, "<", $neighbor_dir."/".$neighbor_file or die "Unable to read from $neighbor_dir/$neighbor_file: $!\n";
 
 undef $p_ql;
 undef $p_qn;
@@ -308,7 +322,7 @@ while (my $line = <IN>){
 			push (@{$clusters{$cluster_number}},$c_ql_2."\t".$c_ql_2_s."\t".$c_sl_2."\t".$c_sl_2_s);
 		}
 		elsif ( $query_gap <= $gap){
-			if ( $sub_gap<= $gap){
+			if ( $sub_gap <= $gap){
 				push (@{$clusters{$cluster_number}},"## Gap of ".$query_gap."\t\t"."Gap of ".$sub_gap." ##\t");
 				push (@{$clusters{$cluster_number}},$c_ql_1."\t".$c_ql_1_s."\t".$c_sl_1."\t".$c_sl_1_s);
 				push (@{$clusters{$cluster_number}},$c_ql_2."\t".$c_ql_2_s."\t".$c_sl_2."\t".$c_sl_2_s);
