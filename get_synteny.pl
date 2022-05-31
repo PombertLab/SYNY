@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 my $name = 'get_synteny.pl';
-my $version = '0.7';
-my $updated = '2022-05-17';
+my $version = '0.7.1';
+my $updated = '2022-05-31';
 
 use strict;
 use warnings;
@@ -199,7 +199,7 @@ foreach my $q_locus (sort(keys(%q_bd_hits))){
 	## Current subject protein number
 	my $c_sn;
 
-	## Gene must have a BLAST hit to be considered a pair
+	## Gene must have a BLAST hit to be considered a neighbor
 	if ($q_bd_hits{$c_ql}){
 
 		$c_sl = $q_bd_hits{$c_ql};
@@ -207,8 +207,9 @@ foreach my $q_locus (sort(keys(%q_bd_hits))){
 		$c_ss = $subject_info{$c_sl}[1];
 		$c_sn = $subject_info{$c_sl}[2];
 
+		## Both a query and subject locus is required
 		if($p_ql && $p_sl){
-			## Genes must be located on the same chromomsome to be considered a pair
+			## Genes must be located on the same chromomsome to be considered a nieghbor
 			if ($c_qc eq $p_qc){
 				if ($c_sc eq $p_sc){
 					
@@ -220,20 +221,7 @@ foreach my $q_locus (sort(keys(%q_bd_hits))){
 					print OUT $c_sc."\t";
 					my $q_o = $p_qs.$c_qs;
 					my $s_o = $p_ss.$c_ss;
-					print OUT $q_o."/".$s_o;
-
-					if ($q_o ne $s_o){
-						if ($q_o eq reverse($s_o)){
-							print OUT "\t"."Inversion";
-						}
-						elsif (substr($q_o,0,1) eq substr($q_o,1,1) && substr($s_o,0,1) eq substr($s_o,1,1)){
-							print OUT "\t"."Inversion";
-						}
-						else{
-							print OUT "\t"."Rearrangement";
-						}
-					}
-					print OUT "\n";
+					print OUT $q_o."/".$s_o."\n";
 				}
 			}
 		}
@@ -253,7 +241,7 @@ foreach my $q_locus (sort(keys(%q_bd_hits))){
 close OUT;
 
 ###################################################################################################
-## Generate clusters file
+## Generate pairs file
 ###################################################################################################
 
 open IN, "<", $neighbor_dir."/".$neighbor_file or die "Unable to read from $neighbor_dir/$neighbor_file: $!\n";
@@ -281,7 +269,7 @@ close OUT;
 ## Generate clusters file
 ###################################################################################################
 
-open IN, "<", $neighbor_dir."/".$neighbor_file or die "Unable to read from $neighbor_dir/$neighbor_file: $!\n";
+open IN, "<", $pair_dir."/".$pair_file or die "Unable to read from $pair_dir/$pair_file: $!\n";
 
 undef $p_ql;
 undef $p_qn;
@@ -313,12 +301,16 @@ while (my $line = <IN>){
 	my $c_sl_2_n = $data[8];
 	my $c_sl_2_s = substr($data[10],4,1);
 
+	## First locus will not have access to previous locus information
 	if ($p_ql){
 
+		## The gap between the previous query and current query is abs() -1
 		my $query_gap = ((($c_ql_1_n - $p_qn)**2)**(1/2)) - 1;
+		## The gap between the previous subject and current subject is abs() -1
 		my $sub_gap = ((($c_sl_1_n - $p_sn)**2)**(1/2)) - 1;
 
-		if ($c_ql_1 eq $p_ql){
+		## No gaps
+		if ($query_gap == -1 && $sub_gap == -1){
 			push (@{$clusters{$cluster_number}},$c_ql_2."\t".$c_ql_2_s."\t".$c_sl_2."\t".$c_sl_2_s);
 		}
 		elsif ( $query_gap <= $gap){
