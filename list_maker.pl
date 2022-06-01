@@ -8,8 +8,8 @@ use File::Basename;
 use File::Path qw(make_path);
 
 my $name = 'list_maker.pl';
-my $version = '0.3';
-my $updated = '2022-03-29';
+my $version = '0.3.1';
+my $updated = '2022-05-31';
 my $usage = <<"OPTIONS";
 NAME		$name
 VERSION		$version
@@ -38,6 +38,7 @@ REGEX
 die "$usage\n" unless @ARGV;
 
 my %filetypes = (
+	'.gbf' => 'gbf',
 	'.gbff' => 'gbf',
 	'.gb' => '.gbf',
 	'.gff' => 'gff',
