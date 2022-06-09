@@ -8,8 +8,8 @@ use File::Basename;
 use File::Path qw(make_path);
 
 my $name = 'run_syny.pl';
-my $version = '0.3';
-my $updated = '2022-03-29';
+my $version = '0.4';
+my $updated = '2022-06-09';
 
 my $usage = <<"OPTIONS";
 NAME		${name}
@@ -62,12 +62,13 @@ unless(-d $outdir){
 
 my $list_dir = "$outdir/LISTS";
 my $prot_dir = "$outdir/PROT_SEQ";
+my $annot_dir = "$outdir/ANNOTATIONS";
 my $diamond_dir = "$outdir/DIAMOND";
 my $db_dir = "$diamond_dir/DB";
 my $synteny_dir = "$outdir/SYNTENY";
 my $conserved_dir = "$outdir/CONSERVED";
 
-my @outdirs = ($list_dir,$prot_dir,$diamond_dir,$db_dir,$synteny_dir);
+my @outdirs = ($list_dir,$prot_dir,$annot_dir,$diamond_dir,$db_dir,$synteny_dir);
 
 foreach my $dir (@outdirs){
 	unless (-d $dir){
@@ -87,6 +88,7 @@ system("
 
 system("mv $list_dir/PROT_SEQ/*.faa $prot_dir; rm -r $list_dir/PROT_SEQ");
 system("mv $list_dir/LISTS/*.list $list_dir; rm -r $list_dir/LISTS");
+system("mv $list_dir/ANNOTATIONS/*.annotations $annot_dir; rm -r $list_dir/ANNOTATIONS");
 
 ###################################################################################################
 ## Run get_homology.pl
@@ -114,6 +116,7 @@ foreach my $annot_file_1 (sort(@annot_files)){
 			foreach my $gap (@gaps){
 				my ($file_name_2,$dir,$ext) = fileparse($annot_file_2,'\..*');
 				my $linked_file_2 = $linked_files{$annot_file_2};
+				print "Identifying synteny between $file_name_1 and $file_name_2!\n";
 				system("
 					$path/get_synteny.pl \\
 					--query_list $list_dir/$file_name_1.list \\
