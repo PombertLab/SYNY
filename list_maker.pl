@@ -8,8 +8,8 @@ use File::Basename;
 use File::Path qw(make_path);
 
 my $name = 'list_maker.pl';
-my $version = '0.3.1';
-my $updated = '2022-05-31';
+my $version = '0.4';
+my $updated = '2022-06-09';
 my $usage = <<"OPTIONS";
 NAME		$name
 VERSION		$version
@@ -20,7 +20,7 @@ SYNOPSIS	Creates a list containing all protein-coding genes with their genomic p
 USAGE		$name 
 		  -f gbf \\
 		  -i *.gbf \\
-		  -o RCC138.list
+		  -o LISTS
 OPTIONS
 
 $usage .= <<'REGEX';
@@ -57,10 +57,10 @@ GetOptions(
 );
 
 my $list_dir = $outdir."/LISTS";
-my $alias_dir = $outdir."/ALIASES";
 my $prot_dir = $outdir."/PROT_SEQ";
+my $annot_dir = $outdir."/ANNOTATIONS";
 
-my @outdirs = ($list_dir,$alias_dir,$prot_dir);
+my @outdirs = ($list_dir,$prot_dir,$annot_dir);
 
 unless (-d $outdir){
 	make_path($outdir,{mode=>0755}) or die("Can't create output directory $outdir: $!\n");
@@ -80,18 +80,30 @@ foreach my $input_file (@input_files){
 
 	open OUT, ">", "$list_dir/$file_name.list" or die "Can't write to output file: $list_dir/$file_name.list\n";
 	open PROT, ">", "$prot_dir/$file_name.faa" or die "Can't write to output file: $prot_dir/$file_name.faa\n";
+	open ANNOT, ">", "$annot_dir/$file_name.annotations" or die "Can't write to output file: $annot_dir/$file_name.annotations\n";
 
 	if ($filetypes{$ext} eq 'gbf'){
 		open GBK, "<", "$input_file" or die "Can't open input file $input_file: $!\n";
+
+		my %location_data;
+		
 		my $contig;
-		my $gene = 0;
-		my $locus_tag;
-		my $protein_id;
-		my $strand;
-		my $start; 
-		my $end;
-		my $protein_seq = "";
+
+		my $gene;
+		my $CDS;
 		my $translate;
+		my $section;
+		
+		my $start;
+		my $sections;
+		my $end;
+		my $strand;
+		my $locus;
+
+		my $gene_num = 1;
+
+		my $sequence;
+
 		while (my $line = <GBK>){
 			
 			chomp $line;
@@ -99,49 +111,117 @@ foreach my $input_file (@input_files){
 			if ($line =~ /^LOCUS\s+(\S+)/ ){
 				$contig = $1;
 			}
-			
-			if ($translate && $line =~ /\s{21}(\w+)/){
-				$protein_seq .= $1;
+
+
+			## Entering the CDS metadata
+			if ($line =~ /^\s{5}CDS/){
+				$CDS = 1;
 			}
-			elsif($translate){
-				print PROT ">$locus_tag\t$contig\t$start\t$end\t$strand\n";
-				my @seq = unpack("(A60)*",$protein_seq);
-				foreach my $seq (@seq){
-					print PROT "$seq\n";
+			
+			## Accessing CDS metadata
+			elsif ($CDS){
+				## Leaving CDS metadata
+				if ($line !~ /^\s{21}/){
+					undef $CDS;
 				}
-				undef $translate;
+
+				## Gather CDS metadata
+				if ($line =~ /^\s{21}\/locus_tag="(.*)"/){
+					$locus = $1;
+					$locus =~ s/\W/\_/g;
+				}
+				elsif ($line =~ /^\s{21}\/product="(.*)"/){
+					print ANNOT "$locus\t$1\n";
+				}
+				elsif ($line =~ /^\s{21}\/translation="([a-zA-Z]+)"*/){
+					$translate = 1;
+					$sequence .= $1;
+				}
+				elsif ($translate){
+					if ($line =~/^\s{21}([a-zA-Z]+)/){
+						$sequence .= $1;
+					}
+					else{
+
+						my ($start,$end,$strand) = @{$location_data{$locus}};
+
+						print OUT $locus."\t";
+						print OUT $contig."\t";
+						print OUT $start."\t";
+						print OUT $end."\t";
+						print OUT $strand."\t";
+						print OUT $gene_num."\n";
+
+						print PROT ">$locus\t$contig\t$start\t$end\t$strand\n";
+						foreach my $line (unpack("(A60)*",$sequence)){
+							print PROT "$line\n";
+						}
+
+						undef $translate;
+						undef $sequence;
+						$gene_num ++;
+					}
+				}
+			}
+			
+			## Entering the gene metadata
+			if ($line =~ /^\s{5}gene\s{12}(?:complement)*\(*<*(\d+)\.\.>*(\d+)/){
+				$gene = 1;
+				$start = $1;
+				$end = $2;
+				$strand = "+";
+				if ($line =~ /complement/){
+					$strand = "-";
+				}
+			}
+			## Entering gene metadata when there is gene on the edge of a circular contig
+			elsif ($line =~ /^\s{5}gene\s{12}(?:complement\()*(?:order\()*(?:join\()*(.*)\)/){
+				$gene = 1;
+				my @sections = split(",",$1);
+				my @start = split(/\.\./,$sections[0]);
+				my @end = split(/\.\./,$sections[-1]);
+				$start = $start[0];
+				$end = $end[-1];
+				$strand = "+";
+				if ($line =~ /complement/){
+					$strand = "-";
+				}
+			}
+			elsif ($line =~ /^\s{5}gene\s{12}(?:complement\()*(?:order\()*(?:join\()*(.*)/){
+				$gene = 1;
+				$section = 1;
+				$sections = $1;
 			}
 
-			if ($line =~ /^\s{5}gene\s{12}(?:complement)*\(*<*(\d+)\.\.>*(\d+)/){
-				$start = $1;
-				$end = $2; 
-				$gene++;
-			}
-			elsif ($line =~ /^\s+\/locus_tag=\"(\w+)\"/){
-				$locus_tag = $1;
-			}
-			elsif ($line =~ /^\s+\/protein_id=\"(\S+)\"/){
-				$protein_id = $1;
-			}
-			elsif ($line =~ /^\s+CDS/){
-				if ($line =~ /complement/){
-					$strand = '-';
+			## Accessing gene metadata
+			elsif ($gene){
+				## Leaving gene metadata
+				if ($line !~ /^\s{21}/){
+					undef $gene;
 				}
-				else {
-					$strand = '+';
+				elsif ($section && $line =~ /^s{21}(.*)/){
+					$sections .= $1
 				}
-				print OUT "$locus_tag"."\t";
-				print OUT "$contig"."\t";
-				print OUT "$start"."\t";
-				print OUT "$end"."\t";
-				print OUT "$strand"."\t";
-				print OUT "$gene"."\n";
+				elsif ($section && $line =~ /^s{21}\//){
+					undef $section;
+					my @sections = split(",",$1);
+					my @start = split(/\.\./,$sections[0]);
+					my @end = split(/\.\./,$sections[-1]);
+					$start = $start[0];
+					$end = $end[-1];
+					$strand = "+";
+					if ($line =~ /complement/){
+						$strand = "-";
+					}
+				}
+				## Gather gene metadata
+				elsif ($line =~ /^\s{21}\/locus_tag="(.*)"/){
+					$locus = $1;
+					$locus =~ s/\W/\_/g;
+					@{$location_data{$locus}} = ($start,$end,$strand);
+				}
 			}
-			elsif ($line =~ /\s{21}\/translation="(\w+)/){
-				$protein_seq = $1;
-				$translate = 1;
-			}
-			
+
 		}
 	}
 	elsif($filetypes{$ext} eq 'gff'){
