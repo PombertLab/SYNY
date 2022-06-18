@@ -4,14 +4,14 @@
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 
 my $name = "id_conserved_regions.pl";
-my $version = '0.5a';
-my $updated = '2022-05-10';
+my $version = '0.5.2';
+my $updated = '2022-06-18';
 
 my $usage = <<"EXIT";
 NAME		$name
 VERSION		$version
 UPDATED		$updated
-SYNOPSIS	This scirpt identifies conserved proteins and chromosomal regions between provided species.
+SYNOPSIS	Identifies conserved proteins and chromosomal regions between provided species.
 
 USAGE		$name \\
 		-l SYNY/LISTS/ \\
@@ -74,7 +74,6 @@ foreach my $file (readdir(BLAST)){
 	my %used;
 	unless(-d "$blasts/$file"){
 		open FILE, "<", "$blasts/$file";
-		print "$blasts/$file\n";
 		my ($sub_org,$query_org) = $file =~ /^(\w+)_vs_(\w+)\.diamond\.6/;
 		while (my $line = <FILE>){
 			chomp($line);
