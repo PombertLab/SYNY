@@ -1,15 +1,16 @@
 #!/usr/bin/perl
 # Pombert lab, 2020
 
+my $name = 'list_maker.pl';
+my $version = '0.4.1';
+my $updated = '2022-06-18';
+
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
 
-my $name = 'list_maker.pl';
-my $version = '0.4';
-my $updated = '2022-06-09';
 my $usage = <<"OPTIONS";
 NAME		$name
 VERSION		$version
@@ -72,11 +73,13 @@ for my $dir (@outdirs){
 	}
 }
 
+print "\n";
+
 foreach my $input_file (@input_files){
 
-	print "Creating .list file for $input_file\n";
-
 	my ($file_name,$dir,$ext) = fileparse($input_file,'\..*');
+	
+	print "Creating .list file for $file_name\n";
 
 	open OUT, ">", "$list_dir/$file_name.list" or die "Can't write to output file: $list_dir/$file_name.list\n";
 	open PROT, ">", "$prot_dir/$file_name.faa" or die "Can't write to output file: $prot_dir/$file_name.faa\n";
@@ -410,3 +413,4 @@ foreach my $input_file (@input_files){
 	close LINK;
 
 }
+print "\n";
