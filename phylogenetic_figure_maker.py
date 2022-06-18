@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 name = 'phylogenetic_figure_maker.py'
-version = '0.2'
-updated = '2022-06-17'
+version = '0.2.1'
+updated = '2022-06-18'
 
 import argparse as ap
 from sys import argv
@@ -25,8 +25,7 @@ USAGE		{name} \\
 OPTIONS
 -d (--dist_mat)		Distance matrix (see GUIDE for file configuration)
 -p (--prefix)		Output file prefix [Default: PHYLOGENTIC_FIGURE]
--f (--format)		Figure format(s) (.png,.eps,.jpg,.jpeg,.pdf,.pgf,.ps,.raw,.rgba,.svg,
-			.svgz,.tif,.tiff) [Default: .svg]
+-f (--format)		Figure format(s) (.png,.eps,.jpg,.jpeg,.pdf,.pgf,.ps,.raw,.rgba,.svg,.svgz,.tif,.tiff) [Default: .svg]
 -o (--out)		Directory containing figures [Default: PHYLOGENTIC_FIGURES]
 
 GUIDE
