@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5';
+my $version = '0.5.1';
 my $updated = '2022-06-18';
 
 use strict;
@@ -83,14 +83,19 @@ foreach my $dir (@outdirs){
 	}
 }
 
+open ERROR, ">", "$outdir/error.log";
+
 ###################################################################################################
 ## Run list_maker.pl
 ###################################################################################################
 
+print ERROR "\n### list_maker.pl ###\n";
+
 system("
 	$path/list_maker.pl \\
 	  --input @annot_files \\
-	  --out $list_dir
+	  --out $list_dir \\
+	  2>> $outdir/error.log
 ");
 
 system("mv $list_dir/PROT_SEQ/*.faa $prot_dir; rm -r $list_dir/PROT_SEQ");
@@ -104,26 +109,32 @@ system("mv $list_dir/ANNOTATIONS/*.annotations $annot_dir; rm -r $list_dir/ANNOT
 my %linked_files;
 link_files();
 
+print ERROR "\n### get_homology.pl ###\n";
+
 system("
 	$path/get_homology.pl \\
 	--input $prot_dir/*.faa \\
 	--evalue $evalue \\
-	--outdir $diamond_dir
+	--outdir $diamond_dir \\
+	2>> $outdir/error.log
 ");
 
 ###################################################################################################
 ## Run get_synteny.pl
 ###################################################################################################
 
+print ERROR "\n### get_synteny.pl ###\n";
+
 foreach my $annot_file_1 (sort(@annot_files)){
 	my ($file_name_1,$dir,$ext) = fileparse($annot_file_1,'\..*');
 	my $linked_file_1 = $linked_files{$annot_file_1};
+	print "\nIdentifying synteny between $file_name_1\n"; 
 	foreach my $annot_file_2 (sort(@annot_files)){
 		if($annot_file_1 ne $annot_file_2){
+			my ($file_name_2,$dir,$ext) = fileparse($annot_file_2,'\..*');
+			my $linked_file_2 = $linked_files{$annot_file_2};
+			print "\t$file_name_2\n";
 			foreach my $gap (@gaps){
-				my ($file_name_2,$dir,$ext) = fileparse($annot_file_2,'\..*');
-				my $linked_file_2 = $linked_files{$annot_file_2};
-				print "Identifying synteny between $file_name_1 and $file_name_2!\n";
 				system("
 					$path/get_synteny.pl \\
 					--query_list $list_dir/$file_name_1.list \\
@@ -131,9 +142,13 @@ foreach my $annot_file_1 (sort(@annot_files)){
 					--subject_list $list_dir/$file_name_2.list \\
 					--subject_blast $diamond_dir/${file_name_2}_vs_${file_name_1}.diamond.6 \\
 					--gap $gap \\
-					--outdir $synteny_dir/gap_$gap
+					--outdir $synteny_dir/gap_$gap \\
+					2>> $outdir/error.log
 				");
 			}
+		}
+		else{
+			print "\t. . .\n";
 		}
 	}
 }
@@ -142,16 +157,23 @@ foreach my $annot_file_1 (sort(@annot_files)){
 ## Run id_conserved_regions.pl
 ###################################################################################################
 
+print ERROR "\n### id_conserved_regions.pl ###\n";
+
 system("
 	$path/id_conserved_regions.pl \\
 	--lists $list_dir \\
 	--blasts $diamond_dir \\
-	--outdir $conserved_dir
+	--outdir $conserved_dir \\
+	2>> $outdir/error.log
 ");
 
 ###################################################################################################
 ## Calculate distance matrices
 ###################################################################################################
+
+print ERROR "\n### make_distance_matrix.py ###\n";
+
+print "\nCalculating distance matrices\n";
 
 foreach my $gap (@gaps){
 	system("
@@ -160,13 +182,18 @@ foreach my $gap (@gaps){
 		-n $synteny_dir/gap_$gap/NEIGHBORS \\
 		-p $synteny_dir/gap_$gap/PAIRS \\
 		-c $synteny_dir/gap_$gap/CLUSTERS \\
-		-o $distance_dir/gap_$gap
+		-o $distance_dir/gap_$gap \\
+		2>> $outdir/error.log
 	");
 }
 
 ###################################################################################################
 ## Generate phylogenetic figures
 ###################################################################################################
+
+print ERROR "\n### phylogenetic_figure_maker.py ###\n";
+
+print "\nCreating phylogentic figures\n\n";
 
 foreach my $gap (@gaps){
 	
@@ -186,7 +213,8 @@ foreach my $gap (@gaps){
 				-d $distance_dir/gap_$gap/$mat \\
 				-p $prefix \\
 				-f $format \\
-				-o $figure_dir/gap_$gap
+				-o $figure_dir/gap_$gap \\
+				2>> $outdir/error.log
 			");
 		}
 	}
@@ -202,7 +230,6 @@ sub link_files {
 	opendir(DIR,$prot_dir);
 	foreach my $file (readdir(DIR)){
 		if(-f "$prot_dir/$file"){
-			print "Pushing $file to prot_files\n";
 			push(@prot_files,"$prot_dir/$file");
 		}
 	}
