@@ -7,14 +7,13 @@ use File::Basename;
 use File::Path qw(make_path);
 
 my $name = "get_homology.pl";
-my $version = "0.1b";
-my $updated = "2022-02-14";
+my $version = "0.1.3";
+my $updated = "2022-06-18";
 my $usage = << "EXIT";
 NAME		$name
 VERSION		$version
 UPDATED		$updated
-SYNOPSIS	The purpose of this script is to create DIAMOND databases based on input protein files
-		and then cross blastp all files
+SYNOPSIS	Creates DIAMOND databases based on input protein files and performs round-robin BLASTP homology searches
 
 USAGE		$name \\
 		  -i *.prot \\
@@ -61,12 +60,14 @@ unless(-d $db_dir){
 # Creating diamond databases
 ###################################################################################################
 
+print "\n";
+
 my @db_files;
+print "Creating DIAMOND DB\n";
 foreach my $file (@input_files){
 	my ($file_name, @aux) = fileparse($file,'\..*');
-
 	unless (-f "$db_dir/$file_name.dmnd"){
-		print("Creating DIAMOND DB $db_dir/$file_name\n");
+		print "\t$file_name\n";
 		system ("
 			diamond makedb \\
 			  --in $file \\
@@ -84,16 +85,20 @@ foreach my $file (sort(@input_files)){
 
 	my ($file_name, @aux) = fileparse($file,'\..*');
 
+	print "\nRunning BLASTP on $file\n";
+
 	foreach my $db_file (sort(@db_files)){
 
 		my ($db_name, @aux) = fileparse($db_file,'\..*');
 
 		if($db_name ne $file_name){
 
+
 			my $blast_file = "$outdir/${file_name}_vs_${db_name}.diamond.6";
 			
+			print "\tusing DB $db_name\n";
+
 			unless(-f $blast_file){
-				print("Running BLASTP on $file using $db_file DB\n");
 				system ("diamond blastp \\
 						-d $db_file \\
 						-q $file \\
@@ -104,6 +109,9 @@ foreach my $file (sort(@input_files)){
 				")
 			}
 			
+		}
+		else{
+			print "\t. . .\n";
 		}
 	}
 }
