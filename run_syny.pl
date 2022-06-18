@@ -1,21 +1,21 @@
 #!/usr/bin/perl
 # Pombert lab, 2022
 
+my $name = 'run_syny.pl';
+my $version = '0.5';
+my $updated = '2022-06-18';
+
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
 
-my $name = 'run_syny.pl';
-my $version = '0.4';
-my $updated = '2022-06-09';
-
-my $usage = <<"OPTIONS";
+my $usage = <<"EXIT";
 NAME		${name}
 VERSION		${version}
 UPDATED		${updated}
-SYNOPSIS	The purpose of the script is to determine the synteny between two organisms
+SYNOPSIS	Runs all the components of the SYNY pipeline step-by-step.
 
 USAGE		${name} \\
 		-a *.gbff \\
@@ -25,23 +25,28 @@ USAGE		${name} \\
 
 OPTION
 -a (--annot)	Annotation files (Supported files: gbff, gff, embl)
+-p (--prot)	Protein files
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
+-f (--format)	Figure format(s) (.png,.eps,.jpg,.jpeg,.pdf,.pgf,.ps,.raw,.rgba,.svg,.svgz,.tif,.tiff) [Default: .svg]
+-n (--name)	Figure file prefix [Default: PHYLOGENTIC_FIGURE]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
-OPTIONS
+EXIT
 
 die ("\n$usage\n") unless (@ARGV);
 
 my @annot_files;
 my @prot_files;
 my $evalue = '1e-10';
-my $outdir = 'SYNY';
+my @formats;
 my @gaps;
+my $outdir = 'SYNY';
 
 GetOptions(
 	'a|annot=s@{1,}' => \@annot_files,
 	'p|proteins=s@{1,}' => \@prot_files,
 	'e|evalue=s' => \$evalue,
+	'f|format=s{1,}' => \@formats,
 	'g|gaps=s{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
 );
@@ -67,8 +72,10 @@ my $diamond_dir = "$outdir/DIAMOND";
 my $db_dir = "$diamond_dir/DB";
 my $synteny_dir = "$outdir/SYNTENY";
 my $conserved_dir = "$outdir/CONSERVED";
+my $distance_dir = "$outdir/DIST_MAT";
+my $figure_dir = "$outdir/FIGURES";
 
-my @outdirs = ($list_dir,$prot_dir,$annot_dir,$diamond_dir,$db_dir,$synteny_dir);
+my @outdirs = ($list_dir,$prot_dir,$annot_dir,$diamond_dir,$db_dir,$synteny_dir,$distance_dir,$figure_dir);
 
 foreach my $dir (@outdirs){
 	unless (-d $dir){
@@ -131,9 +138,9 @@ foreach my $annot_file_1 (sort(@annot_files)){
 	}
 }
 
-# ###################################################################################################
-# ## Run id_conserved_regions.pl
-# ###################################################################################################
+###################################################################################################
+## Run id_conserved_regions.pl
+###################################################################################################
 
 system("
 	$path/id_conserved_regions.pl \\
@@ -141,6 +148,50 @@ system("
 	--blasts $diamond_dir \\
 	--outdir $conserved_dir
 ");
+
+###################################################################################################
+## Calculate distance matrices
+###################################################################################################
+
+foreach my $gap (@gaps){
+	system("
+		$path/make_distance_matrix.py \\
+		-l $list_dir \\
+		-n $synteny_dir/gap_$gap/NEIGHBORS \\
+		-p $synteny_dir/gap_$gap/PAIRS \\
+		-c $synteny_dir/gap_$gap/CLUSTERS \\
+		-o $distance_dir/gap_$gap
+	");
+}
+
+###################################################################################################
+## Generate phylogenetic figures
+###################################################################################################
+
+foreach my $gap (@gaps){
+	
+	my $format = "";
+	
+	foreach my $form (@formats){
+		$format .= "$form "
+	}
+
+	opendir(DIR,"$distance_dir/gap_$gap");
+	
+	foreach my $mat (readdir(DIR)){
+		if (-f "$distance_dir/gap_$gap/$mat"){
+			my ($prefix) = $mat =~ /(\w+)\.tsv/;
+			system("
+				$path/phylogenetic_figure_maker.py \\
+				-d $distance_dir/gap_$gap/$mat \\
+				-p $prefix \\
+				-f $format \\
+				-o $figure_dir/gap_$gap
+			");
+		}
+	}
+
+}
 
 ###################################################################################################
 ## Subroutines
