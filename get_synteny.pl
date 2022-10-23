@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 my $name = 'get_synteny.pl';
-my $version = '0.7.1';
-my $updated = '2022-05-31';
+my $version = '0.7.2';
+my $updated = '2022-06-22';
 
 use strict;
 use warnings;
@@ -54,9 +54,8 @@ GetOptions(
 
 my $pair_dir = $outdir."/PAIRS";
 my $cluster_dir = $outdir."/CLUSTERS";
-my $neighbor_dir = $outdir."/NEIGHBORS";
 
-my @dirs = ($cluster_dir,$pair_dir,$neighbor_dir);
+my @dirs = ($cluster_dir,$pair_dir);
 
 foreach my $dir (@dirs){
 	unless (-d $dir){
@@ -67,7 +66,6 @@ foreach my $dir (@dirs){
 my $query_name = (fileparse($query_list,".list"))[0];
 my $sub_name = (fileparse($subject_list,".list"))[0];
 
-my $neighbor_file = ${query_name}."_vs_".${sub_name}.".neighbors";
 my $pair_file = ${query_name}."_vs_".${sub_name}.".pairs";
 my $cluster_file = ${query_name}."_vs_".${sub_name}.".clusters";
 
@@ -124,7 +122,6 @@ foreach my $q_s_locus (keys(%q_blast_hits)){
 	}
 }
 
-
 ###################################################################################################
 ## Store query and subject info locally
 ###################################################################################################
@@ -156,7 +153,7 @@ while (my $line = <SL>){
 close SL;
 
 ###################################################################################################
-## Generate neighbors file
+## Generate pairs file
 ###################################################################################################
 
 ## Previous query locus
@@ -177,7 +174,7 @@ my $p_ss;
 ## Previous subject protein number
 my $p_sn;
 
-open OUT, ">", $neighbor_dir."/".$neighbor_file or die "Unable to write to $neighbor_dir/$neighbor_file: $!\n";
+open OUT, ">", $pair_dir."/".$pair_file or die "Unable to read from $pair_dir/$pair_file: $!\n";
 
 foreach my $q_locus (sort(keys(%q_bd_hits))){
 	
@@ -209,19 +206,25 @@ foreach my $q_locus (sort(keys(%q_bd_hits))){
 
 		## Both a query and subject locus is required
 		if($p_ql && $p_sl){
+
 			## Genes must be located on the same chromomsome to be considered a nieghbor
 			if ($c_qc eq $p_qc){
 				if ($c_sc eq $p_sc){
 					
-					print OUT $p_ql."\t".$p_qn."\t";
-					print OUT $c_ql."\t".$c_qn."\t";
-					print OUT $c_qc."\t";
-					print OUT $p_sl."\t".$p_sn."\t";
-					print OUT $c_sl."\t".$c_sn."\t";
-					print OUT $c_sc."\t";
-					my $q_o = $p_qs.$c_qs;
-					my $s_o = $p_ss.$c_ss;
-					print OUT $q_o."/".$s_o."\n";
+
+					if ((((($p_qn - $c_qn)**2)**(1/2))-1) <= $gap ){
+						if ((((($p_sn - $c_sn)**2)**(1/2))-1) <= $gap ){
+							print OUT $p_ql."\t".$p_qn."\t";
+							print OUT $c_ql."\t".$c_qn."\t";
+							print OUT $c_qc."\t";
+							print OUT $p_sl."\t".$p_sn."\t";
+							print OUT $c_sl."\t".$c_sn."\t";
+							print OUT $c_sc."\t";
+							my $q_o = $p_qs.$c_qs;
+							my $s_o = $p_ss.$c_ss;
+							print OUT $q_o."/".$s_o."\n";
+						}
+					}
 				}
 			}
 		}
@@ -240,30 +243,6 @@ foreach my $q_locus (sort(keys(%q_bd_hits))){
 
 close OUT;
 
-###################################################################################################
-## Generate pairs file
-###################################################################################################
-
-open IN, "<", $neighbor_dir."/".$neighbor_file or die "Unable to read from $neighbor_dir/$neighbor_file: $!\n";
-open OUT, ">", $pair_dir."/".$pair_file or die "Unable to read from $pair_dir/$pair_file: $!\n";
-while (my $line = <IN>){
-	chomp($line);
-	my @data = split("\t",$line);
-
-	my $query_loc_1 = $data[1];
-	my $query_loc_2 = $data[3];
-
-	my $sub_loc_1 = $data[6];
-	my $sub_loc_2 = $data[8];
-
-	if ((((($query_loc_1 - $query_loc_2)**2)**(1/2))-1) <= $gap){
-		if ((((($sub_loc_1 - $sub_loc_2)**2)**(1/2))-1) <= $gap){
-			print OUT $line."\n";
-		}
-	}
-}
-close IN;
-close OUT;
 
 ###################################################################################################
 ## Generate clusters file
