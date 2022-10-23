@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 name = 'make_distance_matrix.pl'
-version = '0.3'
-updated = '2022-06-17'
+version = '0.3.1'
+updated = '2022-10-22'
 
 from os import listdir, mkdir
 from os.path import isfile, basename, isdir
@@ -77,67 +77,6 @@ for file in listdir(lists):
 			names.append(file_name)
 names = sorted(names)
 
-########################################################################################################################
-## Generating a distance matrix from bidirectional searches
-########################################################################################################################
-
-neighbor_matrix = {}
-
-for name_1 in names:
-	for name_2 in names:
-		if name_1 != name_2:
-
-			neighbors = []
-
-			protein_count = 0
-
-			FILE = open(f"{neighbor_dir}/{name_1}_vs_{name_2}.neighbors","r")
-
-			for line in FILE:
-				line = line.replace("\n","")
-				data = line.split("\t")
-				neighbor_1 = data[0]
-				neighbor_2 = data[2]\
-
-				if neighbor_1 not in neighbors:
-					neighbors.append(neighbor_1)
-					protein_count += 1
-
-				if neighbor_2 not in neighbors:
-					neighbors.append(neighbor_2)
-					protein_count += 1
-
-			if name_1 not in neighbor_matrix:
-				neighbor_matrix[name_1] = {}
-
-			neighbor_matrix[name_1][name_2] = 1 - (protein_count/genome_meta[name_1][1])
-
-		else:
-
-			if name_1 not in neighbor_matrix:
-				neighbor_matrix[name_1] = {}
-
-			neighbor_matrix[name_1][name_2] = 0.0
-
-for x,name_1 in enumerate(names):
-	for y,name_2 in enumerate(names):
-		if y <= x:
-			value = (neighbor_matrix[name_1][name_2] + neighbor_matrix[name_2][name_1]) / 2
-			neighbor_matrix[name_1][name_2] = value
-			neighbor_matrix[name_2][name_1] = value
-
-OUT = open(f"{out}/bidirectional_distance_matrix.tsv","w")
-OUT.write(f"{names[0]}")
-for val in names[1:]:
-	OUT.write(f"\t{val}")
-OUT.write("\n")
-for name_1 in sorted(neighbor_matrix.keys()):
-	key_set = [i for i in sorted(neighbor_matrix[name_1].keys())]
-	OUT.write(f"{neighbor_matrix[name_1][key_set[0]]}")
-	for name_2 in key_set[1:]:
-		OUT.write(f"\t{neighbor_matrix[name_1][name_2]}")
-	OUT.write("\n")
-OUT.close()
 
 ########################################################################################################################
 ## Generating a distance matrix from pairs
@@ -259,10 +198,10 @@ for name_1 in names:
 	for name_2 in names:
 		if name_1 not in sum_of_all_matrix.keys():
 			sum_of_all_matrix[name_1] = {}
-		sum_of_all_matrix[name_1][name_2] = neighbor_matrix[name_1][name_2]
-		sum_of_all_matrix[name_1][name_2] += pairs_matrix[name_1][name_2]
+		# sum_of_all_matrix[name_1][name_2] = neighbor_matrix[name_1][name_2]
+		sum_of_all_matrix[name_1][name_2] = pairs_matrix[name_1][name_2]
 		sum_of_all_matrix[name_1][name_2] += cluster_matrix[name_1][name_2]
-		sum_of_all_matrix[name_1][name_2] /= 3
+		sum_of_all_matrix[name_1][name_2] /= 2
 
 OUT = open(f"{out}/sum_of_all_distance_matrix.tsv","w")
 OUT.write(f"{names[0]}")
