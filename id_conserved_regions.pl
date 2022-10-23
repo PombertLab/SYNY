@@ -4,8 +4,8 @@
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 
 my $name = "id_conserved_regions.pl";
-my $version = '0.5.2';
-my $updated = '2022-06-18';
+my $version = '0.5.3';
+my $updated = '2022-10-22';
 
 my $usage = <<"EXIT";
 NAME		$name
@@ -96,7 +96,6 @@ foreach my $file (readdir(BLAST)){
 
 			if($blast_hits{$sub_org}{$query_org}{$query}){
 				if(@{$blast_hits{$sub_org}{$query_org}{$query}}[1] > $eval ){
-					# print "Replacing ".@{$blast_hits{$sub_org}{$query_org}{$query}}[0]." with $sub\n";
 					@{$blast_hits{$sub_org}{$query_org}{$query}} = ($sub,$eval);
 				}
 			}
