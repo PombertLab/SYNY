@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.1';
-my $updated = '2022-06-18';
+my $version = '0.5.2';
+my $updated = '2022-10-22';
 
 use strict;
 use warnings;
@@ -227,15 +227,8 @@ foreach my $gap (@gaps){
 
 sub link_files {
 
-	opendir(DIR,$prot_dir);
-	foreach my $file (readdir(DIR)){
-		if(-f "$prot_dir/$file"){
-			push(@prot_files,"$prot_dir/$file");
-		}
-	}
-
 	if(scalar(@annot_files) != scalar(@prot_files)){
-		die("The number of annotation files (".scalar(@annot_files).") does not equal the number of protein files (".scalar(@prot_files)."\n");
+		die("The number of annotation files (".scalar(@annot_files).") does not equal the number of protein files (".scalar(@prot_files).")\n");
 	}
 
 	foreach my $annot_file (@annot_files){
