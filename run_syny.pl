@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.2';
-my $updated = '2022-10-22';
+my $version = '0.5.0';
+my $updated = '2022-12-15';
 
 use strict;
 use warnings;
@@ -72,10 +72,8 @@ my $diamond_dir = "$outdir/DIAMOND";
 my $db_dir = "$diamond_dir/DB";
 my $synteny_dir = "$outdir/SYNTENY";
 my $conserved_dir = "$outdir/CONSERVED";
-my $distance_dir = "$outdir/DIST_MAT";
-my $figure_dir = "$outdir/FIGURES";
 
-my @outdirs = ($list_dir,$prot_dir,$annot_dir,$diamond_dir,$db_dir,$synteny_dir,$distance_dir,$figure_dir);
+my @outdirs = ($list_dir,$prot_dir,$annot_dir,$diamond_dir,$db_dir,$synteny_dir);
 
 foreach my $dir (@outdirs){
 	unless (-d $dir){
@@ -166,60 +164,6 @@ system("
 	--outdir $conserved_dir \\
 	2>> $outdir/error.log
 ");
-
-###################################################################################################
-## Calculate distance matrices
-###################################################################################################
-
-print ERROR "\n### make_distance_matrix.py ###\n";
-
-print "\nCalculating distance matrices\n";
-
-foreach my $gap (@gaps){
-	system("
-		$path/make_distance_matrix.py \\
-		-l $list_dir \\
-		-n $synteny_dir/gap_$gap/NEIGHBORS \\
-		-p $synteny_dir/gap_$gap/PAIRS \\
-		-c $synteny_dir/gap_$gap/CLUSTERS \\
-		-o $distance_dir/gap_$gap \\
-		2>> $outdir/error.log
-	");
-}
-
-###################################################################################################
-## Generate phylogenetic figures
-###################################################################################################
-
-print ERROR "\n### phylogenetic_figure_maker.py ###\n";
-
-print "\nCreating phylogentic figures\n\n";
-
-foreach my $gap (@gaps){
-	
-	my $format = "";
-	
-	foreach my $form (@formats){
-		$format .= "$form "
-	}
-
-	opendir(DIR,"$distance_dir/gap_$gap");
-	
-	foreach my $mat (readdir(DIR)){
-		if (-f "$distance_dir/gap_$gap/$mat"){
-			my ($prefix) = $mat =~ /(\w+)\.tsv/;
-			system("
-				$path/phylogenetic_figure_maker.py \\
-				-d $distance_dir/gap_$gap/$mat \\
-				-p $prefix \\
-				-f $format \\
-				-o $figure_dir/gap_$gap \\
-				2>> $outdir/error.log
-			");
-		}
-	}
-
-}
 
 ###################################################################################################
 ## Subroutines
