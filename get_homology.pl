@@ -7,8 +7,8 @@ use File::Basename;
 use File::Path qw(make_path);
 
 my $name = "get_homology.pl";
-my $version = "0.1.3";
-my $updated = "2022-06-18";
+my $version = "0.1.4";
+my $updated = "2023-02-03";
 my $usage = << "EXIT";
 NAME		$name
 VERSION		$version
@@ -53,7 +53,7 @@ unless(-d $outdir){
 
 my $db_dir = "$outdir/DB";
 unless(-d $db_dir){
-	mkdir(0755,$db_dir);
+	make_path($db_dir,{mode=>0755});
 }
 
 ###################################################################################################
