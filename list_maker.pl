@@ -79,8 +79,6 @@ foreach my $input_file (@input_files){
 
 	my ($file_name,$dir,$ext) = fileparse($input_file,'\..*');
 
-	print($ext."\n");
-	
 	print "Creating .list file for $file_name\n";
 
 	open OUT, ">", "$list_dir/$file_name.list" or die "Can't write to output file: $list_dir/$file_name.list\n";
@@ -230,21 +228,18 @@ foreach my $input_file (@input_files){
 		}
 	}
 	elsif($filetypes{$ext} eq 'gff'){
-		print("gff file running!\n");
 		my %contigs; 
 		my %genes;
 		my $start;
 		my $end;
 		open GFF, "<", "$input_file" or die "Can't open input file : $input_file\n";
 		while (my $line = <GFF>){
-			print($line."\n");
 			chomp $line;
 			if ($line =~ /^\S+\t\S+\s+\bgene\b\t(\d+)\t(\d+)/){
 				$start = $1;
 				$end = $2;
 			}
 			if ($line =~ /$regex/){
-				print($line."\n");
 				my $contig = $1;
 				my $strand = $4;
 				my $gene =$5;
