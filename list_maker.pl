@@ -31,7 +31,7 @@ OPTIONS:
 -o (--outdir)	Output directory [Default: LISTS]
 -r (--regex)	For GFF files; regular expression to parse;  default:
 
-		'^(\S+).*CDS\t(\d+)\t(\d+)\t\.\t([+-])\t[012.].*(?:NCBI_GP|Genebank):(\w+\.\d+)'
+		'^(\S+).*CDS\s+(\d+)\s+(\d+)\s+\.\s+([+-])\s+[012.].*(?:NCBI_GP|Genebank):(\w+\.\d+)'
 
 		# $1 => contig, $2 => start , $3 => end, $4 => strand, $5 => protein
 REGEX
@@ -48,7 +48,7 @@ my %filetypes = (
 my @input_files;
 my $format = 'gbf';
 my $outdir = 'LIST_MAKER';
-my $regex = '^(\S+).*CDS\t(\d+)\t(\d+)\t\.\t([+-])\t[012.].*(?:NCBI_GP|Genebank):(\w+\.\d+)';
+my $regex = '^(\S+).*CDS\s+(\d+)\s+(\d+)\s+\.\s+([+-])\s+[012.].*(?:NCBI_GP|Genebank):(\w+\.\d+)';
 
 GetOptions(
 	'i|input=s@{1,}' => \@input_files,
