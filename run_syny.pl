@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.0';
-my $updated = '2022-12-15';
+my $version = '0.5.1';
+my $updated = '2023-02-03';
 
 use strict;
 use warnings;
@@ -111,7 +111,7 @@ print ERROR "\n### get_homology.pl ###\n";
 
 system("
 	$path/get_homology.pl \\
-	--input $prot_dir/*.faa \\
+	--input @prot_files \\
 	--evalue $evalue \\
 	--outdir $diamond_dir \\
 	2>> $outdir/error.log
