@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.4.2';
-my $updated = '2023-02-03';
+my $version = '0.5.0';
+my $updated = '2023-02-24';
 
 use strict;
 use warnings;
@@ -275,7 +275,8 @@ foreach my $input_file (@input_files){
 		my $strand;
 		while (my $line = <EMBL>){
 			chomp $line;
-			if ($line =~ /FT\s+gene/){ $gene++; }
+			if ($line =~ /^ID\s+(\w+);/){ $contig = $1 }
+			elsif ($line =~ /FT\s+gene/){ $gene++; }
 			elsif ($line =~ /FT\s+\/locus_tag=\"(\w+)\"/){ $locus_tag = $1; }
 			elsif ($line =~ /FT\s+CDS/){
 				if ($line =~ /complement/){ $strand = '-';}
