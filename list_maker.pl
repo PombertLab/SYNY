@@ -2,14 +2,15 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.0';
-my $updated = '2023-02-24';
+my $version = '0.5.1';
+my $updated = '2023-09-25';
 
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
+use PerlIO::gzip;
 
 my $usage = <<"OPTIONS";
 NAME		$name
@@ -18,16 +19,14 @@ UPDATED		$updated
 SYNOPSIS	Creates a list containing all protein-coding genes with their genomic positions from GBF
 		(GenBank), GFF, or EMBL files. Also creates .faa files containing protein sequences.
 
-USAGE		$name 
-		  -f gbf \\
+USAGE		$name
 		  -i *.gbf \\
 		  -o LISTS
 OPTIONS
 
 $usage .= <<'REGEX';
 OPTIONS:
--f (--format)	Input file format: gbf, gff or embl [Default: gbf]
--i (--input)	Input file(s)
+-i (--input)	Input file(s) (GZIP supported; File type determined by file extension)
 -o (--outdir)	Output directory [Default: LISTS]
 -r (--regex)	For GFF files; regular expression to parse;  default:
 
@@ -39,20 +38,18 @@ REGEX
 die "$usage\n" unless @ARGV;
 
 my %filetypes = (
-	'.gbf' => 'gbf',
-	'.gbff' => 'gbf',
-	'.gb' => '.gbf',
-	'.gff' => 'gff',
-	'.embl' => 'embl');
+	'gbf' => 'gbf',
+	'gbff' => 'gbf',
+	'gb' => '.gbf',
+	'gff' => 'gff',
+	'embl' => 'embl');
 
 my @input_files;
-my $format = 'gbf';
 my $outdir = 'LIST_MAKER';
 my $regex = '^(\S+).*CDS\s+(\d+)\s+(\d+)\s+\.\s+([+-])\s+[012.].*(?:NCBI_GP|Genbank):(\w+\.\d+)';
 
 GetOptions(
 	'i|input=s@{1,}' => \@input_files,
-	'f|format=s' => \$format,
 	'o|outdir=s' => \$outdir,
 	'r|regex=s' => \$regex
 );
@@ -77,16 +74,29 @@ print "\n";
 
 foreach my $input_file (@input_files){
 
-	my ($file_name,$dir,$ext) = fileparse($input_file,'\..*');
+	# my ($file_name,$dir,$ext) = fileparse($input_file,'\..*');
+
+	my $file_name = $input_file;
+	my @file_data = split('\.',$file_name);
+	my $file_prefix = $file_data[0];
+	my $diamond = "<";
+	my $ext = $file_data[-1];
+
+	if ($file_data[-1] eq 'gz'){ 
+		$diamond = "<:gzip";
+		$ext = $file_data[-2];
+	}
 
 	print "Creating .list file for $file_name\n";
 
-	open OUT, ">", "$list_dir/$file_name.list" or die "Can't write to output file: $list_dir/$file_name.list\n";
-	open PROT, ">", "$prot_dir/$file_name.faa" or die "Can't write to output file: $prot_dir/$file_name.faa\n";
-	open ANNOT, ">", "$annot_dir/$file_name.annotations" or die "Can't write to output file: $annot_dir/$file_name.annotations\n";
+	open OUT, ">", "$list_dir/$file_prefix.list" or die "Can't write to output file: $list_dir/$file_prefix.list\n";
+	open PROT, ">", "$prot_dir/$file_prefix.faa" or die "Can't write to output file: $prot_dir/$file_prefix.faa\n";
+	open ANNOT, ">", "$annot_dir/$file_prefix.annotations" or die "Can't write to output file: $annot_dir/$file_prefix.annotations\n";
+
+	if ($input_file =~ /\.gz$/){ $diamond = "<:gzip"; }
 
 	if ($filetypes{$ext} eq 'gbf'){
-		open GBK, "<", "$input_file" or die "Can't open input file $input_file: $!\n";
+		open GBK, $diamond, "$input_file" or die "Can't open input file $input_file: $!\n";
 
 		my %location_data;
 		
@@ -155,7 +165,7 @@ foreach my $input_file (@input_files){
 						print OUT $strand."\t";
 						print OUT $gene_num."\n";
 
-						print PROT ">$locus\t$contig\t$start\t$end\t$strand\n";
+						print PROT ">$locus\n";#\t$contig\t$start\t$end\t$strand\n";
 						foreach my $line (unpack("(A60)*",$sequence)){
 							print PROT "$line\n";
 						}
@@ -232,7 +242,7 @@ foreach my $input_file (@input_files){
 		my %genes;
 		my $start;
 		my $end;
-		open GFF, "<", "$input_file" or die "Can't open input file : $input_file\n";
+		open GFF, $diamond, "$input_file" or die "Can't open input file : $input_file\n";
 		while (my $line = <GFF>){
 			chomp $line;
 			if ($line =~ /^\S+\t\S+\s+\bgene\b\t(\d+)\t(\d+)/){
@@ -268,7 +278,7 @@ foreach my $input_file (@input_files){
 		}
 	}
 	elsif($filetypes{$ext} eq 'embl'){
-		open EMBL, "<", "$input_file" or die "Can't open input file : $input_file\n";
+		open EMBL, $diamond, "$input_file" or die "Can't open input file : $input_file\n";
 		my $contig = $file_name;
 		my $gene = 0;
 		my $locus_tag;
@@ -291,127 +301,8 @@ foreach my $input_file (@input_files){
 			}
 		}
 	}
-	else{
-		if ($format eq 'gbf'){
-			open GBK, "<", "$input_file" or die "Can't open input file $input_file: $!\n";
-			my $contig;
-			my $gene = 0;
-			my $locus_tag;
-			my $protein_id;
-			my $strand;
-			my $start; 
-			my $end;
-			while (my $line = <GBK>){
-				
-				chomp $line;
-
-				if ($line =~ /^LOCUS\s+(\S+)/ ){
-					$contig = $1;
-				}
-				
-				if ($line =~ /^\s+gene\s+.*<(\d+).*>(\d+)/){
-					$start = $1;
-					$end = $2; 
-					$gene++;
-				}
-				elsif ($line =~ /^\s+\/locus_tag=\"(\w+)\"/){
-					$locus_tag = $1;
-				}
-				elsif ($line =~ /^\s+\/protein_id=\"(\S+)\"/){
-					$protein_id = $1;
-					if($protein_id =~ /\w+\:(\w+)/){
-						$protein_id = $1;
-					}
-					print LINK "$protein_id\t$locus_tag\n";
-				}
-				elsif ($line =~ /^\s+CDS/){
-					if ($line =~ /complement/){
-						$strand = '-';
-					}
-					else {
-						$strand = '+';
-					}
-					print OUT "$locus_tag"."\t";
-					print OUT "$contig"."\t";
-					print OUT "$start"."\t";
-					print OUT "$end"."\t";
-					print OUT "$strand"."\t";
-					print OUT "$gene"."\n";
-				}
-			}
-		}
-		elsif($format eq 'gff'){
-			my %contigs; 
-			my %genes;
-			my $start;
-			my $end;
-			open GFF, "<", "$input_file" or die "Can't open input file : $input_file\n";
-			while (my $line = <GFF>){
-				chomp $line;
-				if ($line =~ /^\S+\t\S+\s+\bgene\b\t(\d+)\t(\d+)/){
-					$start = $1;
-					$end = $2;
-				}
-				if ($line =~ /$regex/){
-					my $contig = $1;
-					my $strand = $4;
-					my $gene =$5;
-					if (!exists $genes{$gene}){
-						$genes{$gene} = $gene;
-						#$start = sprintf("%10d", $start); $end = sprintf("%10d", $end); ## Preventing number ordering SNAFU
-						$contigs{$contig}{$start}[0] = $contig;
-						$contigs{$contig}{$start}[1] = $start;
-						$contigs{$contig}{$start}[2] = $end;
-						$contigs{$contig}{$start}[3] = $strand;
-						$contigs{$contig}{$start}[4] = $gene;
-					}
-				}
-			}
-			foreach my $cg (sort keys %contigs) { ## We must reorder genes in case they were entered out of order in the GFF files
-				my $position = 0;
-				foreach my $pos (sort keys %{ $contigs{$cg} }) {
-					$position ++;
-					print OUT "$contigs{$cg}{$pos}[4]\t"; ## Printing gene
-					print OUT "$contigs{$cg}{$pos}[0]\t"; ## Printing contig
-					print OUT "$contigs{$cg}{$pos}[1]\t"; ## Printing $start
-					print OUT "$contigs{$cg}{$pos}[2]\t"; ## Printing $end
-					print OUT "$contigs{$cg}{$pos}[3]\t"; ## Printing $strand
-					print OUT "$position\n"; ## Printing $strand
-				}
-			}
-		}
-		elsif($format eq 'embl'){
-			open EMBL, "<", "$input_file" or die "Can't open input file : $input_file\n";
-			print "Working on input file $input_file in $format format\n";
-			my $contig = $file_name;
-			my $gene = 0;
-			my $locus_tag;
-			my $strand;
-			while (my $line = <EMBL>){
-				chomp $line;
-				if ($line =~ /FT\s+gene/){ $gene++; }
-				elsif ($line =~ /FT\s+\/locus_tag=\"(\w+)\"/){ $locus_tag = $1; }
-				elsif ($line =~ /FT\s+CDS/){
-					if ($line =~ /complement/){ $strand = '-';}
-					else { $strand = '+';}
-					my ($start, $end) = $line =~ /\(?(\d+).*\.\.(\d+)/;
-					print OUT "$locus_tag"."\t";
-					print OUT "$contig"."\t";
-					print OUT "$start"."\t";
-					print OUT "$end"."\t";
-					print OUT "$strand"."\t";
-					print OUT "$gene"."\n";
-				}
-			}
-		}
-		else{
-			print "[E]  Unsupproted annotation file provided ($ext).\n";
-			print "\t Supported annotation files: .embl, .gb, .gbff, .gff";
-		}
-	}
 
 	close OUT;
-	close LINK;
 
 }
 print "\n";
