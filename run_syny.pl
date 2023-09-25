@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.1';
-my $updated = '2023-02-03';
+my $version = '0.5.2';
+my $updated = '2023-09-25';
 
 use strict;
 use warnings;
@@ -105,8 +105,24 @@ system("mv $list_dir/ANNOTATIONS/*.annotations $annot_dir; rm -r $list_dir/ANNOT
 ###################################################################################################
 
 my %linked_files;
-link_files();
 
+### Checking the $outdir/PROT_SEQ for files
+### unless the -prot command line switch is invoked
+
+unless (@prot_files){
+
+	opendir (FAA, "$outdir/PROT_SEQ") or die "\n\n[ERROR]\tCan't open $outdir/PROT_SEQ: $!\n\n";
+
+	while (my $file = readdir(FAA)){
+		if ($file =~ /\.faa$/){
+			print $file."\n";
+			push (@prot_files, $file)
+		}
+	}
+
+}
+
+link_files();
 print ERROR "\n### get_homology.pl ###\n";
 
 system("
