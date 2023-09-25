@@ -17,6 +17,8 @@ VERSION		${version}
 UPDATED		${updated}
 SYNOPSIS	Runs all the components of the SYNY pipeline step-by-step.
 
+REQS	PerIO::gzip
+
 USAGE		${name} \\
 		-a *.gbff \\
 		-p *.prot \\
