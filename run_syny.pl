@@ -17,40 +17,43 @@ VERSION		${version}
 UPDATED		${updated}
 SYNOPSIS	Runs all the components of the SYNY pipeline step-by-step.
 
-REQS	PerIO::gzip
+REQS		PerlIO::gzip
 
 USAGE		${name} \\
-		-a *.gbff \\
-		-p *.prot \\
-		-g 5 \\
-		-o Chloropicon_synteny
+		  -a *.gbff \\
+		  -g 5 \\
+		  -e 1e-10 \\
+		  -o Chloropicon_synteny
 
 OPTION
 -a (--annot)	Annotation files (Supported files: gbff, gff, embl)
--p (--prot)	Protein files
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
--f (--format)	Figure format(s) (.png,.eps,.jpg,.jpeg,.pdf,.pgf,.ps,.raw,.rgba,.svg,.svgz,.tif,.tiff) [Default: .svg]
--n (--name)	Figure file prefix [Default: PHYLOGENETIC_FIGURE]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
+-p (--prot)	Protein files ## Generated automatically from gbff files
 EXIT
+
+## No yet implemented:
+# -f (--format)	Figure format(s) [Default: .svg]
+# .png,.eps,.jpg,.jpeg,.pdf,.pgf,.ps,.raw,.rgba,.svg,.svgz,.tif,.tiff
+# -n (--name)	Figure file prefix [Default: PHYLOGENETIC_FIGURE]
 
 die ("\n$usage\n") unless (@ARGV);
 
 my @annot_files;
 my @prot_files;
 my $evalue = '1e-10';
-my @formats;
 my @gaps;
 my $outdir = 'SYNY';
+my @formats;
 
 GetOptions(
 	'a|annot=s@{1,}' => \@annot_files,
 	'p|proteins=s@{1,}' => \@prot_files,
 	'e|evalue=s' => \$evalue,
-	'f|format=s{1,}' => \@formats,
 	'g|gaps=s{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
+	'f|format=s{1,}' => \@formats,
 );
 
 unless(@gaps){
