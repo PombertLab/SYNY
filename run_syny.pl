@@ -92,13 +92,9 @@ print ERROR "\n### list_maker.pl ###\n";
 system("
 	$path/list_maker.pl \\
 	  --input @annot_files \\
-	  --out $list_dir \\
+	  --outdir $outdir \\
 	  2>> $outdir/error.log
 ");
-
-system("mv $list_dir/PROT_SEQ/*.faa $prot_dir; rm -r $list_dir/PROT_SEQ");
-system("mv $list_dir/LISTS/*.list $list_dir; rm -r $list_dir/LISTS");
-system("mv $list_dir/ANNOTATIONS/*.annotations $annot_dir; rm -r $list_dir/ANNOTATIONS");
 
 ###################################################################################################
 ## Run get_homology.pl
