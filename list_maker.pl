@@ -76,7 +76,7 @@ foreach my $input_file (@input_files){
 
 	# my ($file_name,$dir,$ext) = fileparse($input_file,'\..*');
 
-	my $file_name = $input_file;
+	my $file_name = basename($input_file);
 	my @file_data = split('\.',$file_name);
 	my $file_prefix = $file_data[0];
 	my $diamond = "<";
@@ -92,8 +92,6 @@ foreach my $input_file (@input_files){
 	open OUT, ">", "$list_dir/$file_prefix.list" or die "Can't write to output file: $list_dir/$file_prefix.list\n";
 	open PROT, ">", "$prot_dir/$file_prefix.faa" or die "Can't write to output file: $prot_dir/$file_prefix.faa\n";
 	open ANNOT, ">", "$annot_dir/$file_prefix.annotations" or die "Can't write to output file: $annot_dir/$file_prefix.annotations\n";
-
-	if ($input_file =~ /\.gz$/){ $diamond = "<:gzip"; }
 
 	if ($filetypes{$ext} eq 'gbf'){
 		open GBK, $diamond, "$input_file" or die "Can't open input file $input_file: $!\n";
