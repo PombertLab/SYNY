@@ -23,7 +23,7 @@ USAGE		$name \\
 OPTIONS
 -i (--input)	Input protein files
 -e (--evalue)	Evalue [Default = 1e-10]
--o (--outidr)	Output directory [Default = DIAMOND]
+-o (--outdir)	Output directory [Default = DIAMOND]
 EXIT
 
 die("\n$usage\n") unless (@ARGV);
@@ -65,7 +65,10 @@ print "\n";
 my @db_files;
 print "Creating DIAMOND DB\n";
 foreach my $file (@input_files){
-	my ($file_name, @aux) = fileparse($file,'\..*');
+
+	my ($basename, $path, $suffix) = fileparse($file);
+	my ($file_name) = $basename =~ /^(\S+)\.(fasta|faa|fa|prot)$/;
+
 	unless (-f "$db_dir/$file_name.dmnd"){
 		print "\t$file_name\n";
 		system ("
@@ -83,7 +86,8 @@ foreach my $file (@input_files){
 
 foreach my $file (sort(@input_files)){
 
-	my ($file_name, @aux) = fileparse($file,'\..*');
+	my ($basename, $path, $suffix) = fileparse($file);
+	my ($file_name) = $basename =~ /^(\S+)\.(fasta|faa|fa|prot)$/;
 
 	print "\nRunning BLASTP on $file\n";
 
@@ -92,7 +96,6 @@ foreach my $file (sort(@input_files)){
 		my ($db_name, @aux) = fileparse($db_file,'\..*');
 
 		if($db_name ne $file_name){
-
 
 			my $blast_file = "$outdir/${file_name}_vs_${db_name}.diamond.6";
 			
