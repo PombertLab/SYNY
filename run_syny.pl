@@ -28,7 +28,7 @@ OPTION
 -p (--prot)	Protein files
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -f (--format)	Figure format(s) (.png,.eps,.jpg,.jpeg,.pdf,.pgf,.ps,.raw,.rgba,.svg,.svgz,.tif,.tiff) [Default: .svg]
--n (--name)	Figure file prefix [Default: PHYLOGENTIC_FIGURE]
+-n (--name)	Figure file prefix [Default: PHYLOGENETIC_FIGURE]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
 EXIT
@@ -115,8 +115,7 @@ unless (@prot_files){
 
 	while (my $file = readdir(FAA)){
 		if ($file =~ /\.faa$/){
-			print $file."\n";
-			push (@prot_files, $file)
+			push (@prot_files, "$outdir/PROT_SEQ/$file");
 		}
 	}
 
