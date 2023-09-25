@@ -266,12 +266,20 @@ while (my $line = <IN>){
 	chomp($line);
 	my @data = split("\t",$line);
 	
+	## Current query 1 locus
 	my $c_ql_1 = $data[0];
+	## Current query 1 number
 	my $c_ql_1_n = $data[1];
+	## Current query strand
 	my $c_ql_1_s = substr($data[10],0,1);
+	## Current query 2 locus
 	my $c_ql_2 = $data[2];
+	## Current query 2 number
 	my $c_ql_2_n = $data[3];
+	## Current query 2
 	my $c_ql_2_s = substr($data[10],1,1);
+	## Current query chromosome
+	my $c_qc = $data[4];
 
 	my $c_sl_1 = $data[5];
 	my $c_sl_1_n = $data[6];
@@ -279,6 +287,7 @@ while (my $line = <IN>){
 	my $c_sl_2 = $data[7];
 	my $c_sl_2_n = $data[8];
 	my $c_sl_2_s = substr($data[10],4,1);
+	my $c_sc = $data[9];
 
 	## First locus will not have access to previous locus information
 	if ($p_ql){
@@ -288,22 +297,32 @@ while (my $line = <IN>){
 		## The gap between the previous subject and current subject is abs() -1
 		my $sub_gap = ((($c_sl_1_n - $p_sn)**2)**(1/2)) - 1;
 
-		## No gaps
-		if ($query_gap == -1 && $sub_gap == -1){
+		## Different chromosomes
+		if ($c_sc ne $p_sc && $c_qc ne $p_qc){
+			$cluster_number ++;
+			push (@{$clusters{$cluster_number}},$c_ql_1."\t".$c_ql_1_s."\t".$c_sl_1."\t".$c_sl_1_s);
 			push (@{$clusters{$cluster_number}},$c_ql_2."\t".$c_ql_2_s."\t".$c_sl_2."\t".$c_sl_2_s);
 		}
+		## No gaps
+		elsif ($query_gap == -1 && $sub_gap == -1){
+			push (@{$clusters{$cluster_number}},$c_ql_2."\t".$c_ql_2_s."\t".$c_sl_2."\t".$c_sl_2_s);
+		}
+		## Acceptable query gap size
 		elsif ( $query_gap <= $gap){
+			## Acceptable subject gap size
 			if ( $sub_gap <= $gap){
 				push (@{$clusters{$cluster_number}},"## Gap of ".$query_gap."\t\t"."Gap of ".$sub_gap." ##\t");
 				push (@{$clusters{$cluster_number}},$c_ql_1."\t".$c_ql_1_s."\t".$c_sl_1."\t".$c_sl_1_s);
 				push (@{$clusters{$cluster_number}},$c_ql_2."\t".$c_ql_2_s."\t".$c_sl_2."\t".$c_sl_2_s);
 			}
+			## Unacceptable subject gap size
 			else {
 				$cluster_number ++;
 				push (@{$clusters{$cluster_number}},$c_ql_1."\t".$c_ql_1_s."\t".$c_sl_1."\t".$c_sl_1_s);
 				push (@{$clusters{$cluster_number}},$c_ql_2."\t".$c_ql_2_s."\t".$c_sl_2."\t".$c_sl_2_s);
 			}
 		}
+		## Unacceptable query gap size
 		else {
 			$cluster_number ++;
 			push (@{$clusters{$cluster_number}},$c_ql_1."\t".$c_ql_1_s."\t".$c_sl_1."\t".$c_sl_1_s);
@@ -318,10 +337,12 @@ while (my $line = <IN>){
 	$p_ql = $c_ql_2;
 	$p_qn = $c_ql_2_n;
 	$p_qs = $c_ql_2_s;
+	$p_qc = $c_qc;
 
 	$p_sl = $c_sl_2;
 	$p_sn = $c_sl_2_n;
 	$p_ss = $c_sl_2_s;
+	$p_sc = $c_sc;
 }
 
 close IN;
