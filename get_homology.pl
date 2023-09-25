@@ -7,8 +7,8 @@ use File::Basename;
 use File::Path qw(make_path);
 
 my $name = "get_homology.pl";
-my $version = "0.1.4";
-my $updated = "2023-02-03";
+my $version = "0.1.5";
+my $updated = "2023-09-25";
 my $usage = << "EXIT";
 NAME		$name
 VERSION		$version
@@ -62,22 +62,23 @@ unless(-d $db_dir){
 
 print "\n";
 
-my @db_files;
+my %db_files;
 print "Creating DIAMOND DB\n";
 foreach my $file (@input_files){
 
-	my ($basename, $path, $suffix) = fileparse($file);
-	my ($file_name) = $basename =~ /^(\S+)\.(fasta|faa|fa|prot)$/;
+	my ($file_name, $path, $suffix) = fileparse($file);
 
-	unless (-f "$db_dir/$file_name.dmnd"){
+	my $file_prefix = (split('\.',$file_name))[0];
+
+	unless (-f "$db_dir/$file_prefix.dmnd"){
 		print "\t$file_name\n";
 		system ("
 			diamond makedb \\
 			  --in $file \\
-			  --db $db_dir/$file_name &> /dev/null
+			  --db $db_dir/$file_prefix &> /dev/null
 		");
 	}
-	push(@db_files,"$db_dir/$file_name");
+	$db_files{$file_prefix} = "$db_dir/$file_prefix";
 }
 
 ###################################################################################################
@@ -86,24 +87,22 @@ foreach my $file (@input_files){
 
 foreach my $file (sort(@input_files)){
 
-	my ($basename, $path, $suffix) = fileparse($file);
-	my ($file_name) = $basename =~ /^(\S+)\.(fasta|faa|fa|prot)$/;
+	my ($file_name, $path, $suffix) = fileparse($file);
+	my $file_prefix = (split('\.',$file_name))[0];
 
 	print "\nRunning BLASTP on $file\n";
 
-	foreach my $db_file (sort(@db_files)){
+	foreach my $db_prefix (keys(%db_files)){
 
-		my ($db_name, @aux) = fileparse($db_file,'\..*');
+		if($db_prefix ne $file_prefix){
 
-		if($db_name ne $file_name){
-
-			my $blast_file = "$outdir/${file_name}_vs_${db_name}.diamond.6";
+			my $blast_file = "$outdir/${file_prefix}_vs_${db_prefix}.diamond.6";
 			
-			print "\tusing DB $db_name\n";
+			print "\tusing DB $db_prefix\n";
 
 			unless(-f $blast_file){
 				system ("diamond blastp \\
-						-d $db_file \\
+						-d $db_files{$db_prefix} \\
 						-q $file \\
 						-o $blast_file \\
 						-e $e_value \\
