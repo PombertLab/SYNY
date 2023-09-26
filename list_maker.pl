@@ -132,10 +132,10 @@ foreach my $input_file (@input_files){
 				$seq_flag = 1;
 			}
 			elsif ($line =~ /^\/\//){
-				$seq_flag = 0;
+				$seq_flag = undef;
 			}
 
-			if ($seq_flag == 1){
+			if ($seq_flag){
 				unless ($line =~ /^ORIGIN/){
 					$line =~ s/\s//g;
 					$line =~ s/\d//g;
