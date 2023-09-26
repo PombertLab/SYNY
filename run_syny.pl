@@ -65,6 +65,7 @@ unless(@gaps){
 ###################################################################################################
 
 my ($script,$path) = fileparse($0);
+my $circos_path = "$path/Circos";
 
 unless(-d $outdir){
 	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
@@ -182,8 +183,24 @@ system("
 ");
 
 ###################################################################################################
-## Create links files for circos
+## Create links files, karyotypes and nucleotide biases for Circos
 ###################################################################################################
+
+## Karyotypes and nucleotide biases
+
+print ERROR "\n### nucleotide_biases.pl ###\n";
+
+system("
+	$circos_path/nucleotide_biases.pl \\
+	--outdir $outdir/CIRCOS \\
+	--fasta $outdir/GENOME/*.fasta \\
+	--winsize 10000 \\
+	--step 5000 \\
+	--circos \\
+	2>> $outdir/error.log
+");
+
+## links files
 
 print ERROR "\n### clusters2links.pl ###\n";
 
@@ -194,7 +211,6 @@ opendir (CDIR, $cluster_dir) or die "Can't open $cluster_dir: $!\n";
 while (my $dname = readdir(CDIR)) {
 	if (-d "$cluster_dir/$dname"){
 		unless (($dname eq '.') or ($dname eq '..')){
-			# print "DIR = $cluster_dir/$dname"."\n";
 			push (@cluster_dirs, "$cluster_dir/$dname");
 		}
 	}
@@ -203,10 +219,10 @@ while (my $dname = readdir(CDIR)) {
 foreach my $cluster_subdir (@cluster_dirs){
 	my ($basedir) = fileparse($cluster_subdir);
 	system("
-		$path/clusters2links.pl \\
+		$circos_path/clusters2links.pl \\
 		--cluster $cluster_subdir/CLUSTERS/*.clusters \\
 		--list $list_dir/*.list \\
-		--outdir $outdir/CIRCOS/$basedir \\
+		--outdir $outdir/CIRCOS \\
 		2>> $outdir/error.log
 	");
 }
