@@ -74,7 +74,7 @@ while (my $list = shift @lists){
 while (my $cluster = shift@clusters){
 
     my ($filename,$path) = fileparse($cluster);
-    my $gap = fileparse($path);
+    my ($gap) = $path =~ /(gap_\d+)/;
     my ($prefix) = $filename =~ /^(\w+)/;
     my ($query) = $prefix =~ /^([^_]+)/;
     my $subdir = $outdir.'/'.$query;
