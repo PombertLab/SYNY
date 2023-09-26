@@ -57,8 +57,9 @@ GetOptions(
 my $list_dir = $outdir."/LISTS";
 my $prot_dir = $outdir."/PROT_SEQ";
 my $annot_dir = $outdir."/ANNOTATIONS";
+my $genome_dir = $outdir."/GENOME";
 
-my @outdirs = ($list_dir,$prot_dir,$annot_dir);
+my @outdirs = ($list_dir,$prot_dir,$annot_dir,$genome_dir);
 
 unless (-d $outdir){
 	make_path($outdir,{mode=>0755}) or die("Can't create output directory $outdir: $!\n");
@@ -91,12 +92,16 @@ foreach my $input_file (@input_files){
 
 	open OUT, ">", "$list_dir/$file_prefix.list" or die "Can't write to output file: $list_dir/$file_prefix.list\n";
 	open PROT, ">", "$prot_dir/$file_prefix.faa" or die "Can't write to output file: $prot_dir/$file_prefix.faa\n";
+	open GEN, ">", "$genome_dir/$file_prefix.fasta" or die "Can't write to output file: $genome_dir/$file_prefix.fasta\n";
 	open ANNOT, ">", "$annot_dir/$file_prefix.annotations" or die "Can't write to output file: $annot_dir/$file_prefix.annotations\n";
 
 	if ($filetypes{$ext} eq 'gbf'){
+
 		open GBK, $diamond, "$input_file" or die "Can't open input file $input_file: $!\n";
 
 		my %location_data;
+		my %genome;
+		my $seq_flag;
 		
 		my $contig;
 
@@ -123,6 +128,20 @@ foreach my $input_file (@input_files){
 				$contig = $1;
 			}
 
+			if ($line =~ /^ORIGIN/){
+				$seq_flag = 1;
+			}
+			elsif ($line =~ /^\/\//){
+				$seq_flag = 0;
+			}
+
+			if ($seq_flag == 1){
+				unless ($line =~ /^ORIGIN/){
+					$line =~ s/\s//g;
+					$line =~ s/\d//g;
+					$genome{$contig} .= uc($line);
+				}
+			}
 
 			## Entering the CDS metadata
 			if ($line =~ /^\s{5}CDS/){
@@ -234,6 +253,16 @@ foreach my $input_file (@input_files){
 			}
 
 		}
+
+		### Creating genome FASTA from GBFF
+		for my $sequence (sort(keys %genome)){
+			print GEN ">$sequence\n";
+			my @data = unpack ("(A60)*", $genome{$sequence});
+			while (my $tmp = shift@data){
+				print GEN "$tmp\n";
+			}
+		}
+
 	}
 	elsif($filetypes{$ext} eq 'gff'){
 		my %contigs; 
