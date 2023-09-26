@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 my $name = 'get_synteny.pl';
-my $version = '0.7.2';
-my $updated = '2022-06-22';
+my $version = '0.7.2b';
+my $updated = '2022-09-26';
 
 use strict;
 use warnings;
@@ -297,8 +297,9 @@ while (my $line = <IN>){
 		## The gap between the previous subject and current subject is abs() -1
 		my $sub_gap = ((($c_sl_1_n - $p_sn)**2)**(1/2)) - 1;
 
-		## Different chromosomes
-		if ($c_sc ne $p_sc && $c_qc ne $p_qc){
+		## Different chromosomes; must be || not &&
+		## => both queries and subject must be located on the same contigs as the previous ones
+		if ($c_sc ne $p_sc || $c_qc ne $p_qc){
 			$cluster_number ++;
 			push (@{$clusters{$cluster_number}},$c_ql_1."\t".$c_ql_1_s."\t".$c_sl_1."\t".$c_sl_1_s);
 			push (@{$clusters{$cluster_number}},$c_ql_2."\t".$c_ql_2_s."\t".$c_sl_2."\t".$c_sl_2_s);
