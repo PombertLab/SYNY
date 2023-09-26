@@ -182,6 +182,36 @@ system("
 ");
 
 ###################################################################################################
+## Create links files for circos
+###################################################################################################
+
+print ERROR "\n### clusters2links.pl ###\n";
+
+my $cluster_dir = "$outdir/SYNTENY";
+
+my @cluster_dirs;
+opendir (CDIR, $cluster_dir) or die "Can't open $cluster_dir: $!\n";
+while (my $dname = readdir(CDIR)) {
+	if (-d "$cluster_dir/$dname"){
+		unless (($dname eq '.') or ($dname eq '..')){
+			# print "DIR = $cluster_dir/$dname"."\n";
+			push (@cluster_dirs, "$cluster_dir/$dname");
+		}
+	}
+}
+
+foreach my $cluster_subdir (@cluster_dirs){
+	my ($basedir) = fileparse($cluster_subdir);
+	system("
+		$path/clusters2links.pl \\
+		--cluster $cluster_subdir/CLUSTERS/*.clusters \\
+		--list $list_dir/*.list \\
+		--outdir $outdir/CIRCOS/$basedir \\
+		2>> $outdir/error.log
+	");
+}
+
+###################################################################################################
 ## Subroutines
 ###################################################################################################
 
