@@ -73,12 +73,20 @@ while (my $list = shift @lists){
 
 while (my $cluster = shift@clusters){
 
-    my $filename = fileparse($cluster);
+    my ($filename,$path) = fileparse($cluster);
+    my $gap = fileparse($path);
     my ($prefix) = $filename =~ /^(\w+)/;
-    my $outlinks = $outdir.'/'.$prefix.'.links';
+    my ($query) = $prefix =~ /^([^_]+)/;
+    my $subdir = $outdir.'/'.$query;
+
+    unless (-d $subdir) {
+        make_path($subdir,{mode => 0755})  or die "Can't create $subdir: $!\n";
+    }
+
+    my $outlinks = $subdir.'/'.$prefix.'.'.$gap.'.links';
 
     open CLUSTER, "<", $cluster or die "Can't open $cluster: $!\n";
-    open OUT, ">", $outlinks or die "Can't create $outlinks\n";
+    open OUT, ">", $outlinks or die "Can't create $outlinks: $!\n";
     print OUT "#locus1 start end locus2 start end\n";
 
     my %queries;
