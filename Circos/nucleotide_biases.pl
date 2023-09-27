@@ -54,11 +54,19 @@ $outdir =~ s/\/$//;
 unless (-d $outdir) {
 	make_path($outdir,{mode => 0755})  or die "Can't create $outdir: $!\n";
 }
+my $catdir = $outdir.'/CONCATENATED';
+unless (-d $catdir) {
+	make_path($catdir,{mode => 0755}) or die "Can't create $$catdir: $!\n";
+}
 
 ### Hash to store percentage values
 my %percent;
 
 ### Iterating through FASTA file(s)
+my $cat_kar = $catdir.'/concatenated.genotype';
+open CAT, ">", $cat_kar or die "Can't create $cat_kar: $!\n";
+print CAT '#chr - ID LABEL START END COLOR'."\n";
+
 while (my $fasta = shift@fasta){
 
 	my ($basename) = fileparse($fasta);
@@ -139,6 +147,7 @@ while (my $fasta = shift@fasta){
 			my $terminus = $csize - 1;
 			$id++;
 			print KAR "chr - $sequence $id 0 $terminus black\n";
+			print CAT "chr - $sequence $id 0 $terminus black\n";
 		}
 
 		my $x;
