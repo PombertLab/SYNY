@@ -414,7 +414,7 @@ for my $genome (keys %data){
 		print $cg 'color         = '.$link_color."\n";
 		print $cg 'thickness     = 1'."\n";
 
-		print $cg $rules."\n";
+		print $cg "\n".$rules."\n";
 
 		print $cg '</link>'."\n";
 		print $cg '</links>'."\n\n";
@@ -427,7 +427,7 @@ for my $genome (keys %data){
 	print $cg '<<include etc/colors_fonts_patterns.conf>>'."\n";
 	print $cg '<<include etc/housekeeping.conf>>'."\n";
 
-	## Running circos; currenlty breaks due to naming
+	## Running circos; currently breaks due to naming
 	## Scheme for the links file; need to rethink it
 
 	# print "\n\nRunning Circos on $pngdir\n\n";
