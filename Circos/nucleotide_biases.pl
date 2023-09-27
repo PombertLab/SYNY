@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.3c';
-my $updated = '2023-09-26';
+my $version = '0.3d';
+my $updated = '2023-09-27';
 
 use strict;
 use warnings;
@@ -62,11 +62,21 @@ unless (-d $catdir) {
 ### Hash to store percentage values
 my %percent;
 
-### Iterating through FASTA file(s)
+### Creating concatenated files
 my $cat_kar = $catdir.'/concatenated.genotype';
 open CAT, ">", $cat_kar or die "Can't create $cat_kar: $!\n";
 print CAT '#chr - ID LABEL START END COLOR'."\n";
 
+no warnings 'once';
+my @cathandles = (*CGC, *CAT, *CGT, *CAC, *CGA, *CCT);
+foreach my $cfh (@cathandles){
+	my ($lfh) = $cfh =~ /C(\w+)$/;
+	my $cat_bias = $catdir.'/concatenated.'.$lfh;
+	open $cfh, '>', $cat_bias or die "Can't create $cat_bias: $!\n";
+	print $cfh '#chr START END GC_PERCENTAGE'."\n";
+}
+
+### Iterating through FASTA file(s)
 while (my $fasta = shift@fasta){
 
 	my ($basename) = fileparse($fasta);
@@ -164,6 +174,10 @@ while (my $fasta = shift@fasta){
 					my ($lfh) = $fh =~ /(\w+)$/;
 					print $fh "$sequence $x $end $percent{$lfh}\n";
 				}
+				foreach my $cfh (@cathandles){
+					my ($lfh) = $cfh =~ /C(\w+)$/;
+					print $cfh "$sequence $x $end $percent{$lfh}\n";
+				}
 			}
 
 		}
@@ -181,6 +195,10 @@ while (my $fasta = shift@fasta){
 			foreach my $fh (@filehandles){
 				my ($lfh) = $fh =~ /(\w+)$/;
 				print $fh "$sequence $x $end $percent{$lfh}\n";
+			}
+			foreach my $cfh (@cathandles){
+				my ($lfh) = $cfh =~ /C(\w+)$/;
+				print $cfh "$sequence $x $end $percent{$lfh}\n";
 			}
 		}
 
