@@ -41,7 +41,11 @@ GetOptions(
 ### Check if output directory / subdirs can be created
 $outdir =~ s/\/$//;
 unless (-d $outdir) {
-	make_path($outdir,{mode => 0755})  or die "Can't create $outdir: $!\n";
+	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
+}
+my $catdir = $outdir.'/CONCATENATED';
+unless (-d $catdir) {
+	make_path($catdir,{mode => 0755}) or die "Can't create $$catdir: $!\n";
 }
 
 my %loci_db;
@@ -70,7 +74,7 @@ while (my $list = shift @lists){
 
 
 ### Iterating through cluster files
-
+my $dflag;
 while (my $cluster = shift@clusters){
 
     my ($filename,$path) = fileparse($cluster);
@@ -84,10 +88,23 @@ while (my $cluster = shift@clusters){
     }
 
     my $outlinks = $subdir.'/'.$prefix.'.'.$gap.'.links';
+    my $catlinks = $catdir.'/concatenated.'.$gap.'.links';
 
     open CLUSTER, "<", $cluster or die "Can't open $cluster: $!\n";
     open OUT, ">", $outlinks or die "Can't create $outlinks: $!\n";
     print OUT "#locus1 start end locus2 start end\n";
+
+    my $diamond;
+    if ($dflag){
+        $diamond = '>>';
+    }
+    else {
+        $diamond = '>';
+        $dflag = 1;
+    }
+
+    open CAT, "$diamond", $catlinks or die "Can't create $catlinks: $!\n";
+    print CAT "#locus1 start end locus2 start end\n";
 
     my %queries;
 
@@ -106,17 +123,22 @@ while (my $cluster = shift@clusters){
             my ($qstart,$qend) = $query =~ /^(\w+) to (\w+)/;
             my ($sstart,$send) = $subject =~ /^(\w+) to (\w+)/;
 
-            # query
-            print OUT $loci_db{$qstart}{'contig'}.' ';
-            print OUT $loci_db{$qstart}{'start'}.' ';
-            print OUT $loci_db{$qend}{'end'}.' ';
-            # subject
-            print OUT $loci_db{$sstart}{'contig'}.' ';
-            print OUT $loci_db{$sstart}{'start'}.' ';
-            print OUT $loci_db{$send}{'end'}."\n";
+            for my $fh (\*OUT,\*CAT){
+                # query
+                print $fh $loci_db{$qstart}{'contig'}.' ';
+                print $fh $loci_db{$qstart}{'start'}.' ';
+                print $fh $loci_db{$qend}{'end'}.' ';
+                # subject
+                print $fh $loci_db{$sstart}{'contig'}.' ';
+                print $fh $loci_db{$sstart}{'start'}.' ';
+                print $fh $loci_db{$send}{'end'}."\n";
+            }
 
         }
 
     }
+
+    close OUT;
+    close CAT;
 
 }
