@@ -57,7 +57,7 @@ GetOptions(
 	'c|circos' => \$circos,
 	'r|reference=s' => \$reference,
 	'g|gap=i' => \$gap,
-	'p|plot' => \$circo_plot,
+	'p|plot' => \$circos_plot,
 	't|tsv' => \$tsv
 );
 

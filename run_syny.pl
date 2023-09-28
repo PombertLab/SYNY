@@ -204,7 +204,7 @@ if ($reference){
 
 my $circos_plot = '';
 if ($circos){
-	$circos_plot = '--image';
+	$circos_plot = '--plot';
 }
 
 my $gap = $gaps[0];
