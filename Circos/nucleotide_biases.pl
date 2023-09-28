@@ -23,13 +23,15 @@ COMMAND		$name \\
 		  -o output_directory \\
 		  -w 1000 \\
 		  -s 500 \\
-		  -c
+		  -c \\
+		  -r CCMP1205
 
 -f (--fasta)	Fasta file(s) to process
 -o (--outdir)	Output directory [Default: ntBiases]
 -w (--winsize)	Sliding window size [Default: 10000]
 -s (--step)		Sliding window step [Default: 5000]
 -c (--circos)	Output files for Circos plotting
+-r (--reference)	Genome reference for Circos plotting
 -t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
 OPTIONS
 die "\n$usage\n" unless @ARGV;
@@ -39,6 +41,7 @@ my $outdir = 'ntBiases';
 my $winsize = 1000;
 my $step = 500;
 my $circos;
+my $reference;
 my $tsv;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
@@ -46,6 +49,7 @@ GetOptions(
 	'w|winsize=i' => \$winsize,
 	's|step=i' => \$step,
 	'c|circos' => \$circos,
+	'r|reference=s' => \$reference,
 	't|tsv' => \$tsv
 );
 
@@ -81,18 +85,19 @@ foreach my $cfh (@cathandles){
 my %data;
 $data{'CONCATENATED'} = 1;
 
+### Creating database of sequences (could be multifasta)
+my %sequences;
+my $seqname;
+my $fileprefix;
+
 while (my $fasta = shift@fasta){
 
 	my ($basename) = fileparse($fasta);
-	my ($fileprefix) = $basename =~ /(\S+)\.\w+$/;
+	($fileprefix) = $basename =~ /(\S+)\.\w+$/;
 
 	$data{$fileprefix} = 1;
 
 	open FASTA, "<", $fasta or die "Can't open $fasta: $!\n";
-
-	### Creating database of sequences (could be multifasta)
-	my %sequences;
-	my $seqname;
 
 	while (my $line = <FASTA>){
 		chomp $line;
@@ -100,7 +105,7 @@ while (my $fasta = shift@fasta){
 			$seqname = $1;
 		}
 		else {
-			$sequences{$seqname} .= $line;
+			$sequences{$fileprefix}{$seqname} .= $line;
 		}
 	}
 
@@ -146,7 +151,7 @@ while (my $fasta = shift@fasta){
 	}
 
 	### Iterating through each sequence in the FASTA file
-	foreach my $sequence (sort (keys %sequences)){
+	foreach my $sequence (sort (keys %{$sequences{$fileprefix}})){
 
 		my $outfile = $fasta_dir.'/'.$fileprefix.'.'.$sequence.'.tsv';
 
@@ -156,7 +161,7 @@ while (my $fasta = shift@fasta){
 		}
 
 		### Sliding windows
-		my $seq = $sequences{$sequence};
+		my $seq = $sequences{$fileprefix}{$sequence};
 		my $csize = length $seq;
 
 		if ($circos){
@@ -216,7 +221,10 @@ while (my $fasta = shift@fasta){
 
 }
 
+####################################################################
 ### Circos
+####################################################################
+
 ## Ideogram for Circos
 my $ideogram = $outdir.'/'.'ideogram.conf';
 open my $id, '>', $ideogram or die $!;
@@ -307,21 +315,6 @@ my $axes = <<'AXES';
 	</axis>
 </axes>
 AXES
-
-my $rules =<<'RULES';
-# <rules>
-# <rule>
-#  condition  = var(intrachr)
-#  show       = no
-# </rule>
-
-# <rule>
-#  condition  = between(chr_01,chr_01)
-#  color      = c01
-#  flow       = continue
-# </rule>
-# </rules>
-RULES
 
 my @biases = ('GC','AT','GT','AC','GA','CT');
 my %colors = (
@@ -414,7 +407,28 @@ for my $genome (keys %data){
 		print $cg 'color         = '.$link_color."\n";
 		print $cg 'thickness     = 1'."\n";
 
-		print $cg "\n".$rules."\n";
+		## Rules
+		print $cg '<rules>'."\n\n";
+		my $color_counter = sprintf("%02d",1);
+		foreach my $refseq (sort (keys %{$sequences{$reference}})){
+			foreach my $queseq (sort (keys %sequences)){
+				if (($queseq eq 'concatenated') or ($queseq eq $reference)){
+					next;
+				}
+				else{
+					foreach my $queseq_cg (sort (keys %{$sequences{$queseq}})){
+						print $cg '<rule>'."\n";
+						print $cg "condition  = between($refseq,$queseq_cg)"."\n";
+						print $cg "color      = c$color_counter"."\n";
+						print $cg 'flow       = continue'."\n";
+						print $cg '</rule>'."\n\n";
+					}
+				}
+			}
+			$color_counter++;
+			$color_counter = sprintf("%02d",$color_counter);
+		}
+		print $cg '</rules>'."\n\n";
 
 		print $cg '</link>'."\n";
 		print $cg '</links>'."\n\n";
@@ -437,6 +451,48 @@ for my $genome (keys %data){
 	#   -outputdir $pngdir";
 
 }
+
+### colors
+my $custom_colors =<<'COLORS';
+c01	= 202,75,75
+c02	= 239,60,104
+c03	= 241,102,140
+c04	= 245,152,162
+c05	= 245,126,47
+c06	= 250,166,55
+c07	= 255,197,61
+c08	= 255,228,67
+c09	= 210,213,76
+c10	= 147,195,84
+c11	= 18,178,89
+c12	= 0,179,127
+c13	= 0,180,161
+c14	= 0,182,204
+c15	= 0,183,241
+c16	= 0,157,218
+c17	= 64,131,196
+c18	= 94,104,176
+c19	= 108,82,162
+c20	= 122,42,144
+
+hm-1 = 245,255,255
+hm-2 = 190,233,244
+hm-3 = 180,212,233
+hm-4 = 170,191,222
+hm-5 = 160,171,211
+hm-6 = 149,150,200
+hm-7 = 138,130,190
+hm-8 = 127,111,179
+hm-9 = 115,91,168
+hm-10 = 103,71,157
+hm-11 = 91,52,146
+hm-12 = 77,30,136
+hm-13 = 63,0,125
+COLORS
+
+my $color_file = $outdir.'/custom_colors.conf';
+open COL, '>', $color_file or die "Can't create $color_file: $!\n";
+print COL $custom_colors;
 
 ### Subroutine(s)
 
