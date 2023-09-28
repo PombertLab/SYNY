@@ -466,6 +466,9 @@ for my $genome (keys %data){
 
 ### colors
 my $custom_colors =<<'COLORS';
+## Custom colors:
+## Add these colors to Circos etc/colors.conf
+
 c01	= 202,75,75
 c02	= 239,60,104
 c03	= 241,102,140
