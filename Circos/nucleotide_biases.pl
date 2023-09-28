@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.3d';
-my $updated = '2023-09-27';
+my $version = '0.4';
+my $updated = '2023-09-28';
 
 use strict;
 use warnings;
@@ -24,6 +24,8 @@ COMMAND		$name \\
 		  -w 1000 \\
 		  -s 500 \\
 		  -c \\
+		  -g 0 \\
+		  -i \\
 		  -r CCMP1205
 
 -f (--fasta)	Fasta file(s) to process
@@ -32,6 +34,8 @@ COMMAND		$name \\
 -s (--step)		Sliding window step [Default: 5000]
 -c (--circos)	Output files for Circos plotting
 -r (--reference)	Genome reference for Circos plotting
+-g (--gap)		Default gap links file for Circos plotting [Default: 0]
+-i (--image)	Generate Circos images
 -t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
 OPTIONS
 die "\n$usage\n" unless @ARGV;
@@ -42,6 +46,8 @@ my $winsize = 1000;
 my $step = 500;
 my $circos;
 my $reference;
+my $gap = 0;
+my $image;
 my $tsv;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
@@ -50,6 +56,8 @@ GetOptions(
 	's|step=i' => \$step,
 	'c|circos' => \$circos,
 	'r|reference=s' => \$reference,
+	'g|gap=i' => \$gap,
+	'i|image' => \$image,
 	't|tsv' => \$tsv
 );
 
@@ -339,11 +347,6 @@ for my $genome (keys %data){
 	my $config = $subdir.'/'.$genome.'.conf';
 	my $subfile = $subdir.'/'.$genome;
 	
-	my $pngdir = $subdir.'/images/';
-	unless (-d $pngdir){
-		make_path($pngdir,{mode => 0755}) or die "Can't create $pngdir: $!\n";
-	}
-
 	my $image = $genome.'.png';
 
 	## Creating a conf file for Circos
@@ -393,14 +396,14 @@ for my $genome (keys %data){
 
 	## Links; only for concatenated genomes
 	if ($genome eq 'concatenated'){
-		my $link_start = $r_end - 0.01;
+		my $link_start = $r_end + 0.04;
 		my $link_color = 'grey_a5';
 
 		print $cg '########### Links'."\n\n";
 		print $cg '<links>'."\n\n";
 
 		print $cg '<link>'."\n";
-		print $cg "file          = $subfile.links"."\n";
+		print $cg "file          = $subfile.gap_$gap.links"."\n";
 		print $cg "radius        = ${link_start}r"."\n";
 		print $cg 'bezier_radius = 0.1r'."\n";
 		print $cg 'ribbon = yes'."\n";
@@ -444,11 +447,20 @@ for my $genome (keys %data){
 	## Running circos; currently breaks due to naming
 	## Scheme for the links file; need to rethink it
 
-	# print "\n\nRunning Circos on $pngdir\n\n";
-	# system "circos \\
-	#   -conf $config \\
-	#   -outputfile $image \\
-	#   -outputdir $pngdir";
+	if ($image){
+
+		my $pngdir = $subdir.'/images/';
+		unless (-d $pngdir){
+			make_path($pngdir,{mode => 0755}) or die "Can't create $pngdir: $!\n";
+		}
+
+		print "\n\nRunning Circos on $pngdir\n\n";
+		system "circos \\
+		-conf $config \\
+		-outputfile $image \\
+		-outputdir $pngdir";
+	
+	}
 
 }
 

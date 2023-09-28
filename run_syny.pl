@@ -32,6 +32,7 @@ OPTION
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
 -r (--reference)	Genome to use as reference [for Circos]
+-i (--image)	Generate Circos images
 -p (--prot)	Protein files ## Generated automatically from gbff files
 EXIT
 
@@ -48,6 +49,7 @@ my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
 my $reference;
+my $image;
 my @formats;
 
 GetOptions(
@@ -57,6 +59,7 @@ GetOptions(
 	'g|gaps=s{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
 	'r|reference=s' => \$reference,
+	'i|image' => \$image,
 	'f|format=s{1,}' => \@formats,
 );
 
@@ -199,6 +202,13 @@ if ($reference){
 	$ref = "--reference $reference";
 }
 
+my $circos_plot = '';
+if ($image){
+	$circos_plot = '--image';
+}
+
+my $gap = $gaps[0];
+
 system("
 	$circos_path/nucleotide_biases.pl \\
 	--outdir $outdir/CIRCOS \\
@@ -206,7 +216,9 @@ system("
 	--winsize 10000 \\
 	--step 5000 \\
 	--circos \\
+	--gap $gap \\
 	$ref \\
+	$circos_plot \\
 	2>> $outdir/error.log
 ");
 
