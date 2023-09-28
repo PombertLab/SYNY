@@ -19,14 +19,14 @@ SYNOPSIS	Generates tab-delimited sliding windows of GC, AT, purine and pyrimidin
 		 coordinate files for Circos.
 
 COMMAND		$name \\
-		  -f *.fasta \\
-		  -o output_directory \\
-		  -w 1000 \\
-		  -s 500 \\
-		  -c \\
-		  -g 0 \\
-		  -i \\
-		  -r CCMP1205
+		  -fasta *.fasta \\
+		  -outdir output_directory \\
+		  -winsize 1000 \\
+		  -step 500 \\
+		  -circos \\
+		  -gap 0 \\
+		  -plot \\
+		  -reference CCMP1205
 
 -f (--fasta)	Fasta file(s) to process
 -o (--outdir)	Output directory [Default: ntBiases]
@@ -35,7 +35,7 @@ COMMAND		$name \\
 -c (--circos)	Output files for Circos plotting
 -r (--reference)	Genome reference for Circos plotting
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
--i (--image)	Generate Circos images
+-p (--plot)	Plot Circos images
 -t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
 OPTIONS
 die "\n$usage\n" unless @ARGV;
@@ -47,7 +47,7 @@ my $step = 500;
 my $circos;
 my $reference;
 my $gap = 0;
-my $image;
+my $circos_plot;
 my $tsv;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
@@ -57,7 +57,7 @@ GetOptions(
 	'c|circos' => \$circos,
 	'r|reference=s' => \$reference,
 	'g|gap=i' => \$gap,
-	'i|image' => \$image,
+	'p|plot' => \$circo_plot,
 	't|tsv' => \$tsv
 );
 
@@ -447,7 +447,7 @@ for my $genome (keys %data){
 	## Running circos; currently breaks due to naming
 	## Scheme for the links file; need to rethink it
 
-	if ($image){
+	if ($circos_plot){
 
 		my $pngdir = $subdir.'/images/';
 		unless (-d $pngdir){
