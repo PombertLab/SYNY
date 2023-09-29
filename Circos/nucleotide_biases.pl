@@ -442,9 +442,10 @@ for my $genome (keys %data){
 		## Rules
 		print $cg '<rules>'."\n\n";
 
-		## Count for colors required
+		## Counting for required colors
 		my $ref_sequence_count = scalar (keys %{$sequences{$reference}});
 		print "Total # of sequences in reference $reference = $ref_sequence_count"."\n";
+
 		if ($custom_cc){
 			@color_set = @custom_set;
 		}
@@ -454,11 +455,17 @@ for my $genome (keys %data){
 		else {
 			@color_set = @bowgrey;
 		}
+
+		## Creating an increment so that it will use the full range of colors
+		## not just the start
 		my $increment = scalar(@color_set)/$ref_sequence_count;
 		my $rounded_increment = round($increment);
 		my $color_start = 0;
-		print "Increment = $increment"."\n";
-		print "Rounded increment = $rounded_increment"."\n";
+
+		## Making sure that the increment is >= 1
+		if ($rounded_increment == 0){
+			$rounded_increment == 1;
+		}
 		
 		foreach my $refseq (sort (keys %{$sequences{$reference}})){
 			foreach my $queseq (sort (keys %sequences)){
@@ -476,6 +483,10 @@ for my $genome (keys %data){
 				}
 			}
 			$color_start += $rounded_increment;
+			## Check if no more colors left, if so restart from 1st color in color set
+			if ($color_start >  scalar(@color_set)){
+				$color_start = 0;
+			}
 		}
 		print $cg '</rules>'."\n\n";
 
@@ -515,7 +526,6 @@ for my $genome (keys %data){
 my $custom_colors =<<'COLORS';
 ## Custom colors:
 ## Add these colors to Circos etc/colors.conf
-
 c01	= 202,75,75
 c02	= 239,60,104
 c03	= 241,102,140
@@ -536,20 +546,6 @@ c17	= 64,131,196
 c18	= 94,104,176
 c19	= 108,82,162
 c20	= 122,42,144
-
-hm-1 = 245,255,255
-hm-2 = 190,233,244
-hm-3 = 180,212,233
-hm-4 = 170,191,222
-hm-5 = 160,171,211
-hm-6 = 149,150,200
-hm-7 = 138,130,190
-hm-8 = 127,111,179
-hm-9 = 115,91,168
-hm-10 = 103,71,157
-hm-11 = 91,52,146
-hm-12 = 77,30,136
-hm-13 = 63,0,125
 COLORS
 
 my $color_file = $outdir.'/custom_colors.conf';
