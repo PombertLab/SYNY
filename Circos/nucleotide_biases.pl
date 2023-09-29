@@ -9,6 +9,7 @@ use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
+use Math::Round;
 
 my $usage = <<"OPTIONS";
 NAME		$name
@@ -26,6 +27,7 @@ COMMAND		$name \\
 		  -circos \\
 		  -gap 0 \\
 		  -plot \\
+		  -custom
 		  -reference CCMP1205
 
 -f (--fasta)	Fasta file(s) to process
@@ -36,6 +38,7 @@ COMMAND		$name \\
 -r (--reference)	Genome reference for Circos plotting
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
 -p (--plot)	Plot Circos images
+-custom		Use custom colors [c01 to c20]
 -t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
 OPTIONS
 die "\n$usage\n" unless @ARGV;
@@ -48,6 +51,7 @@ my $circos;
 my $reference;
 my $gap = 0;
 my $circos_plot;
+my $custom_cc;
 my $tsv;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
@@ -58,6 +62,7 @@ GetOptions(
 	'r|reference=s' => \$reference,
 	'g|gap=i' => \$gap,
 	'p|plot' => \$circos_plot,
+	'custom' => \$custom_cc,
 	't|tsv' => \$tsv
 );
 
@@ -334,6 +339,30 @@ my %colors = (
 	'CT' => 'vdyellow'
 );
 
+#################### Circos colors
+
+my @color_set;
+
+# 7 colors per set
+my @reds = ('vvlred','vlred','lred','red','dred','vdred','vvdred');
+my @oranges = ('vvlorange','vlorange','lorange','orange','dorange','vdorange','vvdorange');
+my @yellows = ('vvlyellow','vlyellow','lyellow','yellow','dyellow','vdyellow','vvdyellow',);
+my @greens = ('vvlgreen','vlgreen','lgreen','green','dgreen','vdgreen','vvdgreen');
+my @blues = ('vvlblue','vlblue','lblue','blue','dblue','vdblue','vvdblue');
+my @purples = ('vvlpurple','vlpurple','lpurple','purple','dpurple','vdpurple','vvdpurple');
+
+# 9 colors per set
+my @greys = ('vvvlgrey','vvlgrey','vlgrey','lgrey','grey','dgrey','vdgrey','vvdgrey','vvvdgrey');
+
+my @rainbow = (@reds,@oranges,@yellows,@greens,@blues,@purples); ## 42 colors total
+my @bowgrey = (@rainbow,@greys); ## 51 colors total
+
+# 20 custom color set 
+my @custom_set = (
+	'c01','c02','c03','c04','c05','c06','c07','c08','c09','c10',
+	'c11','c12','c13','c14','c15','c16','c17','c18','c19','c20'
+);
+
 ############## conf
 for my $genome (keys %data){
 
@@ -412,7 +441,25 @@ for my $genome (keys %data){
 
 		## Rules
 		print $cg '<rules>'."\n\n";
-		my $color_counter = sprintf("%02d",1);
+
+		## Count for colors required
+		my $ref_sequence_count = scalar (keys %{$sequences{$reference}});
+		print "Total # of sequences in reference $reference = $ref_sequence_count"."\n";
+		if ($custom_cc){
+			@color_set = @custom_set;
+		}
+		elsif ($ref_sequence_count <= scalar(@rainbow)){
+			@color_set = @rainbow;
+		}
+		else {
+			@color_set = @bowgrey;
+		}
+		my $increment = scalar(@color_set)/$ref_sequence_count;
+		my $rounded_increment = round($increment);
+		my $color_start = 0;
+		print "Increment = $increment"."\n";
+		print "Rounded increment = $rounded_increment"."\n";
+		
 		foreach my $refseq (sort (keys %{$sequences{$reference}})){
 			foreach my $queseq (sort (keys %sequences)){
 				if (($queseq eq 'concatenated') or ($queseq eq $reference)){
@@ -422,14 +469,13 @@ for my $genome (keys %data){
 					foreach my $queseq_cg (sort (keys %{$sequences{$queseq}})){
 						print $cg '<rule>'."\n";
 						print $cg "condition  = between($refseq,$queseq_cg)"."\n";
-						print $cg "color      = c$color_counter"."\n";
+						print $cg "color      = ".$color_set[$color_start]."\n";
 						print $cg 'flow       = continue'."\n";
 						print $cg '</rule>'."\n\n";
 					}
 				}
 			}
-			$color_counter++;
-			$color_counter = sprintf("%02d",$color_counter);
+			$color_start += $rounded_increment;
 		}
 		print $cg '</rules>'."\n\n";
 
@@ -464,7 +510,8 @@ for my $genome (keys %data){
 
 }
 
-### colors
+#################### custom colors
+# Set of a 20 colors custom palette created for Chloropicon manuscript
 my $custom_colors =<<'COLORS';
 ## Custom colors:
 ## Add these colors to Circos etc/colors.conf

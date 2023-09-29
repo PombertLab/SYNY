@@ -33,6 +33,7 @@ OPTION
 -o (--outdir)	Output directory [Default = SYNY]
 -r (--reference)	Genome to use as reference [for Circos]
 -c (--circos)	Plot Circos images
+-custom		Use custom colors for Circos
 -p (--prot)	Protein files ## Generated automatically from gbff files
 EXIT
 
@@ -50,6 +51,7 @@ my @gaps;
 my $outdir = 'SYNY';
 my $reference;
 my $circos;
+my $custom_colors;
 my @formats;
 
 GetOptions(
@@ -60,6 +62,7 @@ GetOptions(
 	'o|outdir=s' => \$outdir,
 	'r|reference=s' => \$reference,
 	'c|circos' => \$circos,
+	'custom' => \$custom_colors,
 	'f|format=s{1,}' => \@formats,
 );
 
@@ -207,6 +210,11 @@ if ($circos){
 	$circos_plot = '--plot';
 }
 
+my $custom_cc = '';
+if ($custom_colors){
+	$custom_cc = '--custom';
+}
+
 my $gap = $gaps[0];
 
 system("
@@ -219,6 +227,7 @@ system("
 	--gap $gap \\
 	$ref \\
 	$circos_plot \\
+	$custom_cc \\
 	2>> $outdir/error.log
 ");
 
