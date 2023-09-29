@@ -444,7 +444,7 @@ for my $genome (keys %data){
 
 		## Counting for required colors
 		my $ref_sequence_count = scalar (keys %{$sequences{$reference}});
-		print "Total # of sequences in reference $reference = $ref_sequence_count"."\n";
+		print "\n"."Total # of sequences in reference $reference = $ref_sequence_count"."\n";
 
 		if ($custom_cc){
 			@color_set = @custom_set;
@@ -484,7 +484,7 @@ for my $genome (keys %data){
 			}
 			$color_start += $rounded_increment;
 			## Check if no more colors left, if so restart from 1st color in color set
-			if ($color_start >  scalar(@color_set)){
+			if ($color_start >= scalar(@color_set)){
 				$color_start = 0;
 			}
 		}
