@@ -501,8 +501,14 @@ for my $genome (keys %data){
 	print $cg '<<include etc/colors_fonts_patterns.conf>>'."\n";
 	print $cg '<<include etc/housekeeping.conf>>'."\n";
 
-	## Running circos; currently breaks due to naming
-	## Scheme for the links file; need to rethink it
+	close $cg;
+
+	## Running circos; sometimes breaks because it doesn't
+	## find the links file (even if present); runs fine if done manually
+	## sleep() timer doesn't seem to fix it...
+	## Not sure what causes Circos to misbehave
+
+	sleep(5);
 
 	if ($circos_plot){
 
