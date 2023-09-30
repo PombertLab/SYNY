@@ -126,6 +126,11 @@ foreach my $input_file (@input_files){
 
 			if ($line =~ /^LOCUS\s+(\S+)/ ){
 				$contig = $1;
+				## if the contig is not named with a unique LOCUS
+				## add the file_prefix in front to prevent naming clashes 
+				if ($contig =~ /chromosome|contig/i){
+					$contig = $file_prefix.'_'.$contig;
+				}
 			}
 
 			if ($line =~ /^ORIGIN/){
