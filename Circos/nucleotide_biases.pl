@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.4';
-my $updated = '2023-09-28';
+my $version = '0.4a';
+my $updated = '2023-09-30';
 
 use strict;
 use warnings;
@@ -351,11 +351,11 @@ my @greens = ('vvlgreen','vlgreen','lgreen','green','dgreen','vdgreen','vvdgreen
 my @blues = ('vvlblue','vlblue','lblue','blue','dblue','vdblue','vvdblue');
 my @purples = ('vvlpurple','vlpurple','lpurple','purple','dpurple','vdpurple','vvdpurple');
 
-# 9 colors per set
-my @greys = ('vvvlgrey','vvlgrey','vlgrey','lgrey','grey','dgrey','vdgrey','vvdgrey','vvvdgrey');
+# 8 colors per set; did not include vvvlgrey => too light can't see it on a white background
+my @greys = ('vvlgrey','vlgrey','lgrey','grey','dgrey','vdgrey','vvdgrey','vvvdgrey');
 
 my @rainbow = (@reds,@oranges,@yellows,@greens,@blues,@purples); ## 42 colors total
-my @bowgrey = (@rainbow,@greys); ## 51 colors total
+my @bowgrey = (@rainbow,@greys); ## 50 colors total
 
 # 20 custom color set 
 my @custom_set = (
