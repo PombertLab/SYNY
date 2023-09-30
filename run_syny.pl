@@ -3,12 +3,13 @@
 
 my $name = 'run_syny.pl';
 my $version = '0.5.2';
-my $updated = '2023-09-25';
+my $updated = '2023-09-30';
 
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
+use Cwd qw(abs_path);
 use File::Path qw(make_path);
 
 my $usage = <<"EXIT";
@@ -79,6 +80,11 @@ my $circos_path = "$path/Circos";
 
 unless(-d $outdir){
 	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
+}
+
+## Convert $outdir to absolute path: required for Circos files
+if ($outdir !~ /^\//){
+	$outdir = abs_path($outdir);
 }
 
 my $list_dir = "$outdir/LISTS";
