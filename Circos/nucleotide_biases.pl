@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.4a';
+my $version = '0.4b';
 my $updated = '2023-09-30';
 
 use strict;
@@ -76,14 +76,6 @@ unless (-d $catdir) {
 	make_path($catdir,{mode => 0755}) or die "Can't create $catdir: $!\n";
 }
 
-### Hash to store percentage values
-my %percent;
-
-### Creating concatenated files
-my $cat_kar = $catdir.'/concatenated.genotype';
-open CONCAT, ">", $cat_kar or die "Can't create $cat_kar: $!\n";
-print CONCAT '#chr - ID LABEL START END COLOR'."\n";
-
 no warnings 'once';
 my @cathandles = (*CGC, *CAT, *CGT, *CAC, *CGA, *CCT);
 foreach my $cfh (@cathandles){
@@ -93,13 +85,10 @@ foreach my $cfh (@cathandles){
 	print $cfh '#chr START END GC_PERCENTAGE'."\n";
 }
 
-### Iterating through FASTA file(s)
+### Iterating through FASTA file(s); creating database of sequences (could be multifasta)
 
-my %data;
-$data{'CONCATENATED'} = 1;
-
-### Creating database of sequences (could be multifasta)
 my %sequences;
+my %percent;
 my $seqname;
 my $fileprefix;
 
@@ -107,8 +96,6 @@ while (my $fasta = shift@fasta){
 
 	my ($basename) = fileparse($fasta);
 	($fileprefix) = $basename =~ /(\S+)\.\w+$/;
-
-	$data{$fileprefix} = 1;
 
 	open FASTA, "<", $fasta or die "Can't open $fasta: $!\n";
 
@@ -138,9 +125,6 @@ while (my $fasta = shift@fasta){
 	my $circos_GA;
 	my $circos_CT;
 	
-	my $circos_kar;
-	my $id = 0;
-
 	if ($circos){
 
 		my $circos_dir = $outdir.'/'.$fileprefix;
@@ -148,11 +132,6 @@ while (my $fasta = shift@fasta){
 				make_path($circos_dir,{mode => 0755}) or die "Can't create $circos_dir: $!\n";
 		}
 
-		## Creating a "karyotype" file for Circos
-		$circos_kar = $circos_dir.'/'.$fileprefix.'.genotype';
-		open KAR, ">", $circos_kar or die "Can't create $circos_kar: $!\n";
-		print KAR '#chr - ID LABEL START END COLOR'."\n";
-		
 		## Nucleotide biases
 		for my $fh (@filehandles){
 			my ($lfh) = $fh =~ /(\w+)$/; ## grabbing test from filehandle
@@ -176,15 +155,8 @@ while (my $fasta = shift@fasta){
 		### Sliding windows
 		my $seq = $sequences{$fileprefix}{$sequence};
 		my $csize = length $seq;
-
-		if ($circos){
-			my $terminus = $csize - 1;
-			$id++;
-			print KAR "chr - $sequence $id 0 $terminus black\n";
-			print CONCAT "chr - $sequence $id 0 $terminus black\n";
-		}
-
 		my $x;
+
 		for ($x = 0; $x <= ($csize - $winsize); $x += $step){
 
 			my $subseq = substr($seq, $x, $winsize);
@@ -237,6 +209,42 @@ while (my $fasta = shift@fasta){
 ####################################################################
 ### Circos
 ####################################################################
+
+### Creating concatenated files
+my $cat_kar = $catdir.'/concatenated.genotype';
+open CONCAT, ">", $cat_kar or die "Can't create $cat_kar: $!\n";
+print CONCAT '#chr - ID LABEL START END COLOR'."\n";
+
+foreach my $fileprefix (keys %sequences){
+
+	print $fileprefix."\n";
+
+	## Creating a "karyotype" file for Circos
+	my $circos_dir = $outdir.'/'.$fileprefix;
+	my $circos_kar = $circos_dir.'/'.$fileprefix.'.genotype';
+	open KAR, ">", $circos_kar or die "Can't create $circos_kar: $!\n";
+	print KAR '#chr - ID LABEL START END COLOR'."\n";
+
+	my $id = 0;
+
+	### Iterating through each sequence in the FASTA file
+	foreach my $sequence (sort (keys %{$sequences{$fileprefix}})){
+
+		my $seq = $sequences{$fileprefix}{$sequence};
+		my $csize = length $seq;
+
+		my $terminus = $csize - 1;
+		$id++;
+		print KAR "chr - $sequence $id 0 $terminus black\n";
+		print CONCAT "chr - $sequence $id 0 $terminus black\n";
+
+	}
+
+	close KAR;
+
+}
+
+close CONCAT;
 
 ## Ideogram for Circos
 my $ideogram = $outdir.'/'.'ideogram.conf';
@@ -364,14 +372,9 @@ my @custom_set = (
 );
 
 ############## conf
-for my $genome (keys %data){
+for my $genome ((keys %sequences), 'concatenated'){
 
 	my $subdir = $outdir.'/'.$genome;
-
-	if ($genome eq 'CONCATENATED'){
-		$genome = lc($genome);
-	}
-
 	my $karyotype = $subdir.'/'.$genome.'.genotype';
 	my $config = $subdir.'/'.$genome.'.conf';
 	my $subfile = $subdir.'/'.$genome;
