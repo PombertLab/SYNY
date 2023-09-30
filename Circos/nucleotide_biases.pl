@@ -69,7 +69,7 @@ GetOptions(
 ### Check if output directory / subdirs can be created
 $outdir =~ s/\/$//;
 unless (-d $outdir) {
-	make_path($outdir,{mode => 0755})  or die "Can't create $outdir: $!\n";
+	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
 }
 my $catdir = $outdir.'/CONCATENATED';
 unless (-d $catdir) {
@@ -212,23 +212,32 @@ while (my $fasta = shift@fasta){
 
 ### Creating concatenated files
 my $cat_kar = $catdir.'/concatenated.genotype';
+my $cat_kar_inv = $catdir.'/concatenated.inverted.genotype';
+
 open CONCAT, ">", $cat_kar or die "Can't create $cat_kar: $!\n";
+open CONCATINV, ">", $cat_kar_inv or die "Can't create $cat_kar_inv: $!\n";
+
 print CONCAT '#chr - ID LABEL START END COLOR'."\n";
+print CONCATINV '#chr - ID LABEL START END COLOR'."\n";
 
-foreach my $fileprefix (keys %sequences){
-
-	print $fileprefix."\n";
+foreach my $fileprefix (keys (%sequences)){
 
 	## Creating a "karyotype" file for Circos
 	my $circos_dir = $outdir.'/'.$fileprefix;
 	my $circos_kar = $circos_dir.'/'.$fileprefix.'.genotype';
+	my $circos_kar_inv = $circos_dir.'/'.$fileprefix.'.inverted.genotype';
+
 	open KAR, ">", $circos_kar or die "Can't create $circos_kar: $!\n";
+	open KARINV, ">", $circos_kar_inv or die "Can't create $circos_kar_inv: $!\n";
+
 	print KAR '#chr - ID LABEL START END COLOR'."\n";
+	print KARINV '#chr - ID LABEL START END COLOR'."\n";
+
+	my @seqs = sort (keys %{$sequences{$fileprefix}});
 
 	my $id = 0;
 
-	### Iterating through each sequence in the FASTA file
-	foreach my $sequence (sort (keys %{$sequences{$fileprefix}})){
+	foreach my $sequence (@seqs){
 
 		my $seq = $sequences{$fileprefix}{$sequence};
 		my $csize = length $seq;
@@ -238,13 +247,38 @@ foreach my $fileprefix (keys %sequences){
 		print KAR "chr - $sequence $id 0 $terminus black\n";
 		print CONCAT "chr - $sequence $id 0 $terminus black\n";
 
+		if ($fileprefix eq $reference){
+			print CONCATINV "chr - $sequence $id 0 $terminus black\n";
+		}
+
+	}
+
+	
+	my @rev_seqs = reverse(@seqs);
+	my $id_rev = 0;
+
+	foreach my $sequence (@rev_seqs){
+
+		my $seq = $sequences{$fileprefix}{$sequence};
+		my $csize = length $seq;
+
+		my $terminus = $csize - 1;
+		$id_rev++;
+		print KARINV "chr - $sequence $id_rev 0 $terminus black\n";
+
+		if ($fileprefix ne $reference){
+			print CONCATINV "chr - $sequence $id_rev 0 $terminus black\n";
+		}
+
 	}
 
 	close KAR;
+	close KARINV;
 
 }
 
 close CONCAT;
+close CONCATINV;
 
 ## Ideogram for Circos
 my $ideogram = $outdir.'/'.'ideogram.conf';
@@ -375,136 +409,145 @@ my @custom_set = (
 for my $genome ((keys %sequences), 'concatenated'){
 
 	my $subdir = $outdir.'/'.$genome;
-	my $karyotype = $subdir.'/'.$genome.'.genotype';
-	my $config = $subdir.'/'.$genome.'.conf';
 	my $subfile = $subdir.'/'.$genome;
+	my $karyotype = $subfile.'.genotype';
+	my $config = $subfile.'.conf';
 	
-	my $image = $genome.'.png';
+	## Creating conf files for Circos
+	for my $orientation ('normal', 'inverted'){
 
-	## Creating a conf file for Circos
-	open my $cg, '>', $config or die $!;
-
-	print $cg "<<include $ideogram>>"."\n";
-	print $cg "<<include $ticks>>"."\n\n";
-	print $cg "karyotype = $karyotype"."\n";
-	print $cg 'chromosomes_units=10000'."\n\n";
-
-	## Biases plots
-	print $cg '<plots>'."\n";
-	print $cg '################# BIASES'."\n\n";
-
-	my $r_start = 0.99;
-	my $r_end = 0.95;
-	my $modulo_counter = 0;
-
-	for my $bias (@biases) {
-
-		$modulo_counter++;
-
-		print $cg '## '.$bias."\n";
-		print $cg '<plot>'."\n";
-		print $cg "file    = $subfile.$bias"."\n";
-
-		print $cg 'type      = line'."\n";
-		print $cg 'thickness = 2'."\n";
-		print $cg 'max_gap = 1u'."\n";
-		print $cg "color   = ".$colors{$bias}."\n";
-		print $cg 'min     = 20'."\n";
-		print $cg 'max     = 80'."\n";
-		print $cg "r1      = ${r_start}r"."\n";
-		print $cg "r0      = ${r_end}r"."\n\n";
-
-		print $cg $axes;
-		print $cg '</plot>'."\n\n";
-
-		if (($modulo_counter % 2) == 0){
-			$r_start -= 0.05;
-			$r_end -= 0.05;
+		if ($orientation eq 'inverted'){
+			$karyotype = $subfile.'.inverted.genotype';
+			$config = $subfile.'.inverted.conf';
 		}
 
-	}
+		open my $cg, '>', $config or die $!;
 
-	print $cg '</plots>'."\n\n";
+		print $cg "<<include $ideogram>>"."\n";
+		print $cg "<<include $ticks>>"."\n\n";
+		print $cg "karyotype = $karyotype"."\n";
+		print $cg 'chromosomes_units=10000'."\n\n";
 
-	## Links; only for concatenated genomes
-	if ($genome eq 'concatenated'){
-		my $link_start = $r_end + 0.04;
-		my $link_color = 'grey_a5';
+		## Biases plots
+		print $cg '<plots>'."\n";
+		print $cg '################# BIASES'."\n\n";
 
-		print $cg '########### Links'."\n\n";
-		print $cg '<links>'."\n\n";
+		my $r_start = 0.99;
+		my $r_end = 0.95;
+		my $modulo_counter = 0;
 
-		print $cg '<link>'."\n";
-		print $cg "file          = $subfile.gap_$gap.links"."\n";
-		print $cg "radius        = ${link_start}r"."\n";
-		print $cg 'bezier_radius = 0.1r'."\n";
-		print $cg 'ribbon = yes'."\n";
-		print $cg 'color         = '.$link_color."\n";
-		print $cg 'thickness     = 1'."\n";
+		for my $bias (@biases) {
 
-		## Rules
-		print $cg '<rules>'."\n\n";
+			$modulo_counter++;
 
-		## Counting for required colors
-		my $ref_sequence_count = scalar (keys %{$sequences{$reference}});
-		print "\n"."Total # of sequences in reference $reference = $ref_sequence_count"."\n";
+			print $cg '## '.$bias."\n";
+			print $cg '<plot>'."\n";
+			print $cg "file    = $subfile.$bias"."\n";
 
-		if ($custom_cc){
-			@color_set = @custom_set;
+			print $cg 'type      = line'."\n";
+			print $cg 'thickness = 2'."\n";
+			print $cg 'max_gap = 1u'."\n";
+			print $cg "color   = ".$colors{$bias}."\n";
+			print $cg 'min     = 20'."\n";
+			print $cg 'max     = 80'."\n";
+			print $cg "r1      = ${r_start}r"."\n";
+			print $cg "r0      = ${r_end}r"."\n\n";
+
+			print $cg $axes;
+			print $cg '</plot>'."\n\n";
+
+			if (($modulo_counter % 2) == 0){
+				$r_start -= 0.05;
+				$r_end -= 0.05;
+			}
+
 		}
-		elsif ($ref_sequence_count <= scalar(@rainbow)){
-			@color_set = @rainbow;
-		}
-		else {
-			@color_set = @bowgrey;
-		}
 
-		## Creating an increment so that it will use the full range of colors
-		## not just the start
-		my $increment = scalar(@color_set)/$ref_sequence_count;
-		my $rounded_increment = round($increment);
-		my $color_start = 0;
+		print $cg '</plots>'."\n\n";
 
-		## Making sure that the increment is >= 1
-		if ($rounded_increment == 0){
-			$rounded_increment == 1;
-		}
-		
-		foreach my $refseq (sort (keys %{$sequences{$reference}})){
-			foreach my $queseq (sort (keys %sequences)){
-				if (($queseq eq 'concatenated') or ($queseq eq $reference)){
-					next;
-				}
-				else{
-					foreach my $queseq_cg (sort (keys %{$sequences{$queseq}})){
-						print $cg '<rule>'."\n";
-						print $cg "condition  = between($refseq,$queseq_cg)"."\n";
-						print $cg "color      = ".$color_set[$color_start]."\n";
-						print $cg 'flow       = continue'."\n";
-						print $cg '</rule>'."\n\n";
+		## Links; only for concatenated genomes
+		if ($genome eq 'concatenated'){
+			my $link_start = $r_end + 0.04;
+			my $link_color = 'grey_a5';
+
+			print $cg '########### Links'."\n\n";
+			print $cg '<links>'."\n\n";
+
+			print $cg '<link>'."\n";
+			print $cg "file          = $subfile.gap_$gap.links"."\n";
+			print $cg "radius        = ${link_start}r"."\n";
+			print $cg 'bezier_radius = 0.1r'."\n";
+			print $cg 'ribbon = yes'."\n";
+			print $cg 'color         = '.$link_color."\n";
+			print $cg 'thickness     = 1'."\n";
+
+			## Rules
+			print $cg '<rules>'."\n\n";
+
+			## Counting for required colors
+			my $ref_sequence_count = scalar (keys %{$sequences{$reference}});
+			if ($orientation eq 'normal'){
+				print "\n"."Total # of sequences in reference $reference = $ref_sequence_count"."\n";
+			}
+
+			if ($custom_cc){
+				@color_set = @custom_set;
+			}
+			elsif ($ref_sequence_count <= scalar(@rainbow)){
+				@color_set = @rainbow;
+			}
+			else {
+				@color_set = @bowgrey;
+			}
+
+			## Creating an increment so that it will use the full range of colors
+			## not just the start
+			my $increment = scalar(@color_set)/$ref_sequence_count;
+			my $rounded_increment = round($increment);
+			my $color_start = 0;
+
+			## Making sure that the increment is >= 1
+			if ($rounded_increment == 0){
+				$rounded_increment == 1;
+			}
+			
+			foreach my $refseq (sort (keys %{$sequences{$reference}})){
+				foreach my $queseq (sort (keys %sequences)){
+					if (($queseq eq 'concatenated') or ($queseq eq $reference)){
+						next;
+					}
+					else{
+						foreach my $queseq_cg (sort (keys %{$sequences{$queseq}})){
+							print $cg '<rule>'."\n";
+							print $cg "condition  = between($refseq,$queseq_cg)"."\n";
+							print $cg "color      = ".$color_set[$color_start]."\n";
+							print $cg 'flow       = continue'."\n";
+							print $cg '</rule>'."\n\n";
+						}
 					}
 				}
+				$color_start += $rounded_increment;
+				## Check if no more colors left, if so restart from 1st color in color set
+				if ($color_start >= scalar(@color_set)){
+					$color_start = 0;
+				}
 			}
-			$color_start += $rounded_increment;
-			## Check if no more colors left, if so restart from 1st color in color set
-			if ($color_start >= scalar(@color_set)){
-				$color_start = 0;
-			}
+			print $cg '</rules>'."\n\n";
+
+			print $cg '</link>'."\n";
+			print $cg '</links>'."\n\n";
 		}
-		print $cg '</rules>'."\n\n";
 
-		print $cg '</link>'."\n";
-		print $cg '</links>'."\n\n";
+		## image.conf
+		print $cg '<image>'."\n";
+		print $cg '<<include etc/image.conf>>'."\n";
+		print $cg '</image>'."\n\n";
+		print $cg '<<include etc/colors_fonts_patterns.conf>>'."\n";
+		print $cg '<<include etc/housekeeping.conf>>'."\n";
+
+		close $cg;
+	
 	}
-
-	## image.conf
-	print $cg '<image>'."\n";
-	print $cg '<<include etc/image.conf>>'."\n";
-	print $cg '</image>'."\n\n";
-	print $cg '<<include etc/colors_fonts_patterns.conf>>'."\n";
-	print $cg '<<include etc/housekeeping.conf>>'."\n";
-
-	close $cg;
 
 	## Running circos; sometimes breaks because it doesn't
 	## find the links file (even if present); runs fine if done manually
@@ -514,6 +557,8 @@ for my $genome ((keys %sequences), 'concatenated'){
 	sleep(5);
 
 	if ($circos_plot){
+
+		my $image = $genome.'.png';
 
 		my $pngdir = $subdir.'/images/';
 		unless (-d $pngdir){
