@@ -37,7 +37,7 @@ OPTIONS (MAIN):
 
 OPTIONS (PLOTS): ## Requires Circos - http://circos.ca/
 -r (--ref)	Genome to use as reference
--c (--circos)	Generate Circos plots
+-c (--circos)	Generate Circos plots ## currently buggy!
 -custom		Use custom colors for Circos
 EXIT
 
