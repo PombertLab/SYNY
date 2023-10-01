@@ -219,6 +219,12 @@ open CONCATINV, ">", $cat_kar_inv or die "Can't create $cat_kar_inv: $!\n";
 print CONCAT '#chr - ID LABEL START END COLOR'."\n";
 print CONCATINV '#chr - ID LABEL START END COLOR'."\n";
 
+## Using first sequence as reference if none is provided
+	if (!$reference){
+		my @genomes = sort (keys %sequences);
+		$reference = $genomes[0];
+	}
+
 foreach my $fileprefix (keys (%sequences)){
 
 	## Creating a "karyotype" file for Circos
@@ -411,12 +417,6 @@ my %colors = (
 
 ### Creating files for both normal and inverted genotypes
 for my $genome ((keys %sequences), 'concatenated'){
-
-	## Using first sequence as reference if none is provided
-	if (!$reference){
-		my @genomes = sort (keys %sequences);
-		$reference = $genomes[0];
-	}
 
 	my $subdir = $outdir.'/'.$genome;
 	my $subfile = $subdir.'/'.$genome;
