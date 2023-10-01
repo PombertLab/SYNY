@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.4c';
+my $version = '0.4d';
 my $updated = '2023-10-01';
 
 use strict;
@@ -36,6 +36,7 @@ COMMAND		$name \\
 -r (--reference)	Genome reference for Circos plotting
 -c (--circos)	Run Circos to plot images
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
+-u (--unit)		Size unit (Kb or Mb) [Default: Mb]
 -custom		Use custom colors [c01 to c20]
 -t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
 OPTIONS
@@ -47,6 +48,7 @@ my $winsize = 1000;
 my $step = 500;
 my $reference;
 my $gap = 0;
+my $unit = 'Mb';
 my $circos_plot;
 my $custom_cc;
 my $tsv;
@@ -56,6 +58,7 @@ GetOptions(
 	'w|winsize=i' => \$winsize,
 	's|step=i' => \$step,
 	'c|circos' => \$circos_plot,
+	'u|unit=s' => \$unit,
 	'r|reference=s' => \$reference,
 	'g|gap=i' => \$gap,
 	'custom' => \$custom_cc,
@@ -305,7 +308,12 @@ close $id;
 my $ticks = $outdir.'/'.'ticks.conf';
 open my $tk, '>', $ticks or die $!;
 
-my $ticks_data = <<'TICKS';
+my $multiplier = '1e-6';
+if ($unit =~ /kb/i){
+	$multiplier = '1e-3';
+}
+
+my $ticks_data = <<"TICKS";
 show_ticks          = yes
 show_tick_labels    = yes
 
@@ -314,7 +322,7 @@ radius           = 1r
 orientation	= out
 tick_separation  = 3p
 label_separation = 1p
-multiplier       = 1e-6
+multiplier       = $multiplier
 color            = black
 thickness        = 3p
 
@@ -324,8 +332,7 @@ spacing        = 10u
 show_label     = yes
 label_size     = 15p
 label_offset   = 5p
-format         = %d
-suffix         = kb
+format         = \%d $unit
 grid           = yes
 grid_color     = dgrey
 grid_thickness = 1p
@@ -339,7 +346,7 @@ spacing        = 5u
 show_label     = yes
 label_size     = 10p
 label_offset   = 5p
-format         = %d
+format         = \%.1f
 thickness      = 1.5p
 color          = vdgrey
 </tick>
@@ -429,7 +436,12 @@ for my $genome ((keys %sequences), 'concatenated'){
 		print $cg "<<include $ideogram>>"."\n";
 		print $cg "<<include $ticks>>"."\n\n";
 		print $cg "karyotype = $karyotype"."\n";
-		print $cg 'chromosomes_units=10000'."\n\n";
+
+		my $unit_width = 100000;
+		if ($unit =~ /kb/i){
+			$unit_width = 10000;
+		}
+		print $cg 'chromosomes_units='.$unit_width."\n\n";
 
 		## Biases plots
 		print $cg '<plots>'."\n";
