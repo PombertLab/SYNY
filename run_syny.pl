@@ -19,23 +19,26 @@ UPDATED		${updated}
 SYNOPSIS	Runs all the components of the SYNY pipeline step-by-step.
 
 REQS		PerlIO::gzip
+		Diamond - https://github.com/bbuchfink/diamond
 
 USAGE		${name} \\
 		  -a *.gbff \\
 		  -g 5 \\
 		  -e 1e-10 \\
-		  -r CCMP1205 \\
-		  -o Chloropicon_synteny
+		  -o SYNY \\
+		  -r CCMP1205
 
-OPTION
+OPTIONS (MAIN):
 -a (--annot)	Annotation files (Supported files: gbff, gff, embl)
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
--r (--reference)	Genome to use as reference [for Circos]
--c (--circos)	Plot Circos images
+-p (--prot)	Protein files ## Now generated automatically from GenBank gbff files
+
+OPTIONS (PLOTS): ## Requires Circos - http://circos.ca/
+-r (--ref)	Genome to use as reference
+-c (--circos)	Generate Circos plots
 -custom		Use custom colors for Circos
--p (--prot)	Protein files ## Generated automatically from gbff files
 EXIT
 
 ## No yet implemented:
@@ -61,7 +64,7 @@ GetOptions(
 	'e|evalue=s' => \$evalue,
 	'g|gaps=s{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
-	'r|reference=s' => \$reference,
+	'r|ref|reference=s' => \$reference,
 	'c|circos' => \$circos,
 	'custom' => \$custom_colors,
 	'f|format=s{1,}' => \@formats,
