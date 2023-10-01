@@ -407,7 +407,7 @@ for my $genome ((keys %sequences), 'concatenated'){
 
 	## Using first sequence as reference if none is provided
 	if (!$reference){
-		my @genomes = keys %sequences;
+		my @genomes = sort (keys %sequences);
 		$reference = $genomes[0];
 	}
 
