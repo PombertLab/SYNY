@@ -385,10 +385,12 @@ my %colors = (
 
 my @color_set;
 
+# 6 colors per set
+my @yellows = ('vlyellow','lyellow','yellow','dyellow','vdyellow','vvdyellow');
+
 # 7 colors per set
 my @reds = ('vvlred','vlred','lred','red','dred','vdred','vvdred');
 my @oranges = ('vvlorange','vlorange','lorange','orange','dorange','vdorange','vvdorange');
-my @yellows = ('vvlyellow','vlyellow','lyellow','yellow','dyellow','vdyellow','vvdyellow',);
 my @greens = ('vvlgreen','vlgreen','lgreen','green','dgreen','vdgreen','vvdgreen');
 my @blues = ('vvlblue','vlblue','lblue','blue','dblue','vdblue','vvdblue');
 my @purples = ('vvlpurple','vlpurple','lpurple','purple','dpurple','vdpurple','vvdpurple');
@@ -396,8 +398,8 @@ my @purples = ('vvlpurple','vlpurple','lpurple','purple','dpurple','vdpurple','v
 # 8 colors per set; did not include vvvlgrey => too light can't see it on a white background
 my @greys = ('vvlgrey','vlgrey','lgrey','grey','dgrey','vdgrey','vvdgrey','vvvdgrey');
 
-my @rainbow = (@reds,@oranges,@yellows,@greens,@blues,@purples); ## 42 colors total
-my @bowgrey = (@rainbow,@greys); ## 50 colors total
+my @rainbow = (@reds,@oranges,@yellows,@greens,@blues,@purples); ## 41 colors total
+my @bowgrey = (@rainbow,@greys); ## 49 colors total
 
 # 20 custom color set 
 my @custom_set = (
