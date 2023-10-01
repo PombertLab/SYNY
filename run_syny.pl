@@ -38,6 +38,7 @@ OPTIONS (MAIN):
 
 OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 -r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
+-u (--unit)	Size unit (Kb or Mb) [Default: Mb]
 -c (--circos)	Generate Circos plots; currently buggy
 		# works if run independently on configuration files generated, e.g.:
 		# circos --conf concatenated.conf
@@ -58,6 +59,7 @@ my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
 my $reference;
+my $unit = 'Mb';
 my $circos;
 my $custom_colors;
 my @formats;
@@ -69,6 +71,7 @@ GetOptions(
 	'g|gaps=s{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
 	'r|ref|reference=s' => \$reference,
+	'u|unit=s' => \$unit,
 	'c|circos' => \$circos,
 	'custom' => \$custom_colors,
 	'f|format=s{1,}' => \@formats,
@@ -228,6 +231,11 @@ if ($custom_colors){
 	$custom_cc = '--custom';
 }
 
+my $unit_size = '';
+if ($unit){
+	$unit_size = "--unit $unit";
+}
+
 my $gap = $gaps[0];
 
 system("
@@ -238,6 +246,7 @@ system("
 	--step 5000 \\
 	--gap $gap \\
 	$ref \\
+	$unit_size \\
 	$circos_plot \\
 	$custom_cc \\
 	2>> $outdir/error.log
