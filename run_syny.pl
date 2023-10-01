@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.2';
-my $updated = '2023-09-30';
+my $version = '0.5.2a';
+my $updated = '2023-10-01';
 
 use strict;
 use warnings;
@@ -213,7 +213,7 @@ if ($reference){
 
 my $circos_plot = '';
 if ($circos){
-	$circos_plot = '--plot';
+	$circos_plot = '--circos';
 }
 
 my $custom_cc = '';
@@ -229,7 +229,6 @@ system("
 	--fasta $outdir/GENOME/*.fasta \\
 	--winsize 10000 \\
 	--step 5000 \\
-	--circos \\
 	--gap $gap \\
 	$ref \\
 	$circos_plot \\
