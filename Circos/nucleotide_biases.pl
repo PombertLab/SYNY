@@ -405,6 +405,12 @@ my %colors = (
 ### Creating files for both normal and inverted genotypes
 for my $genome ((keys %sequences), 'concatenated'){
 
+	## Using first sequence as reference if none is provided
+	if (!$reference){
+		my @genomes = keys %sequences;
+		$reference = $genomes[0];
+	}
+
 	my $subdir = $outdir.'/'.$genome;
 	my $subfile = $subdir.'/'.$genome;
 	my $karyotype = $subfile.'.genotype';
