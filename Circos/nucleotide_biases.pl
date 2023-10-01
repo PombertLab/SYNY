@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.4b';
-my $updated = '2023-09-30';
+my $version = '0.4c';
+my $updated = '2023-10-01';
 
 use strict;
 use warnings;
@@ -24,20 +24,18 @@ COMMAND		$name \\
 		  -outdir output_directory \\
 		  -winsize 1000 \\
 		  -step 500 \\
+		  -reference CCMP1205 \\
 		  -circos \\
 		  -gap 0 \\
-		  -plot \\
 		  -custom
-		  -reference CCMP1205
 
 -f (--fasta)	Fasta file(s) to process
 -o (--outdir)	Output directory [Default: ntBiases]
 -w (--winsize)	Sliding window size [Default: 10000]
 -s (--step)		Sliding window step [Default: 5000]
--c (--circos)	Output files for Circos plotting
 -r (--reference)	Genome reference for Circos plotting
+-c (--circos)	Run Circos to plot images
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
--p (--plot)	Plot Circos images
 -custom		Use custom colors [c01 to c20]
 -t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
 OPTIONS
@@ -47,7 +45,6 @@ my @fasta;
 my $outdir = 'ntBiases';
 my $winsize = 1000;
 my $step = 500;
-my $circos;
 my $reference;
 my $gap = 0;
 my $circos_plot;
@@ -58,10 +55,9 @@ GetOptions(
 	'o|outdir=s' => \$outdir,
 	'w|winsize=i' => \$winsize,
 	's|step=i' => \$step,
-	'c|circos' => \$circos,
+	'c|circos' => \$circos_plot,
 	'r|reference=s' => \$reference,
 	'g|gap=i' => \$gap,
-	'p|plot' => \$circos_plot,
 	'custom' => \$custom_cc,
 	't|tsv' => \$tsv
 );
@@ -125,21 +121,17 @@ while (my $fasta = shift@fasta){
 	my $circos_GA;
 	my $circos_CT;
 	
-	if ($circos){
+	my $circos_dir = $outdir.'/'.$fileprefix;
+	unless (-d $circos_dir) {
+			make_path($circos_dir,{mode => 0755}) or die "Can't create $circos_dir: $!\n";
+	}
 
-		my $circos_dir = $outdir.'/'.$fileprefix;
-		unless (-d $circos_dir) {
-				make_path($circos_dir,{mode => 0755}) or die "Can't create $circos_dir: $!\n";
-		}
-
-		## Nucleotide biases
-		for my $fh (@filehandles){
-			my ($lfh) = $fh =~ /(\w+)$/; ## grabbing test from filehandle
-			my $filename = $circos_dir.'/'.$fileprefix.'.'.$lfh;
-			open $fh, ">", $filename or die "Can't create $filename: $!\n";
-			print $fh '#chr START END GC_PERCENTAGE'."\n";
-		}
-
+	## Nucleotide biases
+	for my $fh (@filehandles){
+		my ($lfh) = $fh =~ /(\w+)$/; ## grabbing test from filehandle
+		my $filename = $circos_dir.'/'.$fileprefix.'.'.$lfh;
+		open $fh, ">", $filename or die "Can't create $filename: $!\n";
+		print $fh '#chr START END GC_PERCENTAGE'."\n";
 	}
 
 	### Iterating through each sequence in the FASTA file
@@ -165,15 +157,13 @@ while (my $fasta = shift@fasta){
 			%percent = ();
 			biases($subseq,$x);
 
-			if ($circos){
-				foreach my $fh (@filehandles){
-					my ($lfh) = $fh =~ /(\w+)$/;
-					print $fh "$sequence $x $end $percent{$lfh}\n";
-				}
-				foreach my $cfh (@cathandles){
-					my ($lfh) = $cfh =~ /C(\w+)$/;
-					print $cfh "$sequence $x $end $percent{$lfh}\n";
-				}
+			foreach my $fh (@filehandles){
+				my ($lfh) = $fh =~ /(\w+)$/;
+				print $fh "$sequence $x $end $percent{$lfh}\n";
+			}
+			foreach my $cfh (@cathandles){
+				my ($lfh) = $cfh =~ /C(\w+)$/;
+				print $cfh "$sequence $x $end $percent{$lfh}\n";
 			}
 
 		}
@@ -186,16 +176,14 @@ while (my $fasta = shift@fasta){
 		%percent = ();
 		biases($subseqleft,$x);
 
-		if ($circos){
-			my $end = $csize - 1;
-			foreach my $fh (@filehandles){
-				my ($lfh) = $fh =~ /(\w+)$/;
-				print $fh "$sequence $x $end $percent{$lfh}\n";
-			}
-			foreach my $cfh (@cathandles){
-				my ($lfh) = $cfh =~ /C(\w+)$/;
-				print $cfh "$sequence $x $end $percent{$lfh}\n";
-			}
+		my $end = $csize - 1;
+		foreach my $fh (@filehandles){
+			my ($lfh) = $fh =~ /(\w+)$/;
+			print $fh "$sequence $x $end $percent{$lfh}\n";
+		}
+		foreach my $cfh (@cathandles){
+			my ($lfh) = $cfh =~ /C(\w+)$/;
+			print $cfh "$sequence $x $end $percent{$lfh}\n";
 		}
 
 		close BIAS;
@@ -210,7 +198,15 @@ while (my $fasta = shift@fasta){
 ### Circos
 ####################################################################
 
-### Creating concatenated files
+############## Creating genotype/karyotype files
+
+# Normal = genotypes in the same order as encountered
+# Inverted = genotypes in reversed order (except in the contatenated file):
+# In the inverted concatenated file, all but the reference genotypes
+# are in reversed order. This can help visualize synteny when comparing
+# genomes to the reference => sometimes the reversed order is more
+# informative than the normal one
+
 my $cat_kar = $catdir.'/concatenated.genotype';
 my $cat_kar_inv = $catdir.'/concatenated.inverted.genotype';
 
@@ -280,7 +276,7 @@ foreach my $fileprefix (keys (%sequences)){
 close CONCAT;
 close CONCATINV;
 
-## Ideogram for Circos
+############## Creating a default ideogram configuration for Circos
 my $ideogram = $outdir.'/'.'ideogram.conf';
 open my $id, '>', $ideogram or die $!;
 
@@ -305,7 +301,7 @@ IDEO
 print $id $ideogram_data."\n";
 close $id;
 
-############## Ticks
+############## Creating a default ticks configuration for Circos
 my $ticks = $outdir.'/'.'ticks.conf';
 open my $tk, '>', $ticks or die $!;
 
@@ -361,26 +357,6 @@ TICKS
 print $tk $ticks_data."\n";
 close $tk;
 
-my $axes = <<'AXES';
-<axes>
-	<axis>
-	color     = lgrey_a2
-	thickness = 1
-	spacing   = 0.025r
-	</axis>
-</axes>
-AXES
-
-my @biases = ('GC','AT','GT','AC','GA','CT');
-my %colors = (
-	'GC' => 'vdred',
-	'AT' => 'vdgrey',
-	'GT' => 'vdblue',
-	'AC' => 'vdgreen',
-	'GA' => 'vdpurple',
-	'CT' => 'vdyellow'
-);
-
 #################### Circos colors
 
 my @color_set;
@@ -407,7 +383,26 @@ my @custom_set = (
 	'c11','c12','c13','c14','c15','c16','c17','c18','c19','c20'
 );
 
-############## conf
+custom_colors();
+
+
+############## Creating configuration files for Circos
+
+### Nucleotides biases calculated by nucleotide_biases.pl
+### Using same color scheme as in Mascarenhas dos Santos et al. (2023)
+### https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-023-09331-3
+
+my @biases = ('GC','AT','GT','AC','GA','CT');
+my %colors = (
+	'GC' => 'vdred',
+	'AT' => 'vdgrey',
+	'GT' => 'vdblue',
+	'AC' => 'vdgreen',
+	'GA' => 'vdpurple',
+	'CT' => 'vdyellow'
+);
+
+### Creating files for both normal and inverted genotypes
 for my $genome ((keys %sequences), 'concatenated'){
 
 	my $subdir = $outdir.'/'.$genome;
@@ -445,7 +440,6 @@ for my $genome ((keys %sequences), 'concatenated'){
 			print $cg '## '.$bias."\n";
 			print $cg '<plot>'."\n";
 			print $cg "file    = $subfile.$bias"."\n";
-
 			print $cg 'type      = line'."\n";
 			print $cg 'thickness = 2'."\n";
 			print $cg 'max_gap = 1u'."\n";
@@ -454,8 +448,7 @@ for my $genome ((keys %sequences), 'concatenated'){
 			print $cg 'max     = 80'."\n";
 			print $cg "r1      = ${r_start}r"."\n";
 			print $cg "r0      = ${r_end}r"."\n\n";
-
-			print $cg $axes;
+			axes(\*$cg);
 			print $cg '</plot>'."\n\n";
 
 			if (($modulo_counter % 2) == 0){
@@ -551,15 +544,26 @@ for my $genome ((keys %sequences), 'concatenated'){
 	
 	}
 
-	## Running circos; sometimes breaks because it doesn't
-	## find the links file (even if present); runs fine if done manually
-	## sleep() timer doesn't seem to fix it...
-	## Not sure what causes Circos to misbehave
+}
 
-	sleep(5);
+####################################################################
+### Running Circos
+####################################################################
 
-	if ($circos_plot){
+## Running circos; sometimes breaks because it doesn't
+## find the links file (even if present); runs fine if done manually
+## sleep() timer doesn't seem to fix it...
+## Not sure what causes Circos to misbehave
 
+if ($circos_plot){
+
+	sleep(10);
+
+	for my $genome ((keys %sequences), 'concatenated'){
+
+		my $subdir = $outdir.'/'.$genome;
+		my $subfile = $subdir.'/'.$genome;
+		my $config = $subfile.'.conf';
 		my $image = $genome.'.png';
 
 		my $pngdir = $subdir.'/images/';
@@ -567,48 +571,30 @@ for my $genome ((keys %sequences), 'concatenated'){
 			make_path($pngdir,{mode => 0755}) or die "Can't create $pngdir: $!\n";
 		}
 
-		print "\n\nRunning Circos on $pngdir\n\n";
-		system "circos \\
-		-conf $config \\
-		-outputfile $image \\
-		-outputdir $pngdir";
-	
+		for my $orientation ('normal', 'inverted'){
+
+			if ($orientation eq 'inverted'){
+				$config = $subfile.'.inverted.conf';
+				$image = $genome.'.inverted.png';
+			}
+
+			print "\n\nRunning Circos for $genome: $orientation\n\n";
+
+			system ("circos \\
+			  -conf $config \\
+			  -outputfile $image \\
+			  -outputdir $pngdir"
+			);
+		
+		}
+
 	}
 
 }
 
-#################### custom colors
-# Set of a 20 colors custom palette created for Chloropicon manuscript
-my $custom_colors =<<'COLORS';
-## Custom colors:
-## Add these colors to Circos etc/colors.conf
-c01	= 202,75,75
-c02	= 239,60,104
-c03	= 241,102,140
-c04	= 245,152,162
-c05	= 245,126,47
-c06	= 250,166,55
-c07	= 255,197,61
-c08	= 255,228,67
-c09	= 210,213,76
-c10	= 147,195,84
-c11	= 18,178,89
-c12	= 0,179,127
-c13	= 0,180,161
-c14	= 0,182,204
-c15	= 0,183,241
-c16	= 0,157,218
-c17	= 64,131,196
-c18	= 94,104,176
-c19	= 108,82,162
-c20	= 122,42,144
-COLORS
-
-my $color_file = $outdir.'/custom_colors.conf';
-open COL, '>', $color_file or die "Can't create $color_file: $!\n";
-print COL $custom_colors;
-
+####################################################################
 ### Subroutine(s)
+####################################################################
 
 sub biases {
 
@@ -633,5 +619,48 @@ sub biases {
 		if ($tsv){
 			print BIAS "$pos\t$gc\t$at\t$ga\t$ct\t$gt\t$ac\n";
 		}
+
+}
+
+sub axes {
+	my $fh = $_[0];
+	print $fh '<axes>'."\n";
+	print $fh "\t".'<axis>'."\n";
+	print $fh "\t".'color     = lgrey_a2'."\n";
+	print $fh "\t".'thickness = 1'."\n";
+	print $fh "\t".'spacing   = 0.025r'."\n";
+	print $fh "\t".'</axis>'."\n";
+	print $fh '</axes>'."\n";
+}
+
+sub custom_colors {
+
+	my $color_file = $outdir.'/custom_colors.conf';
+	open COL, '>', $color_file or die "Can't create $color_file: $!\n";
+
+	print COL '### Custom palette of 20 colors created for the Chloropicon manuscript:'."\n";
+	print COL '### https://www.nature.com/articles/s41467-019-12014-x'."\n\n";
+
+	print COL '### Add these colors to Circos etc/colors.conf'."\n";
+	print COL 'c01	= 202,75,75'."\n";
+	print COL 'c02	= 239,60,104'."\n";
+	print COL 'c03	= 241,102,140'."\n";
+	print COL 'c04	= 245,152,162'."\n";
+	print COL 'c05	= 245,126,47'."\n";
+	print COL 'c06	= 250,166,55'."\n";
+	print COL 'c07	= 255,197,61'."\n";
+	print COL 'c08	= 255,228,67'."\n";
+	print COL 'c09	= 210,213,76'."\n";
+	print COL 'c10	= 147,195,84'."\n";
+	print COL 'c11	= 18,178,89'."\n";
+	print COL 'c12	= 0,179,127'."\n";
+	print COL 'c13	= 0,180,161'."\n";
+	print COL 'c14	= 0,182,204'."\n";
+	print COL 'c15	= 0,183,241'."\n";
+	print COL 'c16	= 0,157,218'."\n";
+	print COL 'c17	= 64,131,196'."\n";
+	print COL 'c18	= 94,104,176'."\n";
+	print COL 'c19	= 108,82,162'."\n";
+	print COL 'c20	= 122,42,144'."\n";
 
 }
