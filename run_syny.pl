@@ -16,15 +16,16 @@ my $usage = <<"EXIT";
 NAME		${name}
 VERSION		${version}
 UPDATED		${updated}
-SYNOPSIS	Runs all the components of the SYNY pipeline step-by-step.
+SYNOPSIS	Runs all the components of the SYNY pipeline and
+		creates configuration files for Circos plots
 
 REQS		PerlIO::gzip
 		Diamond - https://github.com/bbuchfink/diamond
 
 USAGE		${name} \\
 		  -a *.gbff \\
-		  -g 5 \\
 		  -e 1e-10 \\
+		  -g 0 1 5 \\
 		  -o SYNY \\
 		  -r CCMP1205
 
@@ -33,12 +34,15 @@ OPTIONS (MAIN):
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
--p (--prot)	Protein files ## Now generated automatically from GenBank gbff files
+-p (--prot)	Protein files # Now generated automatically from GenBank gbff files
 
-OPTIONS (PLOTS): ## Requires Circos - http://circos.ca/
--r (--ref)	Genome to use as reference
--c (--circos)	Generate Circos plots ## currently buggy!
--custom		Use custom colors for Circos
+OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
+-r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
+-c (--circos)	Generate Circos plots; currently buggy
+		# works if run independently on configuration files generated, e.g.:
+		# circos --conf concatenated.conf
+-custom		Use custom color palette (20 colors) from Lemieux et al. (2019):
+		# https://pubmed.ncbi.nlm.nih.gov/31492891/
 EXIT
 
 ## No yet implemented:
