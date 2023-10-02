@@ -239,6 +239,7 @@ foreach my $fileprefix (keys (%sequences)){
 	print KARINV '#chr - ID LABEL START END COLOR'."\n";
 
 	my @seqs = sort (keys %{$sequences{$fileprefix}});
+	my $num_of_seq = scalar (@seqs);
 
 	my $id = 0;
 
@@ -260,7 +261,7 @@ foreach my $fileprefix (keys (%sequences)){
 
 	
 	my @rev_seqs = reverse(@seqs);
-	my $id_rev = 0;
+	my $id_rev = $num_of_seq;
 
 	foreach my $sequence (@rev_seqs){
 
@@ -268,12 +269,13 @@ foreach my $fileprefix (keys (%sequences)){
 		my $csize = length $seq;
 
 		my $terminus = $csize - 1;
-		$id_rev++;
 		print KARINV "chr - $sequence $id_rev 0 $terminus black\n";
 
 		if ($fileprefix ne $reference){
 			print CONCATINV "chr - $sequence $id_rev 0 $terminus black\n";
 		}
+		
+		$id_rev--;
 
 	}
 
