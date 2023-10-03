@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.4d';
-my $updated = '2023-10-01';
+my $version = '0.4e';
+my $updated = '2023-10-03';
 
 use strict;
 use warnings;
@@ -158,7 +158,7 @@ while (my $fasta = shift@fasta){
 			my $end = $x + $winsize - 1;
 			
 			%percent = ();
-			biases($subseq,$x);
+			biases($subseq,$x,$winsize);
 
 			foreach my $fh (@filehandles){
 				my ($lfh) = $fh =~ /(\w+)$/;
@@ -177,7 +177,7 @@ while (my $fasta = shift@fasta){
 		my $leftover_size = length $subseqleft;
 
 		%percent = ();
-		biases($subseqleft,$x);
+		biases($subseqleft,$x,$leftover_size);
 
 		my $end = $csize - 1;
 		foreach my $fh (@filehandles){
@@ -620,6 +620,7 @@ sub biases {
 
 		my $curseq = $_[0];
 		my $pos = $_[1];
+		my $divider = $_[2];
 
 		my $gc = $curseq =~ tr/GgCc//;
 		my $at = $curseq =~ tr/AaTt//;
@@ -629,12 +630,12 @@ sub biases {
 		my $ac = $curseq =~ tr/AaCc//;
 		
 
-		$percent{'GC'} = $gc = ($gc/$winsize) * 100;
-		$percent{'AT'} = $at = ($at/$winsize) * 100;
-		$percent{'GA'} = $ga = ($ga/$winsize) * 100;
-		$percent{'CT'} = $ct = ($ct/$winsize) * 100;
-		$percent{'GT'} = $gt = ($gt/$winsize) * 100;
-		$percent{'AC'} = $ac = ($ac/$winsize) * 100;
+		$percent{'GC'} = $gc = ($gc/$divider) * 100;
+		$percent{'AT'} = $at = ($at/$divider) * 100;
+		$percent{'GA'} = $ga = ($ga/$divider) * 100;
+		$percent{'CT'} = $ct = ($ct/$divider) * 100;
+		$percent{'GT'} = $gt = ($gt/$divider) * 100;
+		$percent{'AC'} = $ac = ($ac/$divider) * 100;
 
 		if ($tsv){
 			print BIAS "$pos\t$gc\t$at\t$ga\t$ct\t$gt\t$ac\n";
