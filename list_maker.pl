@@ -27,7 +27,7 @@ OPTIONS
 $usage .= <<'REGEX';
 OPTIONS:
 -i (--input)	Input file(s) (GZIP supported; File type determined by file extension)
--o (--outdir)	Output directory [Default: LISTS]
+-o (--outdir)	Output directory [Default: LIST_MAKER]
 -r (--regex)	For GFF files; regular expression to parse;  default:
 
 		'^(\S+).*CDS\s+(\d+)\s+(\d+)\s+\.\s+([+-])\s+[012.].*(?:NCBI_GP|Genbank):(\w+\.\d+)'
