@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.1';
-my $updated = '2023-09-25';
+my $version = '0.5.2';
+my $updated = '2023-10-06';
 
 use strict;
 use warnings;
@@ -120,6 +120,8 @@ foreach my $input_file (@input_files){
 
 		my $sequence;
 
+		my $incomplete_product_name;
+
 		while (my $line = <GBK>){
 			
 			chomp $line;
@@ -165,9 +167,26 @@ foreach my $input_file (@input_files){
 					$locus = $1;
 					$locus =~ s/\W/\_/g;
 				}
+
+				## Checking for product names, including accross multiple lines
 				elsif ($line =~ /^\s{21}\/product="(.*)"/){
 					print ANNOT "$locus\t$1\n";
 				}
+				elsif ($line =~ /^\s{21}\/product="(.*)/){
+					$incomplete_product_name = $1;
+					print 'incomplete product'.$locus."\n";
+				}
+				elsif ((defined $incomplete_product_name) && ($line =~ /^\s{21}(.*)\"$/)){
+					$incomplete_product_name .= ' ';
+					$incomplete_product_name .= $1;
+					print ANNOT "$locus\t$incomplete_product_name\n";
+					$incomplete_product_name = undef;
+				}
+				elsif ((defined $incomplete_product_name) && ($line =~ /^\s{21}(.*)/)){
+					$incomplete_product_name .= ' ';
+					$incomplete_product_name .= $1;
+				}
+
 				elsif ($line =~ /^\s{21}\/translation="([a-zA-Z]+)"*/){
 					$translate = 1;
 					$sequence .= $1;
