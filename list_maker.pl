@@ -174,7 +174,6 @@ foreach my $input_file (@input_files){
 				}
 				elsif ($line =~ /^\s{21}\/product="(.*)/){
 					$incomplete_product_name = $1;
-					print 'incomplete product'.$locus."\n";
 				}
 				elsif ((defined $incomplete_product_name) && ($line =~ /^\s{21}(.*)\"$/)){
 					$incomplete_product_name .= ' ';
