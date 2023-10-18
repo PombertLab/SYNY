@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.2a';
-my $updated = '2023-10-01';
+my $version = '0.5.3';
+my $updated = '2023-10-18';
 
 use strict;
 use warnings;
@@ -102,6 +102,7 @@ my $prot_dir = "$outdir/PROT_SEQ";
 my $annot_dir = "$outdir/ANNOTATIONS";
 my $diamond_dir = "$outdir/DIAMOND";
 my $db_dir = "$diamond_dir/DB";
+my $shared_dir = "$outdir/SHARED";
 my $synteny_dir = "$outdir/SYNTENY";
 my $conserved_dir = "$outdir/CONSERVED";
 
@@ -157,6 +158,8 @@ system("
 	--input @prot_files \\
 	--evalue $evalue \\
 	--outdir $diamond_dir \\
+	--shared $shared_dir \\
+	--list $list_dir \\
 	2>> $outdir/error.log
 ");
 
