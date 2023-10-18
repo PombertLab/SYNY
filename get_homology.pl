@@ -202,13 +202,14 @@ foreach my $prefix (@prefixes){
 	open SHA, '>', $shared or die "Can't create $shared:$!\n"; 
 
 	## Printing header
-	print SHA '#'.$prefix;
-	foreach my $key (sort (keys %hom_results)){
-		my ($query, $subject) = split('_vs_', $key);
-		print SHA "\t".$subject.' locus';
-		print SHA "\t".$subject.' evalue';
+	print SHA '# '.$prefix;
+	foreach my $subject (sort @prefixes){
+		if ($subject ne $prefix){
+			print SHA "\t".$subject.' locus';
+			print SHA "\t".$subject.' evalue';
+		}
 	}
-	print SHA '\n';
+	print SHA "\n";
 
 	# Working on data
 	while (my $line = <LIST>){
@@ -223,13 +224,18 @@ foreach my $prefix (@prefixes){
 
 		foreach my $key (sort (keys %hom_results)){
 
-			if (exists $hom_results{$key}{$protein}){
-				$found = 1;
-				$line_out .= "\t$hom_results{$key}{$protein}{subject}";
-				$line_out .= "\t$hom_results{$key}{$protein}{evalue}";
-			}
-			else {
-				$line_out .= "\t---" x 2;
+			## Print only relevant entrys from the master results database
+			if ($key =~ /^$prefix/){
+
+				if (exists $hom_results{$key}{$protein}){
+					$found = 1;
+					$line_out .= "\t$hom_results{$key}{$protein}{subject}";
+					$line_out .= "\t$hom_results{$key}{$protein}{evalue}";
+				}
+				else {
+					$line_out .= "\t---" x 2;
+				}
+
 			}
 
 		}
