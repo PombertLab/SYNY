@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+## Pombert Lab, 2022
 
 use warnings;
 use strict;
@@ -9,13 +10,14 @@ use File::Path qw(make_path);
 my $name = "get_homology.pl";
 my $version = "0.1.6a";
 my $updated = "2023-10-19";
+
 my $usage = << "EXIT";
-NAME		$name
-VERSION		$version
-UPDATED		$updated
+NAME		${name}
+VERSION		${version}
+UPDATED		${updated}
 SYNOPSIS	Creates DIAMOND databases based on input protein files and performs round-robin BLASTP homology searches
 
-USAGE		$name \\
+USAGE		${name} \\
 		  -i *.prot \\
 		  -a *.annotations \\
 		  -e 1e-40 \\
@@ -153,7 +155,6 @@ foreach my $annot (@annotation_files){
 		chomp $line;
 		my ($locus, $description) = split("\t", $line);
 		$annotations{$locus} = $description;
-		# print $locus."\t".$description."\n";
 	}
 
 }
@@ -164,45 +165,45 @@ my %hom_results;
 
 foreach my $diamond (@diamond_results){
 
-    open DD, '<', $diamond or die "Can't open $diamond: $!\n";
-    my ($basename) = fileparse($diamond);
-    $basename =~ s/\.diamond\.6$//;
+	open DD, '<', $diamond or die "Can't open $diamond: $!\n";
+	my ($basename) = fileparse($diamond);
+	$basename =~ s/\.diamond\.6$//;
 
-    while (my $line = <DD>){
+	while (my $line = <DD>){
 
-        chomp $line;
+		chomp $line;
 
-        if ($line =~ /^#/){
-            next;
-        }
-        else {
+		if ($line =~ /^#/){
+			next;
+		}
+		else {
 
-            my @data = split ("\t", $line);
+			my @data = split ("\t", $line);
 
-            my $query = $data[0];
-            my $subject = $data[1];
-            my $eval = $data[10];
+			my $query = $data[0];
+			my $subject = $data[1];
+			my $eval = $data[10];
 
-            if ($eval <= $e_value){
-                
-                if (exists $hom_results{$basename}{$query}){
+			if ($eval <= $e_value){
+				
+				if (exists $hom_results{$basename}{$query}){
 					## Keeping only the best evalues
-                    if ($eval < $hom_results{$basename}{$query}{'evalue'}){
-                        $hom_results{$basename}{$query}{'subject'} = $subject;
-                        $hom_results{$basename}{$query}{'evalue'} = $eval;
-                    }
-                }
+					if ($eval < $hom_results{$basename}{$query}{'evalue'}){
+						$hom_results{$basename}{$query}{'subject'} = $subject;
+						$hom_results{$basename}{$query}{'evalue'} = $eval;
+					}
+				}
 
-                else {
-                    $hom_results{$basename}{$query}{'subject'} = $subject;
-                    $hom_results{$basename}{$query}{'evalue'} = $eval;
-                }
+				else {
+					$hom_results{$basename}{$query}{'subject'} = $subject;
+					$hom_results{$basename}{$query}{'evalue'} = $eval;
+				}
 
-            }
+			}
 
-        }
+		}
 
-    }
+	}
 
 	close DD;
 
