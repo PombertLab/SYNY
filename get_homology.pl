@@ -197,19 +197,23 @@ foreach my $prefix (@prefixes){
 
 	my $uniques = $shared_dir.'/'.$prefix.'.uniques.txt';
 	my $shared = $shared_dir.'/'.$prefix.'.shared.tsv';
+	my $all = $shared_dir.'/'.$prefix.'.all.tsv';
 
-	open UNI, '>', $uniques or die "Can't create $uniques:$!\n"; 
-	open SHA, '>', $shared or die "Can't create $shared:$!\n"; 
+	open UNI, '>', $uniques or die "Can't create $uniques: $!\n"; 
+	open SHA, '>', $shared or die "Can't create $shared: $!\n";
+	open ALL, '>', $all or die "Can't create $all: $!\n";
 
 	## Printing header
-	print SHA '# '.$prefix;
-	foreach my $subject (sort @prefixes){
-		if ($subject ne $prefix){
-			print SHA "\t".$subject.' locus';
-			print SHA "\t".$subject.' evalue';
+	for my $fh (\*SHA,\*ALL){
+		print $fh '# '.$prefix;
+		foreach my $subject (sort @prefixes){
+			if ($subject ne $prefix){
+				print $fh "\t".$subject.' locus';
+				print $fh "\t".$subject.' evalue';
+			}
 		}
+		print $fh "\n";
 	}
-	print SHA "\n";
 
 	# Working on data
 	while (my $line = <LIST>){
@@ -242,9 +246,11 @@ foreach my $prefix (@prefixes){
 
 		if ($found){
 			print SHA $line_out."\n";
+			print ALL $line_out."\n";
 		}
 		else {
 			print UNI $protein."\n";
+			print ALL $line_out."\n";
 		}
 
 		$found = undef;
