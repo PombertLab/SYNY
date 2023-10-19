@@ -217,7 +217,7 @@ foreach my $prefix (@prefixes){
 
 	open LIST, '<', $protein_list or die "Can't open $protein_list: $!\n";
 
-	my $uniques = $shared_dir.'/'.$prefix.'.uniques.txt';
+	my $uniques = $shared_dir.'/'.$prefix.'.uniques.tsv';
 	my $shared = $shared_dir.'/'.$prefix.'.shared.tsv';
 	my $all = $shared_dir.'/'.$prefix.'.all.tsv';
 
