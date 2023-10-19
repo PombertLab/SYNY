@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.3';
-my $updated = '2023-10-18';
+my $version = '0.5.3a';
+my $updated = '2023-10-19';
 
 use strict;
 use warnings;
@@ -160,6 +160,7 @@ system("
 	--outdir $diamond_dir \\
 	--shared $shared_dir \\
 	--list $list_dir \\
+	--annot $annot_dir/*.annotations \\
 	2>> $outdir/error.log
 ");
 
