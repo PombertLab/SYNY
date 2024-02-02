@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.4e';
-my $updated = '2023-10-03';
+my $version = '0.4f';
+my $updated = '2024-02-02';
 
 use strict;
 use warnings;
@@ -34,6 +34,7 @@ COMMAND		$name \\
 -w (--winsize)	Sliding window size [Default: 10000]
 -s (--step)		Sliding window step [Default: 5000]
 -r (--reference)	Genome reference for Circos plotting
+-n (--ncheck)	Check for ambiguous/masked (Nn) nucleotides
 -c (--circos)	Run Circos to plot images
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
 -u (--unit)		Size unit (Kb or Mb) [Default: Mb]
@@ -47,6 +48,7 @@ my $outdir = 'ntBiases';
 my $winsize = 1000;
 my $step = 500;
 my $reference;
+my $ncheck;
 my $gap = 0;
 my $unit = 'Mb';
 my $circos_plot;
@@ -57,6 +59,7 @@ GetOptions(
 	'o|outdir=s' => \$outdir,
 	'w|winsize=i' => \$winsize,
 	's|step=i' => \$step,
+	'n|ncheck' => \$ncheck,
 	'c|circos' => \$circos_plot,
 	'u|unit=s' => \$unit,
 	'r|reference=s' => \$reference,
@@ -117,12 +120,17 @@ while (my $fasta = shift@fasta){
 	no warnings 'once'; ## Filehandles are used in a loop...
 	my @filehandles = (*GC, *AT, *GT, *AC, *GA, *CT);
 
+	if ($ncheck){
+		@filehandles = (*GC, *AT, *GT, *AC, *GA, *CT, *NN);
+	}
+
 	my $circos_GC;
 	my $circos_AT;
 	my $circos_GT;
 	my $circos_AC;
 	my $circos_GA;
 	my $circos_CT;
+	my $circos_NN;
 	
 	my $circos_dir = $outdir.'/'.$fileprefix;
 	unless (-d $circos_dir) {
@@ -144,7 +152,11 @@ while (my $fasta = shift@fasta){
 
 		if ($tsv){
 			open BIAS, ">", $outfile or die "Can't create $outfile: $!\n";
-			print BIAS "# Location\t% GC\t% AT\t% AG\t% CT\t% GT\t% AC\n";
+			print BIAS "# Location\t% GC\t% AT\t% AG\t% CT\t% GT\t% AC";
+			if ($ncheck){
+				print BIAS "\t% NN";
+			}
+			print BIAS "\n";
 		}
 
 		### Sliding windows
@@ -408,13 +420,17 @@ custom_colors();
 ### https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-023-09331-3
 
 my @biases = ('GC','AT','GT','AC','GA','CT');
+if ($ncheck){
+	@biases = ('GC','AT','GT','AC','GA','CT','NN');
+}
 my %colors = (
 	'GC' => 'vdred',
 	'AT' => 'vdgrey',
 	'GT' => 'vdblue',
 	'AC' => 'vdgreen',
 	'GA' => 'vdpurple',
-	'CT' => 'vdyellow'
+	'CT' => 'vdyellow',
+	'NN' => 'black'
 );
 
 ### Creating files for both normal and inverted genotypes
@@ -523,7 +539,7 @@ for my $genome ((keys %sequences), 'concatenated'){
 
 			## Making sure that the increment is >= 1
 			if ($rounded_increment == 0){
-				$rounded_increment == 1;
+				$rounded_increment = 1;
 			}
 			
 			foreach my $refseq (sort (keys %{$sequences{$reference}})){
@@ -628,6 +644,7 @@ sub biases {
 		my $ct = $curseq =~ tr/CcTt//;
 		my $gt = $curseq =~ tr/GgTt//;
 		my $ac = $curseq =~ tr/AaCc//;
+		my $nn = $curseq =~ tr/Nn//;
 		
 
 		$percent{'GC'} = $gc = ($gc/$divider) * 100;
@@ -636,9 +653,14 @@ sub biases {
 		$percent{'CT'} = $ct = ($ct/$divider) * 100;
 		$percent{'GT'} = $gt = ($gt/$divider) * 100;
 		$percent{'AC'} = $ac = ($ac/$divider) * 100;
+		$percent{'NN'} = $nn = ($nn/$divider) * 100;
 
 		if ($tsv){
-			print BIAS "$pos\t$gc\t$at\t$ga\t$ct\t$gt\t$ac\n";
+			print BIAS "$pos\t$gc\t$at\t$ga\t$ct\t$gt\t$ac";
+			if ($ncheck){
+				print BIAS "\t$nn";
+			}
+			print BIAS "\n";
 		}
 
 }
