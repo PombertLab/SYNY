@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.4f';
-my $updated = '2024-02-02';
+my $version = '0.4g';
+my $updated = '2024-02-06';
 
 use strict;
 use warnings;
@@ -45,8 +45,8 @@ die "\n$usage\n" unless @ARGV;
 
 my @fasta;
 my $outdir = 'ntBiases';
-my $winsize = 1000;
-my $step = 500;
+my $winsize = 10000;
+my $step = 5000;
 my $reference;
 my $ncheck;
 my $gap = 0;
