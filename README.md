@@ -72,7 +72,7 @@ SYNY can be run from the master script as follows:<br>
 run_SYNY.pl \
   -a *.gbff \
   -g 5 \
-  -o Chloropicon_synteny
+  -o SYNY
 ```
 Options for run_SYNY.pl are:
 ```
