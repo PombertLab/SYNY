@@ -21,12 +21,12 @@ Synteny inferences can be used to:
 - Perform evolutionary distance analyses (<i>e.g.</i> species sharing similar/identical genome reorganization events are likely more closely related than species that do not share these events).
 
 ## <b>Requirements</b>
-- [DIAMOND](https://github.com/bbuchfink/diamond) ## To perform homology searches
+- [DIAMOND](https://github.com/bbuchfink/diamond)
 - [Perl5](https://www.perl.org/)
 - [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip)
 
 ##### <b>Optional</b>
-- [Circos](https://circos.ca/) ## To generate circos plots
+- [Circos](https://circos.ca/)
 
 #### <b>Downloading SYNY from GitHub</b>
 
@@ -40,7 +40,7 @@ sudo cpan<br>
 cpan[1]> install PerlIO::gzip
 
 ##### To install DIAMOND:
-version=v2.1.9 ## Replace value with desired DIAMOND version<br>
+version=v2.1.9 ## Replace with desired DIAMOND version<br>
 DIR=/opt/diamond ## Replace with desired installation directory<br>
 mkdir -p $DIR
 
@@ -60,7 +60,7 @@ The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SY
 4. Identifies sample-wide conserved genes, as well as missing or unique proteins for each species.
 5. Generates configuration files/templates for plotting with [Circos](https://circos.ca/).
 
-SYNY can be run utilizing the master script as follows:<br>
+SYNY can be run from the master script as follows:<br>
 ```
 run_SYNY.pl \
   -a *.gbff \
@@ -103,7 +103,7 @@ The contents of the subdirectories are:
 - ANNOTATIONS:
 	- Tab-delimited lists of locus_tags and their products
 - CIRCOS:
-	- Configuration files for plotting with Circos
+	- Configuration files for Circos plots
 - CONSERVED:
 	- List of proteins that are conserved within the sample, for each species (.conserved)
 	- Summary of all homology results and conservation within the sample, for each species (.conserved_summary)
