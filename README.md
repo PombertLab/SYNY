@@ -143,7 +143,6 @@ Below is a quick example describing how to compare two genomes from <i>Cryptococ
 ##### Downloading annotation data from GenBank (NCBI):
 ```bash
 DATA=~/DATA
-SYNY=~/SYNY
 mkdir -p $DATA
 
 # Cryptococcus neoformans JEC21
@@ -159,6 +158,8 @@ curl \
 
 ##### Running SYNY:
 ```Bash
+SYNY=~/SYNY
+
 run_syny.pl \
   -a $DATA/*.gbff.gz \
   -g 0 1 5 \
