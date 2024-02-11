@@ -8,7 +8,8 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
   * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
   * [Installing dependencies](#installing-dependencies)
 * [Using SYNY](#Using-SYNY)
-  * [Examples](#Examples)
+  * [Command line options](#Command-line-options)
+  * [A step by step example](#A-step-by-step-example)
 * [References](#References)
 
 ## <b>Introduction</b>
@@ -58,6 +59,7 @@ export PATH=$PATH:$DIR
 ```
 
 ## <b>Using SYNY</b>
+### Command line options
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
 1. Extracts protein sequences from provided annotation files (currently supported: .gbf, .gbff, .prot, .embl).
 2. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches.
@@ -134,8 +136,7 @@ The contents of the subdirectories are:
 		- PAIRS:
 			- Round-robin identified gene pairs for each species
 
-## <b>SYNY step-by-step [Coming soon]</b>
-
+### <b>A step by step example</b>
 
 
 
