@@ -2,6 +2,15 @@
 
 The SYNY pipeline investigates gene colinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches.
 
+## Table of contents
+* [Introduction](#Introduction)
+* [Requirements](#Requirements)
+  * [Downloading from GitHub](#downloading-from-github)
+  * [Installing dependencies](#installing-dependencies)
+* [Examples](#Examples)
+  * [TEXT](#Text)
+* [References](#References)
+
 ## <b>Introduction</b>
 #### <b>What is synteny?</b>
 Synteny is the measure of similarity in gene organization between two species. Through time, genomes can be reorganized by large-scale events such as recombination, but also smaller events like -- but not exhaustively -- duplication, translocation, deletion, or inversion.
@@ -12,12 +21,38 @@ Synteny inferences can be used to:
 - Perform evolutionary distance analyses (<i>e.g.</i> species sharing similar/identical genome reorganization events are likely more closely related than species that do not share these events).
 
 ## <b>Requirements</b>
-- [Diamond](https://github.com/bbuchfink/diamond) ## To perform homology searches
+- [DIAMOND](https://github.com/bbuchfink/diamond) ## To perform homology searches
 - [Perl5](https://www.perl.org/)
 - [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip)
 
 ##### <b>Optional</b>
 - [Circos](https://circos.ca/) ## To generate circos plots
+
+#### <b>Downloading from GitHub</b>
+
+git clone https://github.com/PombertLab/SYNY.git
+cd SYNY
+export PATH=$PATH:$(pwd)
+
+#### <b>Installing dependencies</b>
+##### DIAMOND
+version=v2.1.9 ## Replace with desired DIAMOND version
+DIR=/opt/diamond
+
+mkdir -p $DIR
+
+curl \\
+  -L https://github.com/bbuchfink/diamond/releases/download/$version/diamond-linux64.tar.gz \\
+  -o $DIR/diamond-linux64.tar.gz
+
+tar -zxvf diamond-linux64.tar.gz --directory $DIR
+rm diamond-linux64.tar.gz
+
+export PATH=$PATH:$DIR
+
+##### PerlIO::gzip
+sudo cpan
+cpan[1]> install PerlIO::gzip
 
 ## <b>Using SYNY</b>
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
@@ -68,9 +103,9 @@ drwxr-xr-x. 3 julian julian 4.0K May 10 18:18 SYNTENY
 
 The contents of the subdirectories are:
 - ANNOTATIONS:
-	- Contains tab-delimited lists of locus_tags and their products
+	- Tab-delimited lists of locus_tags and their products
 - CIRCOS:
-	- Contains configuration files for plotting with Circos
+	- Configuration files for plotting with Circos
 - CONSERVED:
 	- List of proteins that are conserved within the sample, for each species (.conserved)
 	- Summary of all homology results and conservation within the sample, for each species (.conserved_summary)
@@ -80,15 +115,15 @@ The contents of the subdirectories are:
 		- BLASTP databases
 	- Round-robin BLASTP results (.diamond.6)
 - GENOME:
-	- Contains FASTA files from the genomes being investigated
+	- FASTA files from the investigated genomes
 - LISTS:
 	- Lists connecting accession numbers to locus tags (ALIASES)
 	- Lists of protein coding genes with location details (.list)
 - PROT_SEQ:
 	- Protein sequences for each species (.faa)
 - SHARED:
-	- Contains lists of all proteins and their top homologs (if any) in other species (.shared.tsv)
-	- Contains lists of proteins that are unique to each species (.uniques.tsv)
+	- Lists of all proteins and their top homologs (if any) in other species (.shared.tsv)
+	- Lists of proteins that are unique to each species (.uniques.tsv)
 - SYNTENY:
 	- Directory per specified gap allowance (gap_#)
 		- CLUSTERS:
