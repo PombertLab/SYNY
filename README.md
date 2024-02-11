@@ -35,10 +35,13 @@ cd SYNY<br>
 export PATH=$PATH:$(pwd)
 
 #### <b>Installing dependencies</b>
-##### DIAMOND
-version=v2.1.9 ## Replace with desired DIAMOND version
-DIR=/opt/diamond
+##### PerlIO::gzip
+sudo cpan<br>
+cpan[1]> install PerlIO::gzip
 
+##### DIAMOND
+version=v2.1.9 ## Replace with desired DIAMOND version<br>
+DIR=/opt/diamond
 mkdir -p $DIR
 
 curl \\<br>
@@ -46,13 +49,8 @@ curl \\<br>
   -o $DIR/diamond-linux64.tar.gz
 
 tar -zxvf diamond-linux64.tar.gz --directory $DIR<br>
-rm diamond-linux64.tar.gz
-
+rm diamond-linux64.tar.gz<br>
 export PATH=$PATH:$DIR
-
-##### PerlIO::gzip
-sudo cpan<br>
-cpan[1]> install PerlIO::gzip
 
 ## <b>Using SYNY</b>
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
