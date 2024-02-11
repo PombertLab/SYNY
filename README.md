@@ -2,7 +2,7 @@
 
 The SYNY pipeline investigates gene colinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches.
 
-## Table of contents
+## <b>Table of contents</b>
 * [Introduction](#Introduction)
 * [Requirements](#Requirements)
   * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
@@ -138,6 +138,47 @@ The contents of the subdirectories are:
 
 ### <b>A step by step example</b>
 
+Below is a quick example describing how to compare two genomes from <i>Cryptococcus neoformans</i> var. <i>neoformans</i> JEC21 and <i>Cryptococcus gattii</i> WM276 using annotation data available in public databases.
+
+##### Downloading annotation data from GenBank (NCBI):
+```bash
+DATA=~/DATA
+SYNY=~/SYNY
+mkdir -p $DATA
+
+# Cryptococcus neoformans JEC21
+curl \
+  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/091/045/GCF_000091045.1_ASM9104v1/GCF_000091045.1_ASM9104v1_genomic.gbff.gz \
+  -o $DATA/JEC21.gbff.gz
+
+# Cryptococcus gattii WM276
+curl \
+  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/185/945/GCF_000185945.1_ASM18594v1/GCF_000185945.1_ASM18594v1_genomic.gbff.gz \
+  -o $DATA/WM276.gbff.gz
+```
+
+##### Running SYNY:
+```Bash
+run_syny.pl \
+  -a $DATA/*.gbff.gz \
+  -g 0 1 5 \
+  -e 1e-10 \
+  -r JEC21 \
+  -o $SYNY
+```
+
+##### Plotting comparisons with Circos:
+```Bash
+circos \
+  -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
+  -outputdir $SYNY \
+  -outputfile WM276_vs_JEC21.png
+```
+
+##### Image generated with Circos and SYNY (using defaults):
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.png">
+</p>
 
 
 ## <b>References</b>
