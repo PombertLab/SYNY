@@ -29,28 +29,33 @@ Synteny inferences can be used to:
 - [Circos](https://circos.ca/)
 
 #### <b>Downloading SYNY from GitHub</b>
-
+```
 git clone https://github.com/PombertLab/SYNY.git<br>
 cd SYNY<br>
 export PATH=$PATH:$(pwd)
+```
 
 #### <b>Installing dependencies</b>
 ##### To install PerlIO::gzip:
-sudo cpan<br>
-cpan[1]> install PerlIO::gzip
+```
+sudo cpan
+  cpan[1]> install PerlIO::gzip
+```
 
 ##### To install DIAMOND:
-version=v2.1.9 ## Replace with desired DIAMOND version<br>
-DIR=/opt/diamond ## Replace with desired installation directory<br>
+```
+version=v2.1.9     ## Replace with desired DIAMOND version
+DIR=/opt/diamond   ## Replace with desired installation directory
 mkdir -p $DIR
 
-curl \\<br>
-  -L https://github.com/bbuchfink/diamond/releases/download/$version/diamond-linux64.tar.gz \\<br>
+curl \
+  -L https://github.com/bbuchfink/diamond/releases/download/$version/diamond-linux64.tar.gz \
   -o $DIR/diamond-linux64.tar.gz
 
-tar -zxvf diamond-linux64.tar.gz --directory $DIR<br>
-rm diamond-linux64.tar.gz<br>
+tar -zxvf diamond-linux64.tar.gz --directory $DIR
+rm diamond-linux64.tar.gz
 export PATH=$PATH:$DIR
+```
 
 ## <b>Using SYNY</b>
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
