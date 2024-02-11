@@ -2,8 +2,8 @@
 ## Pombert Lab, Illinois Tech 2023
 
 my $name = 'clusters2links.pl';
-my $version = '0.1';
-my $updated = '2023-09-26';
+my $version = '0.1a';
+my $updated = '2023-02-11';
 
 use strict;
 use warnings;
@@ -45,7 +45,7 @@ unless (-d $outdir) {
 }
 my $catdir = $outdir.'/CONCATENATED';
 unless (-d $catdir) {
-	make_path($catdir,{mode => 0755}) or die "Can't create $$catdir: $!\n";
+	make_path($catdir,{mode => 0755}) or die "Can't create $catdir: $!\n";
 }
 
 my %loci_db;
