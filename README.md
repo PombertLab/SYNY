@@ -77,21 +77,21 @@ run_SYNY.pl \
 Options for run_SYNY.pl are:
 ```
 OPTIONS (MAIN):
--a (--annot)	Annotation files (Supported files: gbff, gff, embl)
--e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
--g (--gaps)		Allowable number of gaps between pairs [Default = 0]
--o (--outdir)	Output directory [Default = SYNY]
--p (--prot)		Protein files # Generated automatically if GenBank files
+-a (--annot)    Annotation files (Supported files: gbff, gff, embl)
+-e (--evalue)   BLAST evalue cutoff [Default = 1e-10]
+-g (--gaps)     Allowable number of gaps between pairs [Default = 0]
+-o (--outdir)   Output directory [Default = SYNY]
+-p (--prot)     Protein files # Generated automatically if GenBank files
 
 OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
--r (--ref)		Genome to use as reference (defaults to first one
-				alphabetically if none provided)
--u (--unit)		Size unit (Kb or Mb) [Default: Mb]
--c (--circos)	Generate Circos plots; currently buggy
-				# works if run independently on configuration files
-				# generated, e.g.: circos --conf concatenated.conf
--custom			Use custom color palette (20 colors) from Lemieux et al.:
-				# https://pubmed.ncbi.nlm.nih.gov/31492891/
+-r (--ref)      Genome to use as reference (defaults to first one
+                alphabetically if none provided)
+-u (--unit)     Size unit (Kb or Mb) [Default: Mb]
+-c (--circos)   Generate Circos plots; currently buggy
+                # works if run independently on configuration files
+                # generated, e.g.: circos --conf concatenated.conf
+-custom         Use custom color palette (20 colors) from Lemieux et al.:
+                # https://pubmed.ncbi.nlm.nih.gov/31492891/
 ```
 The output directory will be structured as follows: 
 ```Bash
