@@ -7,8 +7,8 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
 * [Requirements](#Requirements)
   * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
   * [Installing dependencies](#installing-dependencies)
-* [Examples](#Examples)
-  * [TEXT](#Text)
+* [Using SYNY](#Using-SYNY)
+  * [Examples](#Examples)
 * [References](#References)
 
 ## <b>Introduction</b>
