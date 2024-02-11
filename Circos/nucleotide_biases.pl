@@ -73,7 +73,7 @@ $outdir =~ s/\/$//;
 unless (-d $outdir) {
 	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
 }
-my $catdir = $outdir.'/CONCATENATED';
+my $catdir = $outdir.'/concatenated';
 unless (-d $catdir) {
 	make_path($catdir,{mode => 0755}) or die "Can't create $catdir: $!\n";
 }
@@ -440,7 +440,7 @@ for my $genome ((keys %sequences), 'concatenated'){
 	my $subfile = $subdir.'/'.$genome;
 	my $karyotype = $subfile.'.genotype';
 	my $config = $subfile.'.conf';
-	
+
 	## Creating conf files for Circos
 	for my $orientation ('normal', 'inverted'){
 
@@ -449,7 +449,7 @@ for my $genome ((keys %sequences), 'concatenated'){
 			$config = $subfile.'.inverted.conf';
 		}
 
-		open my $cg, '>', $config or die $!;
+		open my $cg, '>', $config or die "Can't create $config: $!\n";
 
 		print $cg "<<include $ideogram>>"."\n";
 		print $cg "<<include $ticks>>"."\n\n";

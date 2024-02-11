@@ -43,7 +43,7 @@ $outdir =~ s/\/$//;
 unless (-d $outdir) {
 	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
 }
-my $catdir = $outdir.'/CONCATENATED';
+my $catdir = $outdir.'/concatenated';
 unless (-d $catdir) {
 	make_path($catdir,{mode => 0755}) or die "Can't create $catdir: $!\n";
 }
