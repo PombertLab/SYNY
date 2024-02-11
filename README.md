@@ -35,11 +35,11 @@ cd SYNY<br>
 export PATH=$PATH:$(pwd)
 
 #### <b>Installing dependencies</b>
-##### PerlIO::gzip
+##### To install PerlIO::gzip:
 sudo cpan<br>
 cpan[1]> install PerlIO::gzip
 
-##### DIAMOND
+##### To install DIAMOND:
 version=v2.1.9 ## Replace with desired DIAMOND version<br>
 DIR=/opt/diamond
 mkdir -p $DIR
