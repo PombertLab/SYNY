@@ -30,8 +30,8 @@ Synteny inferences can be used to:
 
 #### <b>Downloading SYNY from GitHub</b>
 ```
-git clone https://github.com/PombertLab/SYNY.git<br>
-cd SYNY<br>
+git clone https://github.com/PombertLab/SYNY.git
+cd SYNY
 export PATH=$PATH:$(pwd)
 ```
 
