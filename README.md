@@ -5,7 +5,7 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
 ## Table of contents
 * [Introduction](#Introduction)
 * [Requirements](#Requirements)
-  * [Downloading from GitHub](#downloading-from-github)
+  * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
   * [Installing dependencies](#installing-dependencies)
 * [Examples](#Examples)
   * [TEXT](#Text)
@@ -28,7 +28,7 @@ Synteny inferences can be used to:
 ##### <b>Optional</b>
 - [Circos](https://circos.ca/) ## To generate circos plots
 
-#### <b>Downloading from GitHub</b>
+#### <b>Downloading SYNY from GitHub</b>
 
 git clone https://github.com/PombertLab/SYNY.git<br>
 cd SYNY<br>
@@ -40,8 +40,8 @@ sudo cpan<br>
 cpan[1]> install PerlIO::gzip
 
 ##### To install DIAMOND:
-version=v2.1.9 ## Replace with desired DIAMOND version<br>
-DIR=/opt/diamond
+version=v2.1.9 ## Replace value with desired DIAMOND version<br>
+DIR=/opt/diamond ## Replace with desired installation directory<br>
 mkdir -p $DIR
 
 curl \\<br>
