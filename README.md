@@ -178,7 +178,36 @@ circos \
   -outputfile WM276_vs_JEC21.png
 ```
 
-##### Image generated with Circos and SYNY (using defaults):
+##### Example of clusters identified with SYNY
+```Bash
+head -n 22 $SYNY/SYNTENY/gap_0/CLUSTERS/JEC21_vs_WM276.clusters
+
+### Cluster 0001; CNA00020 to CNA00070; CGB_B0020C to CGB_B0070W; size = 6 ###
+CNA00020	-	CGB_B0020C	-
+CNA00030	+	CGB_B0030W	+
+CNA00040	-	CGB_B0040C	-
+CNA00050	+	CGB_B0050W	+
+CNA00060	-	CGB_B0060C	-
+CNA00070	+	CGB_B0070W	+
+### Cluster 0002; CNA00080 to CNA00150; CGB_B0080W to CGB_B0150C; size = 8 ###
+CNA00080	+	CGB_B0080W	+
+CNA00090	+	CGB_B0090W	+
+CNA00100	-	CGB_B0100C	-
+CNA00110	+	CGB_B0110W	+
+CNA00120	-	CGB_B0120C	-
+CNA00130	+	CGB_B0130W	+
+CNA00140	-	CGB_B0140C	-
+CNA00150	-	CGB_B0150C	-
+### Cluster 0003; CNA00180 to CNA00220; CGB_B0180C to CGB_B0220W; size = 5 ###
+CNA00180	-	CGB_B0180C	-
+CNA00190	-	CGB_B0190C	-
+CNA00200	+	CGB_B0200W	+
+CNA00210	-	CGB_B0210C	-
+CNA00220	+	CGB_B0220W	+
+```
+
+
+##### Example of an image generated with Circos and SYNY (using defaults):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.png">
 </p>
