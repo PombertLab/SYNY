@@ -30,8 +30,8 @@ Synteny inferences can be used to:
 
 #### <b>Downloading from GitHub</b>
 
-git clone https://github.com/PombertLab/SYNY.git
-cd SYNY
+git clone https://github.com/PombertLab/SYNY.git<br>
+cd SYNY<br>
 export PATH=$PATH:$(pwd)
 
 #### <b>Installing dependencies</b>
@@ -41,17 +41,17 @@ DIR=/opt/diamond
 
 mkdir -p $DIR
 
-curl \\
-  -L https://github.com/bbuchfink/diamond/releases/download/$version/diamond-linux64.tar.gz \\
+curl \\<br>
+  -L https://github.com/bbuchfink/diamond/releases/download/$version/diamond-linux64.tar.gz \\<br>
   -o $DIR/diamond-linux64.tar.gz
 
-tar -zxvf diamond-linux64.tar.gz --directory $DIR
+tar -zxvf diamond-linux64.tar.gz --directory $DIR<br>
 rm diamond-linux64.tar.gz
 
 export PATH=$PATH:$DIR
 
 ##### PerlIO::gzip
-sudo cpan
+sudo cpan<br>
 cpan[1]> install PerlIO::gzip
 
 ## <b>Using SYNY</b>
