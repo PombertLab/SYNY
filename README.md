@@ -29,7 +29,7 @@ Synteny inferences can be used to:
 - [Circos](https://circos.ca/)
 
 #### <b>Downloading SYNY from GitHub</b>
-```
+```Bash
 git clone https://github.com/PombertLab/SYNY.git
 cd SYNY
 export PATH=$PATH:$(pwd)
@@ -37,13 +37,13 @@ export PATH=$PATH:$(pwd)
 
 #### <b>Installing dependencies</b>
 ##### To install PerlIO::gzip:
-```
+```Bash
 sudo cpan
   cpan[1]> install PerlIO::gzip
 ```
 
 ##### To install DIAMOND:
-```
+```Bash
 version=v2.1.9     ## Replace with desired DIAMOND version
 DIR=/opt/diamond   ## Replace with desired installation directory
 mkdir -p $DIR
@@ -66,7 +66,7 @@ The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SY
 5. Generates configuration files/templates for plotting with [Circos](https://circos.ca/).
 
 SYNY can be run from the master script as follows:<br>
-```
+```Bash
 run_SYNY.pl \
   -a *.gbff \
   -g 5 \
@@ -92,7 +92,7 @@ OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 				# https://pubmed.ncbi.nlm.nih.gov/31492891/
 ```
 The output directory will be structured as follows: 
-```
+```Bash
 drwxr-xr-x. 2 julian julian 4.0K May 10 18:18 ANNOTATIONS
 drwxr-xr-x. 2 julian julian 4.0K May 10 18:18 CIRCOS
 drwxr-xr-x. 2 julian julian 4.0K May 10 18:18 CONSERVED
