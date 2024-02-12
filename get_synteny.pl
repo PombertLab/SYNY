@@ -457,15 +457,15 @@ $n75 = commify($n75);
 $n90 = sprintf ("%.0f", $n90);
 $n90 = commify($n90);
 
-print SUM ${query_name}."_vs_".${sub_name}."\n";
-print SUM "  Total number of protein clusters: $fsum"."\n";
-print SUM "  Longest: ".$large."\n";
-print SUM "  Shortest: ".$small."\n";
-print SUM "  Average cluster size: ".$average."\n";
-print SUM "  Median cluster size: ".$median."\n";
-print SUM "  N50: ".$n50."\n";
-print SUM "  N75: ".$n75."\n";
-print SUM "  N90: ".$n90."\n";
+print SUM '##### '.${query_name}."_vs_".${sub_name}.' #####'."\n";
+print SUM '  Total number of protein clusters:'."\t".$fsum."\n";
+print SUM '  Longest:'."\t".$large."\n";
+print SUM '  Shortest:'."\t".$small."\n";
+print SUM '  Average cluster size:'."\t".$average."\n";
+print SUM '  Median cluster size:'."\t".$median."\n";
+print SUM '  N50:'."\t".$n50."\n";
+print SUM '  N75:'."\t".$n75."\n";
+print SUM '  N90:'."\t".$n90."\n";
 print SUM "\n";
 
 # Adds commas to numbers; from the Perl Cookbook (O'Reilly)
