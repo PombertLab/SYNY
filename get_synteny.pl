@@ -34,6 +34,7 @@ OPTIONS:
 -sb (--subject_blast)		BLAST/DIAMOND homology searches in output format 6 for subject_vs_query
 -g (--gap)		Space allowed between adjacent genes [Default: 0]
 -o (--outdir)		Output directory ## Writes detected gene pairs
+-sd (--sumdir)		Summary output directory
 EXIT
 
 my $query_list;
@@ -42,6 +43,7 @@ my $subject_list;
 my $subject_blast;
 my $gap = 0;
 my $outdir = 'SYNTENY';
+my $sumdir = $outdir;
 
 GetOptions(
 	'ql|query_list=s' => \$query_list,
@@ -50,13 +52,13 @@ GetOptions(
 	'sb|subject_blast=s' => \$subject_blast,
 	'g|gap=s' => \$gap,
 	'o|outdir=s' => \$outdir,
+	'sd|sumdir=s' => \$sumdir
 );
 
 my $pair_dir = $outdir."/PAIRS";
 my $cluster_dir = $outdir."/CLUSTERS";
-my $summary_dir = $outdir."/SUMMARY";
 
-my @dirs = ($cluster_dir,$pair_dir,$summary_dir);
+my @dirs = ($cluster_dir,$pair_dir,$sumdir);
 
 foreach my $dir (@dirs){
 	unless (-d $dir){
@@ -69,7 +71,6 @@ my $sub_name = (fileparse($subject_list,".list"))[0];
 
 my $pair_file = ${query_name}."_vs_".${sub_name}.".pairs";
 my $cluster_file = ${query_name}."_vs_".${sub_name}.".clusters";
-my $summary_file = 'clusters_summary.tsv';
 
 ###################################################################################################
 ## Parse DIAMOND files for homologs
@@ -374,8 +375,12 @@ foreach my $cluster (sort{$a <=> $b}(keys(%clusters))){
 
 close OUT;
 
-### SUMMARY
-my $sum_outfile = $summary_dir.'/'.$summary_file;
+###################################################################################################
+## Generate summary file
+###################################################################################################
+
+my $summary_file = 'clusters_summary.tsv';
+my $sum_outfile = $sumdir.'/'.$summary_file;
 open SUM, '>>', $sum_outfile or die "Unable to write to $sum_outfile: $!\n";
 
 my $total_cluster = scalar(@cluster_sizes);
@@ -457,7 +462,7 @@ $n75 = commify($n75);
 $n90 = sprintf ("%.0f", $n90);
 $n90 = commify($n90);
 
-print SUM '##### '.${query_name}."_vs_".${sub_name}.' #####'."\n";
+print SUM '##### '.${query_name}."_vs_".${sub_name}.'; Gap = '.$gap.' #####'."\n";
 print SUM '  Total number of protein clusters:'."\t".$fsum."\n";
 print SUM '  Longest:'."\t".$large."\n";
 print SUM '  Shortest:'."\t".$small."\n";

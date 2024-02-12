@@ -170,6 +170,11 @@ system("
 
 print ERROR "\n### get_synteny.pl ###\n";
 
+my $clu_sum_file = $synteny_dir.'/'.'clusters_summary.tsv';
+if (-f $clu_sum_file){
+	system("rm $clu_sum_file");
+}
+
 foreach my $annot_file_1 (sort(@annot_files)){
 	my ($file_name_1,$dir,$ext) = fileparse($annot_file_1,'\..*');
 	my $linked_file_1 = $linked_files{$annot_file_1};
@@ -188,6 +193,7 @@ foreach my $annot_file_1 (sort(@annot_files)){
 					--subject_blast $diamond_dir/${file_name_2}_vs_${file_name_1}.diamond.6 \\
 					--gap $gap \\
 					--outdir $synteny_dir/gap_$gap \\
+					--sumdir $synteny_dir \\
 					2>> $outdir/error.log
 				");
 			}
