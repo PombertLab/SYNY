@@ -180,6 +180,40 @@ circos \
 
 ##### Example of clusters identified with SYNY
 ```Bash
+head -n 29 $SYNY/SYNTENY/clusters_summary.tsv
+
+##### JEC21_vs_WM276; Gap = 0 #####
+  Total number of protein clusters:	5,760
+  Longest:	64
+  Shortest:	2
+  Average cluster size:	7
+  Median cluster size:	5
+  N50:	10
+  N75:	6
+  N90:	4
+
+##### JEC21_vs_WM276; Gap = 1 #####
+  Total number of protein clusters:	5,921
+  Longest:	204
+  Shortest:	2
+  Average cluster size:	26
+  Median cluster size:	15
+  N50:	53
+  N75:	26
+  N90:	13
+
+##### JEC21_vs_WM276; Gap = 5 #####
+  Total number of protein clusters:	5,956
+  Longest:	434
+  Shortest:	2
+  Average cluster size:	112
+  Median cluster size:	58
+  N50:	237
+  N75:	163
+  N90:	66
+```
+
+```Bash
 head -n 22 $SYNY/SYNTENY/gap_0/CLUSTERS/JEC21_vs_WM276.clusters
 
 ### Cluster 0001; CNA00020 to CNA00070; CGB_B0020C to CGB_B0070W; size = 6 ###
