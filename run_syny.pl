@@ -252,7 +252,7 @@ while (my $line = <CLU>){
 }
 
 foreach my $query (sort (keys %cluster_metrics)){
-	foreach my $gap (sort (keys %{$cluster_metrics{$query}})){
+	foreach my $gap (sort {$a <=> $b}(keys %{$cluster_metrics{$query}})){
 		print TSV $query."\t".$gap."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'total'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'longest'}."\t";
