@@ -112,9 +112,9 @@ The contents of the subdirectories are:
 - CIRCOS:
 	- Configuration files for Circos plots
 - CONSERVED:
-	- List of proteins that are conserved within the sample, for each species (.conserved)
-	- Summary of all homology results and conservation within the sample, for each species (.conserved_summary)
-	- List of unique proteins for each species (.unique)
+	- Lists of proteins that are conserved within the samples (.conserved)
+	- Summaries of all homology results and conservation within the samples (.conserved_summary)
+	- Lists of unique proteins and their locations (.unique)
 - DIAMOND:
 	- DB
 		- BLASTP databases
