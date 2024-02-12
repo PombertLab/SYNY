@@ -129,8 +129,9 @@ The contents of the subdirectories are:
 	- Lists of all proteins and their top homologs (if any) in other species (.shared.tsv)
 	- Lists of proteins that are unique to each species (.uniques.tsv)
 - SYNTENY:
-  - Tab-delimited cluster summary (clusters_summary.tsv)
-	- Directory per specified gap allowance (gap_#)
+	- Cluster summary (clusters_summary.tsv)
+	- Tab-delimited cluster summary table (clusters_summary_table.tsv)
+	- Subdirectory per specified gap allowance (gap_#)
 		- CLUSTERS:
 			- Round-robin reconstructed syntetic clusters for each species
 		- PAIRS:
