@@ -131,7 +131,7 @@ The contents of the subdirectories are:
 - SYNTENY:
 	- Cluster summary (clusters_summary.tsv)
 	- Tab-delimited cluster summary table (clusters_summary_table.tsv)
-	- Subdirectory per specified gap allowance (gap_#)
+	- Subdirectory per specified gap allowance (gap_#) containing:
 		- CLUSTERS:
 			- Round-robin reconstructed syntetic clusters for each species
 		- PAIRS:
