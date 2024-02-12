@@ -54,8 +54,9 @@ GetOptions(
 
 my $pair_dir = $outdir."/PAIRS";
 my $cluster_dir = $outdir."/CLUSTERS";
+my $summary_dir = $outdir."/SUMMARY";
 
-my @dirs = ($cluster_dir,$pair_dir);
+my @dirs = ($cluster_dir,$pair_dir,$summary_dir);
 
 foreach my $dir (@dirs){
 	unless (-d $dir){
@@ -68,6 +69,7 @@ my $sub_name = (fileparse($subject_list,".list"))[0];
 
 my $pair_file = ${query_name}."_vs_".${sub_name}.".pairs";
 my $cluster_file = ${query_name}."_vs_".${sub_name}.".clusters";
+my $summary_file = 'clusters_summary.tsv';
 
 ###################################################################################################
 ## Parse DIAMOND files for homologs
@@ -207,7 +209,7 @@ foreach my $q_locus (sort(keys(%q_bd_hits))){
 		## Both a query and subject locus is required
 		if($p_ql && $p_sl){
 
-			## Genes must be located on the same chromomsome to be considered a nieghbor
+			## Genes must be located on the same chromosome to be considered a neighbor
 			if ($c_qc eq $p_qc){
 				if ($c_sc eq $p_sc){
 					
@@ -352,16 +354,123 @@ open OUT, ">", $cluster_dir."/".$cluster_file or die "Unable to write to $cluste
 
 my $padding = $cluster_number =~ s/\d//g;
 $padding ++;
+my @cluster_sizes;
+
 foreach my $cluster (sort{$a <=> $b}(keys(%clusters))){
+
 	my $cluster_num = sprintf("%0${padding}d",$cluster);
 	my $ql_1 = (split("\t",$clusters{$cluster}[0]))[0];
 	my $ql_2 = (split("\t",$clusters{$cluster}[-1]))[0];
 	my $sl_1 = (split("\t",$clusters{$cluster}[0]))[2];
 	my $sl_2 = (split("\t",$clusters{$cluster}[-1]))[2];
+
 	print OUT "### Cluster $cluster_num; $ql_1 to $ql_2; $sl_1 to $sl_2; size = ".scalar(@{$clusters{$cluster}})." ###\n";
+	push (@cluster_sizes, scalar(@{$clusters{$cluster}}));
+
 	foreach my $line (@{$clusters{$cluster}}){
 		print OUT $line."\n";
 	}
 }
 
 close OUT;
+
+### SUMMARY
+my $sum_outfile = $summary_dir.'/'.$summary_file;
+open SUM, '>>', $sum_outfile or die "Unable to write to $sum_outfile: $!\n";
+
+my $total_cluster = scalar(@cluster_sizes);
+my @len = sort({$b <=> $a}@cluster_sizes);
+
+# median
+my $median;
+my $median_pos = $total_cluster/2;
+if ($median_pos =~ /^\d+$/){
+	$median = $len[$median_pos];
+}
+else {
+	my $med1 = int($median_pos);
+	my $med2 = $med1 + 1;
+	$median = (($len[$med1] + $len[$med2])/2);
+}
+$median = sprintf("%.0f", $median);
+$median = commify($median);
+
+# sum
+my $sum;
+foreach (@len){ $sum += $_; }
+my $fsum = commify($sum);
+
+# longest
+my $large = sprintf("%.0f", $len[0]);
+$large = commify($large);
+
+# shortest
+my $small = sprintf("%.0f", $len[$#len]);
+$small = commify($small);
+
+# average
+my $average = sprintf("%.0f", ($sum/$total_cluster));
+$average = commify($average);
+
+### N50, N75, N90
+# thresholds to reach for N metrics
+my $n50_td = $sum*0.5;
+my $n75_td = $sum*0.75;
+my $n90_td = $sum*0.9;
+# sums to calculate
+my $nsum50 = 0;
+my $nsum75 = 0;
+my $nsum90 = 0;
+# metrics to capture
+my $n50;
+my $n75,
+my $n90;
+
+foreach (@len){
+	$nsum50 += $_;
+	if ($nsum50 >= $n50_td){
+		$n50 = $_;
+		last;
+	}
+}
+foreach (@len){
+	$nsum75 += $_;
+	if ($nsum75 >= $n75_td){
+		$n75 = $_;
+		last
+	}
+}
+foreach (@len){
+	$nsum90 += $_;
+	if ($nsum90 >= $n90_td){
+		$n90 = $_;
+		last;
+	}
+}
+
+$n50 = sprintf ("%.0f", $n50);
+$n50 = commify($n50);
+
+$n75 = sprintf ("%.0f", $n75);
+$n75 = commify($n75);
+
+$n90 = sprintf ("%.0f", $n90);
+$n90 = commify($n90);
+
+print SUM ${query_name}."_vs_".${sub_name}."\n";
+print SUM "  Total number of protein clusters: $fsum"."\n";
+print SUM "  Longest: ".$large."\n";
+print SUM "  Shortest: ".$small."\n";
+print SUM "  Average cluster size: ".$average."\n";
+print SUM "  Median cluster size: ".$median."\n";
+print SUM "  N50: ".$n50."\n";
+print SUM "  N75: ".$n75."\n";
+print SUM "  N90: ".$n90."\n";
+print SUM "\n";
+
+# Adds commas to numbers; from the Perl Cookbook (O'Reilly)
+sub commify {
+	my $text = reverse $_[0];
+	$text =~ s/(\d{3})(?=\d)(?!\d*\.)/$1,/g;
+	return scalar reverse $text;
+}
