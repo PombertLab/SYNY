@@ -181,10 +181,11 @@ circos \
 
 ##### Example of clusters identified with SYNY
 ```Bash
-head -n 29 $SYNY/SYNTENY/clusters_summary.tsv
+head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
 
 ##### JEC21_vs_WM276; Gap = 0 #####
-  Total number of protein clusters:	5,760
+  Total number of proteins in clusters:	5,760
+  # of clusters:	779
   Longest:	64
   Shortest:	2
   Average cluster size:	7
@@ -194,7 +195,8 @@ head -n 29 $SYNY/SYNTENY/clusters_summary.tsv
   N90:	4
 
 ##### JEC21_vs_WM276; Gap = 1 #####
-  Total number of protein clusters:	5,921
+  Total number of proteins in clusters:	5,921
+  # of clusters:	228
   Longest:	204
   Shortest:	2
   Average cluster size:	26
@@ -204,7 +206,8 @@ head -n 29 $SYNY/SYNTENY/clusters_summary.tsv
   N90:	13
 
 ##### JEC21_vs_WM276; Gap = 5 #####
-  Total number of protein clusters:	5,956
+  Total number of proteins in clusters:	5,956
+  # of clusters:	53
   Longest:	434
   Shortest:	2
   Average cluster size:	112
