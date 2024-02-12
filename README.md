@@ -172,6 +172,7 @@ run_syny.pl \
 ##### Plotting comparisons with Circos:
 ```Bash
 CIRCOS=~/CIRCOS  ## Replace by desired Circos output directory
+mkdir -p $CIRCOS
 
 circos \
   -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
