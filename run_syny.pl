@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.3a';
-my $updated = '2023-10-19';
+my $version = '0.5.4';
+my $updated = '2024-02-12';
 
 use strict;
 use warnings;
@@ -204,9 +204,75 @@ foreach my $annot_file_1 (sort(@annot_files)){
 	}
 }
 
+### Create a cluster summary table
+my $clu_sum_table = $synteny_dir.'/'.'clusters_summary_table.tsv';
+open CLU, '<', $clu_sum_file or die "Can't read $clu_sum_file: $!\n";
+open TSV, '>', $clu_sum_table or die "Can't create $clu_sum_table: $!\n";
+
+print TSV '### Query'."\t".'Allowed Gaps'."\t";
+print TSV 'Total # of clusters'."\t";
+print TSV 'Longest'."\t".'Shortest'."\t";
+print TSV 'Average'."\t".'Median'."\t";
+print TSV 'N50'."\t".'N75'."\t".'N90'."\n";
+
+my %cluster_metrics;
+my $clu_query;
+my $qgap;
+
+while (my $line = <CLU>){
+	chomp $line;
+	if ($line =~ /##### (\w+); Gap = (\d+) #####/){
+		$clu_query = $1;
+		$qgap = $2;
+	}
+	elsif ($line =~ /Total.*\t(\S+)$/){
+		$cluster_metrics{$clu_query}{$qgap}{'total'} = $1;
+	}
+	elsif ($line =~ /Longest.*\t(\S+)$/){
+		$cluster_metrics{$clu_query}{$qgap}{'longest'} = $1;
+	}
+	elsif ($line =~ /Shortest.*\t(\S+)$/){
+		$cluster_metrics{$clu_query}{$qgap}{'shortest'} = $1;
+	}
+	elsif ($line =~ /Average.*\t(\S+)$/){
+		$cluster_metrics{$clu_query}{$qgap}{'average'} = $1;
+	}
+	elsif ($line =~ /Median.*\t(\S+)$/){
+		$cluster_metrics{$clu_query}{$qgap}{'median'} = $1;
+	}
+	elsif ($line =~ /N50.*\t(\S+)$/){
+		$cluster_metrics{$clu_query}{$qgap}{'n50'} = $1;
+	}
+	elsif ($line =~ /N75.*\t(\S+)$/){
+		$cluster_metrics{$clu_query}{$qgap}{'n75'} = $1;
+	}
+	elsif ($line =~ /N90.*\t(\S+)$/){
+		$cluster_metrics{$clu_query}{$qgap}{'n90'} = $1;
+	}
+}
+
+foreach my $query (sort (keys %cluster_metrics)){
+	foreach my $gap (sort (keys %{$cluster_metrics{$query}})){
+		print TSV $query."\t".$gap."\t";
+		print TSV $cluster_metrics{$query}{$gap}{'total'}."\t";
+		print TSV $cluster_metrics{$query}{$gap}{'longest'}."\t";
+		print TSV $cluster_metrics{$query}{$gap}{'shortest'}."\t";
+		print TSV $cluster_metrics{$query}{$gap}{'average'}."\t";
+		print TSV $cluster_metrics{$query}{$gap}{'median'}."\t";
+		print TSV $cluster_metrics{$query}{$gap}{'n50'}."\t";
+		print TSV $cluster_metrics{$query}{$gap}{'n75'}."\t";
+		print TSV $cluster_metrics{$query}{$gap}{'n90'}."\n";
+	}
+}
+
+close CLU;
+close TSV;
+
 ###################################################################################################
 ## Run id_conserved_regions.pl
 ###################################################################################################
+
+use strict;
 
 print ERROR "\n### id_conserved_regions.pl ###\n";
 
