@@ -463,7 +463,7 @@ $n90 = sprintf ("%.0f", $n90);
 $n90 = commify($n90);
 
 print SUM '##### '.${query_name}."_vs_".${sub_name}.'; Gap = '.$gap.' #####'."\n";
-print SUM '  Total number of protein in clusters:'."\t".$fsum."\n";
+print SUM '  Total number of proteins in clusters:'."\t".$fsum."\n";
 print SUM '  # of clusters:'."\t".$total_cluster."\n";
 print SUM '  Longest:'."\t".$large."\n";
 print SUM '  Shortest:'."\t".$small."\n";
