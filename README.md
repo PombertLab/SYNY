@@ -184,7 +184,7 @@ circos \
 head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
 
 ##### JEC21_vs_WM276; Gap = 0 #####
-  Total number of proteins in clusters:	5,760
+  Total number of proteins in clusters:	5760
   # of clusters:	779
   Longest:	64
   Shortest:	2
@@ -195,7 +195,7 @@ head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
   N90:	4
 
 ##### JEC21_vs_WM276; Gap = 1 #####
-  Total number of proteins in clusters:	5,921
+  Total number of proteins in clusters:	5921
   # of clusters:	228
   Longest:	204
   Shortest:	2
@@ -206,7 +206,7 @@ head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
   N90:	13
 
 ##### JEC21_vs_WM276; Gap = 5 #####
-  Total number of proteins in clusters:	5,956
+  Total number of proteins in clusters:	5956
   # of clusters:	53
   Longest:	434
   Shortest:	2
