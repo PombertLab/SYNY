@@ -122,7 +122,6 @@ The contents of the subdirectories are:
 - GENOME:
 	- FASTA files from the investigated genomes
 - LISTS:
-	- Lists connecting accession numbers to locus tags (ALIASES)
 	- Lists of protein coding genes with location details (.list)
 - PROT_SEQ:
 	- Protein sequences for each species (.faa)
