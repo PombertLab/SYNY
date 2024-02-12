@@ -210,7 +210,8 @@ open CLU, '<', $clu_sum_file or die "Can't read $clu_sum_file: $!\n";
 open TSV, '>', $clu_sum_table or die "Can't create $clu_sum_table: $!\n";
 
 print TSV '### Query'."\t".'Allowed Gaps'."\t";
-print TSV 'Total # of clusters'."\t";
+print TSV 'Total # proteins in clusters'."\t";
+print TSV '# of clusters'."\t";
 print TSV 'Longest'."\t".'Shortest'."\t";
 print TSV 'Average'."\t".'Median'."\t";
 print TSV 'N50'."\t".'N75'."\t".'N90'."\n";
@@ -227,6 +228,9 @@ while (my $line = <CLU>){
 	}
 	elsif ($line =~ /Total.*\t(\S+)$/){
 		$cluster_metrics{$clu_query}{$qgap}{'total'} = $1;
+	}
+	elsif ($line =~ /# of clusters.*\t(\S+)$/){
+		$cluster_metrics{$clu_query}{$qgap}{'total_clu'} = $1;
 	}
 	elsif ($line =~ /Longest.*\t(\S+)$/){
 		$cluster_metrics{$clu_query}{$qgap}{'longest'} = $1;
@@ -255,6 +259,7 @@ foreach my $query (sort (keys %cluster_metrics)){
 	foreach my $gap (sort {$a <=> $b}(keys %{$cluster_metrics{$query}})){
 		print TSV $query."\t".$gap."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'total'}."\t";
+		print TSV $cluster_metrics{$query}{$gap}{'total_clu'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'longest'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'shortest'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'average'}."\t";
