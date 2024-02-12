@@ -204,13 +204,41 @@ foreach my $annot_file_1 (sort(@annot_files)){
 	}
 }
 
+### Grabbing total number of entries in .list files
+my %gene_count;
+opendir (LISTS, "$outdir/LISTS") or die "\n\n[ERROR]\tCan't open $outdir/LISTS: $!\n\n";
+
+while (my $file = readdir(LISTS)){
+
+	if ($file =~ /\.list$/){
+
+		my $list_file = $outdir.'/LISTS/'.$file;
+		open TMP, '<', $list_file or die "$!\n";
+		my ($basename,$path) = fileparse($file);
+		$basename =~ s/\.list$//;
+
+		my $counter = 0;
+		while (my $line = <TMP>){
+			chomp $line;
+			if ($line ne ''){
+				$counter++;
+			}
+		}
+		$gene_count{$basename} = $counter;
+
+	}
+}
+
 ### Create a cluster summary table
 my $clu_sum_table = $synteny_dir.'/'.'clusters_summary_table.tsv';
 open CLU, '<', $clu_sum_file or die "Can't read $clu_sum_file: $!\n";
 open TSV, '>', $clu_sum_table or die "Can't create $clu_sum_table: $!\n";
 
-print TSV '### Query'."\t".'Allowed Gaps'."\t";
+print TSV '### Query'."\t";
+print TSV 'Total # proteins'."\t";
+print TSV 'Allowed Gaps'."\t";
 print TSV 'Total # proteins in clusters'."\t";
+print TSV '% of proteins in clusters'."\t";
 print TSV '# of clusters'."\t";
 print TSV 'Longest'."\t".'Shortest'."\t";
 print TSV 'Average'."\t".'Median'."\t";
@@ -257,8 +285,19 @@ while (my $line = <CLU>){
 
 foreach my $query (sort (keys %cluster_metrics)){
 	foreach my $gap (sort {$a <=> $b}(keys %{$cluster_metrics{$query}})){
-		print TSV $query."\t".$gap."\t";
+
+		print TSV $query."\t";
+
+		my ($ref) = $query =~ /^(\w+)\_vs/;
+		print TSV $gene_count{$ref}."\t";
+
+		print TSV $gap."\t";
+
 		print TSV $cluster_metrics{$query}{$gap}{'total'}."\t";
+		my $percent = ($cluster_metrics{$query}{$gap}{'total'}/$gene_count{$ref})*100;
+		$percent = sprintf("%.2f", $percent);
+		print TSV $percent."\t";
+
 		print TSV $cluster_metrics{$query}{$gap}{'total_clu'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'longest'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'shortest'}."\t";
@@ -267,6 +306,7 @@ foreach my $query (sort (keys %cluster_metrics)){
 		print TSV $cluster_metrics{$query}{$gap}{'n50'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'n75'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'n90'}."\n";
+
 	}
 }
 

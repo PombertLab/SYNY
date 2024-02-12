@@ -398,24 +398,17 @@ else {
 	$median = (($len[$med1] + $len[$med2])/2);
 }
 $median = sprintf("%.0f", $median);
-$median = commify($median);
 
 # sum
 my $sum;
 foreach (@len){ $sum += $_; }
-my $fsum = commify($sum);
 
-# longest
+# longest/shortest
 my $large = sprintf("%.0f", $len[0]);
-$large = commify($large);
-
-# shortest
 my $small = sprintf("%.0f", $len[$#len]);
-$small = commify($small);
 
 # average
 my $average = sprintf("%.0f", ($sum/$total_cluster));
-$average = commify($average);
 
 ### N50, N75, N90
 # thresholds to reach for N metrics
@@ -454,16 +447,11 @@ foreach (@len){
 }
 
 $n50 = sprintf ("%.0f", $n50);
-$n50 = commify($n50);
-
 $n75 = sprintf ("%.0f", $n75);
-$n75 = commify($n75);
-
 $n90 = sprintf ("%.0f", $n90);
-$n90 = commify($n90);
 
 print SUM '##### '.${query_name}."_vs_".${sub_name}.'; Gap = '.$gap.' #####'."\n";
-print SUM '  Total number of proteins in clusters:'."\t".$fsum."\n";
+print SUM '  Total number of proteins in clusters:'."\t".$sum."\n";
 print SUM '  # of clusters:'."\t".$total_cluster."\n";
 print SUM '  Longest:'."\t".$large."\n";
 print SUM '  Shortest:'."\t".$small."\n";
@@ -474,9 +462,3 @@ print SUM '  N75:'."\t".$n75."\n";
 print SUM '  N90:'."\t".$n90."\n";
 print SUM "\n";
 
-# Adds commas to numbers; from the Perl Cookbook (O'Reilly)
-sub commify {
-	my $text = reverse $_[0];
-	$text =~ s/(\d{3})(?=\d)(?!\d*\.)/$1,/g;
-	return scalar reverse $text;
-}
