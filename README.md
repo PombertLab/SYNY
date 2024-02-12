@@ -174,10 +174,17 @@ run_syny.pl \
 CIRCOS=~/CIRCOS  ## Replace by desired Circos output directory
 mkdir -p $CIRCOS
 
+## Default orientation
 circos \
   -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
   -outputdir $CIRCOS \
   -outputfile WM276_vs_JEC21.png
+
+## Inverted orientation
+circos \
+  -conf $SYNY/CIRCOS/concatenated/concatenated.inverted.conf \
+  -outputdir $CIRCOS \
+  -outputfile WM276_vs_JEC21.inverted.png
 ```
 
 ##### Example of clusters identified with SYNY
@@ -249,6 +256,11 @@ CNA00220	+	CGB_B0220W	+
 ##### Example of an image generated with Circos and SYNY (using defaults):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.png">
+</p>
+
+##### Example of an image generated with Circos and SYNY (using the inverted karyotype).
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.inverted.png">
 </p>
 
 
