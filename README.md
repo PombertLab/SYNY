@@ -134,6 +134,8 @@ The contents of the subdirectories are:
 			- Round-robin reconstructed syntetic clusters for each species
 		- PAIRS:
 			- Round-robin identified gene pairs for each species
+		- SUMMARY:
+			- Cluster metrics summary
 
 ### <b>A step by step example</b>
 
