@@ -142,7 +142,7 @@ The contents of the subdirectories are:
 ### <b>Step by step examples</b>
 
 #### Example 1 - <i>Cryptococcus</i>
-Below is a quick example describing how to compare two genomes from <i>Cryptococcus neoformans</i> var. <i>neoformans</i> JEC21 and <i>Cryptococcus gattii</i> WM276 using annotation data available in public databases.
+Below is a quick example describing how to compare two genomes from [<i>Cryptococcus neoformans</i> var. <i>neoformans</i> JEC21](https://pubmed.ncbi.nlm.nih.gov/15653466/) and [<i>Cryptococcus gattii</i> WM276](https://pubmed.ncbi.nlm.nih.gov/21304167/) using annotation data available in public databases.
 
 ##### Downloading annotation data from GenBank (NCBI):
 ```bash
@@ -268,7 +268,7 @@ CNA00220	+	CGB_B0220W	+
 
 
 #### Example 2 - <i>Encephalitozoon</i>
-Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species <i>E. intestinalis</i> ATCC 50506, <i>E. hellem</i> ATCC 50451, and <i>E. cuniculi</i> ATCC 50602 using annotation data available in public databases.
+Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
 
 ##### Downloading annotation data from GenBank (NCBI):
 ```bash
@@ -280,10 +280,10 @@ curl \
   -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/024/399/295/GCA_024399295.1_ASM2439929v1/GCA_024399295.1_ASM2439929v1_genomic.gbff.gz \
   -o $DATA/intestinalis_50506.gbff.gz
 
-## Encephalitozoon hellem ATCC 50451 telomere-to-telomere (T2T) genome
+## Encephalitozoon hellem ATCC 50604 telomere-to-telomere (T2T) genome
 curl \
-  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/029/215/505/GCA_029215505.1_ASM2921550v1/GCA_029215505.1_ASM2921550v1_genomic.gbff.gz \
-  -o $DATA/hellem_50451.gbff.gz
+  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/024/399/255/GCA_024399255.1_ASM2439925v1/GCA_024399255.1_ASM2439925v1_genomic.gbff.gz \
+  -o $DATA/hellem_50604.gbff.gz
 
 ## Encephalitozoon cuniculi ATCC 50602 telomere-to-telomere (T2T) genome
 curl \
@@ -294,7 +294,7 @@ curl \
 
 ##### Running SYNY:
 ```Bash
-SYNY=~/ENCE      ## Replace by desired SYNY output directory
+SYNY=~/SYNY_ENCE      ## Replace by desired SYNY output directory
 
 run_syny.pl \
   -a $DATA/*.gbff.gz \
@@ -320,37 +320,37 @@ circos \
 ```Bash
 head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
 
-##### cuniculi_50602_vs_hellem_50451; Gap = 0 #####
-  Total number of proteins in clusters: 1831
-  # of clusters:        87
-  Longest:      101
+##### cuniculi_50602_vs_hellem_50604; Gap = 0 #####
+  Total number of proteins in clusters: 1827
+  # of clusters:        86
+  Longest:      109
   Shortest:     2
   Average cluster size: 21
-  Median cluster size:  14
+  Median cluster size:  12
   N50:  38
-  N75:  22
+  N75:  23
   N90:  10
 
-##### cuniculi_50602_vs_hellem_50451; Gap = 1 #####
-  Total number of proteins in clusters: 1840
-  # of clusters:        26
-  Longest:      185
+##### cuniculi_50602_vs_hellem_50604; Gap = 1 #####
+  Total number of proteins in clusters: 1834
+  # of clusters:        24
+  Longest:      184
   Shortest:     2
-  Average cluster size: 71
-  Median cluster size:  49
+  Average cluster size: 76
+  Median cluster size:  48
   N50:  148
-  N75:  86
-  N90:  49
+  N75:  128
+  N90:  48
 
-##### cuniculi_50602_vs_hellem_50451; Gap = 5 #####
-  Total number of proteins in clusters: 1845
+##### cuniculi_50602_vs_hellem_50604; Gap = 5 #####
+  Total number of proteins in clusters: 1838
   # of clusters:        19
-  Longest:      195
+  Longest:      194
   Shortest:     2
   Average cluster size: 97
   Median cluster size:  92
   N50:  160
-  N75:  147
+  N75:  146
   N90:  55
 ```
 
@@ -388,6 +388,12 @@ GPK93_01g00270  -       J0A71_11g23150  -
 </p>
 
 ## <b>References</b>
-[Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). <b>Buchfink B, Reuter K, Drost HG.</b> Nature Methods 18, 366–368 (2021). doi:10.1038/s41592-021-01101-x
+[Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi:10.1038/s41592-021-01101-x
 
-[Circos: an information aesthetic for comparative genomics](https://pubmed.ncbi.nlm.nih.gov/19541911/). <b >Krzywinski M, Schein J, Birol I, Connors J, Gascoyne R, Horsman D, Jones SJ, Marra MA.</b> Genome Res. 2009 Sep;19(9):1639-45. doi:10.1101/gr.092759.109
+[Circos: an information aesthetic for comparative genomics](https://pubmed.ncbi.nlm.nih.gov/19541911/). Krzywinski M, Schein J, Birol I, Connors J, Gascoyne R, Horsman D, Jones SJ, Marra MA. <b>Genome Res.</b> 2009 Sep;19(9):1639-45. doi:10.1101/gr.092759.109
+
+[The genome of the basidiomycetous yeast and human pathogen <i>Cryptococcus neoformans</i>](https://pubmed.ncbi.nlm.nih.gov/15653466/). Loftus BJ, Fung E, Roncaglia P, Rowley D, Amedeo P, Bruno D, Vamathevan J, Miranda M, Anderson IJ, Fraser JA, Allen JE, Bosdet IE, Brent MR, Chiu R, Doering TL, Donlin MJ, D'Souza CA, Fox DS, Grinberg V, Fu J, Fukushima M, Haas BJ, Huang JC, Janbon G, Jones SJ, Koo HL, Krzywinski MI, Kwon-Chung JK, Lengeler KB, Maiti R, Marra MA, Marra RE, Mathewson CA, Mitchell TG, Pertea M, Riggs FR, Salzberg SL, Schein JE, Shvartsbeyn A, Shin H, Shumway M, Specht CA, Suh BB, Tenney A, Utterback TR, Wickes BL, Wortman JR, Wye NH, Kronstad JW, Lodge JK, Heitman J, Davis RW, Fraser CM, Hyman RW. <b>Science.</b> 2005 Feb 25;307(5713):1321-4. doi: 10.1126/science.1103773. Epub 2005 Jan 13. PMID: 15653466; PMCID: PMC3520129.
+
+[Genome variation in <i>Cryptococcus gattii</i>, an emerging pathogen of immunocompetent hosts](https://pubmed.ncbi.nlm.nih.gov/21304167/). D'Souza CA, Kronstad JW, Taylor G, Warren R, Yuen M, Hu G, Jung WH, Sham A, Kidd SE, Tangen K, Lee N, Zeilmaker T, Sawkins J, McVicker G, Shah S, Gnerre S, Griggs A, Zeng Q, Bartlett K, Li W, Wang X, Heitman J, Stajich JE, Fraser JA, Meyer W, Carter D, Schein J, Krzywinski M, Kwon-Chung KJ, Varma A, Wang J, Brunham R, Fyfe M, Ouellette BF, Siddiqui A, Marra M, Jones S, Holt R, Birren BW, Galagan JE, Cuomo CA. <b>mBio</b>. 2011 Feb 8;2(1):e00342-10. doi: 10.1128/mBio.00342-10. PMID: 21304167; PMCID: PMC3037005.
+
+[Telomere-to-Telomere genome assemblies of human-infecting <i>Encephalitozoon</i> species](https://pubmed.ncbi.nlm.nih.gov/37142951/). Mascarenhas Dos Santos AC, Julian AT, Liang P, Juárez O, Pombert JF. <b>BMC Genomics</b>. 2023 May 4;24(1):237. doi: 10.1186/s12864-023-09331-3. PMID: 37142951; PMCID: PMC10158259.
