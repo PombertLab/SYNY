@@ -268,7 +268,7 @@ CNA00220	+	CGB_B0220W	+
 
 
 #### Example 2 - Encephalitozoon
-Below is a quick example describing how to compare two genomes from <i>Cryptococcus neoformans</i> var. <i>neoformans</i> JEC21 and <i>Cryptococcus gattii</i> WM276 using annotation data available in public databases.
+Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species <i>E. intestinalis</i> ATCC 50506, <i>E. hellem</i> ATCC 50451, and <i>E. cuniculi</i> ATCC 50602 using annotation data available in public databases.
 
 ##### Downloading annotation data from GenBank (NCBI):
 ```bash
