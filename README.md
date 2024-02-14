@@ -11,6 +11,7 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
   * [Command line options](#Command-line-options)
   * [Step by step examples](#Step-by-step-examples)
     * [Example 1: Cryptococcus](#Example-1---Cryptococcus)
+    * [Example 2: Encephalitozoon](#Example-2---Encephalitozoon)
 * [References](#References)
 
 ## <b>Introduction</b>
@@ -260,11 +261,131 @@ CNA00220	+	CGB_B0220W	+
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.png">
 </p>
 
-##### Example of an image generated with Circos and SYNY (using the inverted karyotype).
+##### Example of an image generated with Circos and SYNY (using the inverted karyotype):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.inverted.png">
 </p>
 
+
+#### Example 2 - Encephalitozoon
+Below is a quick example describing how to compare two genomes from <i>Cryptococcus neoformans</i> var. <i>neoformans</i> JEC21 and <i>Cryptococcus gattii</i> WM276 using annotation data available in public databases.
+
+##### Downloading annotation data from GenBank (NCBI):
+```bash
+DATA=~/ENCE
+mkdir -p $DATA
+
+## Encephalitozoon intestinalis ATCC 50506 telomere-to-telomere (T2T) genome
+curl \
+  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/024/399/295/GCA_024399295.1_ASM2439929v1/GCA_024399295.1_ASM2439929v1_genomic.gbff.gz \
+  -o $DATA/intestinalis_50506.gbff.gz
+
+## Encephalitozoon hellem ATCC 50451 telomere-to-telomere (T2T) genome
+curl \
+  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/029/215/505/GCA_029215505.1_ASM2921550v1/GCA_029215505.1_ASM2921550v1_genomic.gbff.gz \
+  -o $DATA/hellem_50451.gbff.gz
+
+## Encephalitozoon cuniculi ATCC 50602 telomere-to-telomere (T2T) genome
+curl \
+  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/027/571/585/GCA_027571585.1_ASM2757158v1/GCA_027571585.1_ASM2757158v1_genomic.gbff.gz \
+  -o $DATA/cuniculi_50602.gbff.gz
+
+```
+
+##### Running SYNY:
+```Bash
+SYNY=~/ENCE      ## Replace by desired SYNY output directory
+
+run_syny.pl \
+  -a $DATA/*.gbff.gz \
+  -g 0 1 5 \
+  -e 1e-10 \
+  -r intestinalis_50506 \
+  -o $SYNY
+```
+
+##### Plotting comparisons with Circos:
+```Bash
+CIRCOS=~/CIRCOS  ## Replace by desired Circos output directory
+mkdir -p $CIRCOS
+
+## Default orientation
+circos \
+  -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
+  -outputdir $CIRCOS \
+  -outputfile encephalitozoon.png
+```
+
+##### Example of clusters identified with SYNY
+```Bash
+head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
+
+##### cuniculi_50602_vs_hellem_50451; Gap = 0 #####
+  Total number of proteins in clusters: 1831
+  # of clusters:        87
+  Longest:      101
+  Shortest:     2
+  Average cluster size: 21
+  Median cluster size:  14
+  N50:  38
+  N75:  22
+  N90:  10
+
+##### cuniculi_50602_vs_hellem_50451; Gap = 1 #####
+  Total number of proteins in clusters: 1840
+  # of clusters:        26
+  Longest:      185
+  Shortest:     2
+  Average cluster size: 71
+  Median cluster size:  49
+  N50:  148
+  N75:  86
+  N90:  49
+
+##### cuniculi_50602_vs_hellem_50451; Gap = 5 #####
+  Total number of proteins in clusters: 1845
+  # of clusters:        19
+  Longest:      195
+  Shortest:     2
+  Average cluster size: 97
+  Median cluster size:  92
+  N50:  160
+  N75:  147
+  N90:  55
+```
+
+```Bash
+head -n 22 $SYNY/SYNTENY/gap_0/CLUSTERS/intestinalis_50506_vs_cuniculi_50602.clusters
+
+### Cluster 001; GPK93_01g00070 to GPK93_01g00480; J0A71_11g22950 to J0A71_11g23360; size = 41 ###
+GPK93_01g00070  -       J0A71_11g22950  -
+GPK93_01g00080  +       J0A71_11g22960  +
+GPK93_01g00090  +       J0A71_11g22970  +
+GPK93_01g00100  +       J0A71_11g22980  +
+GPK93_01g00110  +       J0A71_11g22990  +
+GPK93_01g00120  +       J0A71_11g23000  +
+GPK93_01g00130  -       J0A71_11g23010  -
+GPK93_01g00140  -       J0A71_11g23020  -
+GPK93_01g00150  -       J0A71_11g23030  -
+GPK93_01g00160  +       J0A71_11g23040  +
+GPK93_01g00170  -       J0A71_11g23050  -
+GPK93_01g00180  +       J0A71_11g23060  +
+GPK93_01g00190  -       J0A71_11g23070  -
+GPK93_01g00200  -       J0A71_11g23080  -
+GPK93_01g00210  -       J0A71_11g23090  -
+GPK93_01g00220  +       J0A71_11g23100  +
+GPK93_01g00230  -       J0A71_11g23110  -
+GPK93_01g00240  -       J0A71_11g23120  -
+GPK93_01g00250  -       J0A71_11g23130  -
+GPK93_01g00260  -       J0A71_11g23140  -
+GPK93_01g00270  -       J0A71_11g23150  -
+```
+
+
+##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using defaults):
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.png">
+</p>
 
 ## <b>References</b>
 [Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). <b>Buchfink B, Reuter K, Drost HG.</b> Nature Methods 18, 366–368 (2021). doi:10.1038/s41592-021-01101-x
