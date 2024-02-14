@@ -53,6 +53,8 @@ EXIT
 
 die ("\n$usage\n") unless (@ARGV);
 
+my @commands = @ARGV;
+
 my @annot_files;
 my @prot_files;
 my $evalue = '1e-10';
@@ -114,7 +116,18 @@ foreach my $dir (@outdirs){
 	}
 }
 
-open ERROR, ">", "$outdir/error.log";
+## Logs
+my $log_file = $outdir.'/'.'syny.log';
+my $log_err = $outdir.'/'.'error.log';
+
+open LOG, '>', $log_file or die "Can't create $log_err: $!\n";
+open ERROR, '>', $log_err or die "Can't create $log_err: $!\n";
+
+my $time = localtime();
+my $tstart = time();
+
+print LOG "SYNY started on: ".$time."\n";
+print LOG "COMMAND: $0 @commands\n";
 
 ###################################################################################################
 ## Run list_maker.pl
@@ -399,6 +412,16 @@ foreach my $cluster_subdir (@cluster_dirs){
 		2>> $outdir/error.log
 	");
 }
+
+###################################################################################################
+## Completion
+###################################################################################################
+
+my $end_time = localtime();
+my $run_time = time - $tstart;
+
+print LOG "SYNY completed on: ".$end_time."\n";
+print LOG "Runtime: ".$run_time." seconds\n";
 
 ###################################################################################################
 ## Subroutines
