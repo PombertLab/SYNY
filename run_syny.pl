@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.4';
-my $updated = '2024-02-12';
+my $version = '0.5.4a';
+my $updated = '2024-02-14';
 
 use strict;
 use warnings;
@@ -329,8 +329,6 @@ close TSV;
 ###################################################################################################
 ## Run id_conserved_regions.pl
 ###################################################################################################
-
-use strict;
 
 print ERROR "\n### id_conserved_regions.pl ###\n";
 
