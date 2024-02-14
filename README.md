@@ -10,8 +10,8 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
 * [Using SYNY](#Using-SYNY)
   * [Command line options](#Command-line-options)
   * [Step by step examples](#Step-by-step-examples)
-    * [Example 1: Cryptococcus](#Example-1---Cryptococcus)
-    * [Example 2: Encephalitozoon](#Example-2---Encephalitozoon)
+    * [Example 1: <i>Cryptococcus</i>](#Example-1---Cryptococcus)
+    * [Example 2: <i>Encephalitozoon</i>](#Example-2---Encephalitozoon)
 * [References](#References)
 
 ## <b>Introduction</b>
@@ -141,7 +141,7 @@ The contents of the subdirectories are:
 
 ### <b>Step by step examples</b>
 
-#### Example 1 - Cryptococcus
+#### Example 1 - <i>Cryptococcus</i>
 Below is a quick example describing how to compare two genomes from <i>Cryptococcus neoformans</i> var. <i>neoformans</i> JEC21 and <i>Cryptococcus gattii</i> WM276 using annotation data available in public databases.
 
 ##### Downloading annotation data from GenBank (NCBI):
@@ -267,7 +267,7 @@ CNA00220	+	CGB_B0220W	+
 </p>
 
 
-#### Example 2 - Encephalitozoon
+#### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species <i>E. intestinalis</i> ATCC 50506, <i>E. hellem</i> ATCC 50451, and <i>E. cuniculi</i> ATCC 50602 using annotation data available in public databases.
 
 ##### Downloading annotation data from GenBank (NCBI):
