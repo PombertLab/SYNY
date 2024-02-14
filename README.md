@@ -9,7 +9,8 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
   * [Installing dependencies](#installing-dependencies)
 * [Using SYNY](#Using-SYNY)
   * [Command line options](#Command-line-options)
-  * [A step by step example](#A-step-by-step-example)
+  * [Step by step examples](#Step-by-step-examples)
+    * [Example 1: Cryptococcus](#Example-1:-Cryptococcus)
 * [References](#References)
 
 ## <b>Introduction</b>
@@ -137,8 +138,9 @@ The contents of the subdirectories are:
 		- PAIRS:
 			- Round-robin identified gene pairs for each species
 
-### <b>A step by step example</b>
+### <b>Step by step examples</b>
 
+#### Example 1: Cryptococcus
 Below is a quick example describing how to compare two genomes from <i>Cryptococcus neoformans</i> var. <i>neoformans</i> JEC21 and <i>Cryptococcus gattii</i> WM276 using annotation data available in public databases.
 
 ##### Downloading annotation data from GenBank (NCBI):
