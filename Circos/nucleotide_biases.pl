@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.4g';
-my $updated = '2024-02-06';
+my $version = '0.5';
+my $updated = '2024-03-05';
 
 use strict;
 use warnings;
@@ -27,19 +27,20 @@ COMMAND		$name \\
 		  -reference CCMP1205 \\
 		  -circos \\
 		  -gap 0 \\
-		  -custom
+		  -custom chloropicon
 
--f (--fasta)	Fasta file(s) to process
--o (--outdir)	Output directory [Default: ntBiases]
--w (--winsize)	Sliding window size [Default: 10000]
+-f (--fasta)		Fasta file(s) to process
+-o (--outdir)		Output directory [Default: ntBiases]
+-w (--winsize)		Sliding window size [Default: 10000]
 -s (--step)		Sliding window step [Default: 5000]
 -r (--reference)	Genome reference for Circos plotting
--n (--ncheck)	Check for ambiguous/masked (Nn) nucleotides
--c (--circos)	Run Circos to plot images
+-n (--ncheck)		Check for ambiguous/masked (Nn) nucleotides
+-c (--circos)		Run Circos to plot images
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
 -u (--unit)		Size unit (Kb or Mb) [Default: Mb]
--custom		Use custom colors [c01 to c20]
 -t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
+-custom			Use a custom color palette ## Can be added/customized in the subroutine
+			# chloropicon - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
@@ -64,7 +65,7 @@ GetOptions(
 	'u|unit=s' => \$unit,
 	'r|reference=s' => \$reference,
 	'g|gap=i' => \$gap,
-	'custom' => \$custom_cc,
+	'custom=s' => \$custom_cc,
 	't|tsv' => \$tsv
 );
 
@@ -404,14 +405,13 @@ my @greys = ('vvlgrey','vlgrey','lgrey','grey','dgrey','vdgrey','vvdgrey','vvvdg
 my @rainbow = (@reds,@oranges,@yellows,@greens,@blues,@purples); ## 41 colors total
 my @bowgrey = (@rainbow,@greys); ## 49 colors total
 
-# 20 custom color set 
-my @custom_set = (
-	'c01','c02','c03','c04','c05','c06','c07','c08','c09','c10',
-	'c11','c12','c13','c14','c15','c16','c17','c18','c19','c20'
-);
+# Custom color set(s)
+my %custom_colors = cc_colors();
+my @custom_set;
 
-custom_colors();
-
+if ($custom_cc){
+	@custom_set = sort (keys %{$custom_colors{$custom_cc}});
+} 
 
 ############## Creating configuration files for Circos
 
@@ -576,6 +576,14 @@ for my $genome ((keys %sequences), 'concatenated'){
 		print $cg '<<include etc/colors_fonts_patterns.conf>>'."\n";
 		print $cg '<<include etc/housekeeping.conf>>'."\n";
 
+		if ($custom_cc){
+			print $cg '<colors>'."\n";
+			foreach my $color (@custom_set){
+				print $cg $color.' = '.$custom_colors{$custom_cc}{$color}."\n";
+			}
+			print $cg '</colors>'."\n";
+		}
+
 		close $cg;
 	
 	}
@@ -676,34 +684,40 @@ sub axes {
 	print $fh '</axes>'."\n";
 }
 
-sub custom_colors {
-
-	my $color_file = $outdir.'/custom_colors.conf';
-	open COL, '>', $color_file or die "Can't create $color_file: $!\n";
-
-	print COL '### Custom palette of 20 colors created for the Chloropicon manuscript:'."\n";
-	print COL '### https://www.nature.com/articles/s41467-019-12014-x'."\n\n";
-
-	print COL '### Add these colors to Circos etc/colors.conf'."\n";
-	print COL 'c01	= 202,75,75'."\n";
-	print COL 'c02	= 239,60,104'."\n";
-	print COL 'c03	= 241,102,140'."\n";
-	print COL 'c04	= 245,152,162'."\n";
-	print COL 'c05	= 245,126,47'."\n";
-	print COL 'c06	= 250,166,55'."\n";
-	print COL 'c07	= 255,197,61'."\n";
-	print COL 'c08	= 255,228,67'."\n";
-	print COL 'c09	= 210,213,76'."\n";
-	print COL 'c10	= 147,195,84'."\n";
-	print COL 'c11	= 18,178,89'."\n";
-	print COL 'c12	= 0,179,127'."\n";
-	print COL 'c13	= 0,180,161'."\n";
-	print COL 'c14	= 0,182,204'."\n";
-	print COL 'c15	= 0,183,241'."\n";
-	print COL 'c16	= 0,157,218'."\n";
-	print COL 'c17	= 64,131,196'."\n";
-	print COL 'c18	= 94,104,176'."\n";
-	print COL 'c19	= 108,82,162'."\n";
-	print COL 'c20	= 122,42,144'."\n";
-
+sub cc_colors {
+	%custom_colors = (
+		'chloropicon' => { # from Lemieux et al. (2019) https://www.nature.com/articles/s41467-019-12014-x
+			'c01' => '202,75,75',
+			'c02' => '239,60,104',
+			'c03' => '241,102,140',
+			'c04' => '245,152,162',
+			'c05' => '245,126,47',
+			'c06' => '250,166,55',
+			'c07' => '255,197,61',
+			'c08' => '255,228,67',
+			'c09' => '210,213,76',
+			'c10' => '147,195,84',
+			'c11' => '18,178,89',
+			'c12' => '0,179,127',
+			'c13' => '0,180,161',
+			'c14' => '0,182,204',
+			'c15' => '0,183,241',
+			'c16' => '0,157,218',
+			'c17' => '64,131,196',
+			'c18' => '94,104,176',
+			'c19' => '108,82,162',
+			'c20' => '122,42,144'
+		},
+		### add custom colors as desired
+		# 'custom_name_2' => {
+		# 	'key_1' => 'rgb_value_1',
+		# 	'key_2' => 'rgb_value_2',
+		# 	'key_3' => 'rgb_value_3',
+		# },
+		# 'custom_name_2' => {
+		# 	'key_1' => 'rgb_value_1',
+		# 	'key_2' => 'rgb_value_2',
+		# 	'key_3' => 'rgb_value_3',
+		# },
+	)
 }

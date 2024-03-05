@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.4a';
-my $updated = '2024-02-14';
+my $version = '0.5.4b';
+my $updated = '2024-03-05';
 
 use strict;
 use warnings;
@@ -42,8 +42,8 @@ OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 -c (--circos)	Generate Circos plots; currently buggy
 		# works if run independently on configuration files generated, e.g.:
 		# circos --conf concatenated.conf
--custom		Use custom color palette (20 colors) from Lemieux et al. (2019):
-		# https://pubmed.ncbi.nlm.nih.gov/31492891/
+-custom		Use a custom color palette ## Customizable in nucleotide_biases.pl (in sub cc_colors {})
+		# chloropicon - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 EXIT
 
 ## No yet implemented:
@@ -75,7 +75,7 @@ GetOptions(
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
 	'c|circos' => \$circos,
-	'custom' => \$custom_colors,
+	'custom=s' => \$custom_colors,
 	'f|format=s{1,}' => \@formats,
 );
 
@@ -360,7 +360,7 @@ if ($circos){
 
 my $custom_cc = '';
 if ($custom_colors){
-	$custom_cc = '--custom';
+	$custom_cc = "--custom $custom_colors";
 }
 
 my $unit_size = '';

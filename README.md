@@ -92,8 +92,8 @@ OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 -c (--circos)   Generate Circos plots; currently buggy
                 # works if run independently on configuration files
                 # generated, e.g.: circos --conf concatenated.conf
--custom         Use custom color palette (20 colors) from Lemieux et al.:
-                # https://pubmed.ncbi.nlm.nih.gov/31492891/
+-custom         Use a custom color palette ## Customizable in nucleotide_biases.pl (in sub cc_colors {})
+                # chloropicon - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 ```
 The output directory will be structured as follows: 
 ```Bash
