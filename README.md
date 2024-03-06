@@ -12,6 +12,7 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
   * [Step by step examples](#Step-by-step-examples)
     * [Example 1: <i>Cryptococcus</i>](#Example-1---Cryptococcus)
     * [Example 2: <i>Encephalitozoon</i>](#Example-2---Encephalitozoon)
+    * [Example 3: <i>Encephalitozoon</i> with (custom colors)](#Example-2---Encephalitozoon-with-custom-colors)
 * [References](#References)
 
 ## <b>Introduction</b>
@@ -83,17 +84,28 @@ OPTIONS (MAIN):
 -e (--evalue)   BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)     Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)   Output directory [Default = SYNY]
--p (--prot)     Protein files # Generated automatically if GenBank files
+-p (--prot)     Protein files # Now generated automatically from GenBank gbff files
+
+OPTIONS (MAIN):
+-a (--annot)    Annotation files (Supported files: gbff, gff, embl)
+-e (--evalue)   BLAST evalue cutoff [Default = 1e-10]
+-g (--gaps)     Allowable number of gaps between pairs [Default = 0]
+-o (--outdir)   Output directory [Default = SYNY]
+-p (--prot)     Protein files # Now generated automatically from GenBank gbff files
 
 OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
--r (--ref)      Genome to use as reference (defaults to first one
-                alphabetically if none provided)
+-r (--ref)      Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
--c (--circos)   Generate Circos plots; currently buggy
-                # works if run independently on configuration files
-                # generated, e.g.: circos --conf concatenated.conf
--custom         Use a custom color palette ## Customizable in nucleotide_biases.pl (in sub cc_colors {})
-                # chloropicon - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
+
+-custom_file    Load custom colors from file
+-list_preset    List available custom color presets
+-custom_preset  Use a custom color preset; e.g.
+                # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
+                # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+
+-c (--circos)   Generate Circos plots automatically; currently buggy
+                # works if run independently on configuration files generated, e.g.:
+                # circos --conf concatenated.conf
 ```
 The output directory will be structured as follows: 
 ```Bash
@@ -386,6 +398,81 @@ GPK93_01g00270  -       J0A71_11g23150  -
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.png">
 </p>
+
+#### Example 3 - <i>Encephalitozoon</i> with custom colors
+Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Circos/custom_color_1.txt) for an example) containing color names and their associated RGB values. A few custom presets are also available to use.
+
+##### Running SYNY with custom colors loaded from a tab-delimited file:
+```Bash
+SYNY=~/SYNY_ENCE_CC         ## Replace by desired SYNY output directory
+COLORS=~/custom_color_2.txt ## Repplace de desired custom color file
+
+run_syny.pl \
+  -a $DATA/*.gbff.gz \
+  -g 0 1 5 \
+  -e 1e-10 \
+  -r intestinalis_50506 \
+  -o $SYNY \
+  --custom_file $COLORS
+```
+
+##### Plotting comparisons with Circos:
+```Bash
+CIRCOS=~/CIRCOS  ## Replace by desired Circos output directory
+mkdir -p $CIRCOS
+
+## Default orientation
+circos \
+  -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
+  -outputdir $CIRCOS \
+  -outputfile encephalitozoon_cc.png
+```
+
+##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using a custom color set):
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_cc.png">
+</p>
+
+##### Listing available custom color presets:
+```
+run_syny.pl --list_preset
+
+Available color presets:
+blues   13 colors
+chloropicon     20 colors
+encephalitozoon 11 colors
+```
+
+##### Running SYNY with a custom colors preset:
+```Bash
+SYNY=~/SYNY_ENCE_CC_PRESET   ## Replace by desired SYNY output directory
+
+run_syny.pl \
+  -a $DATA/*.gbff.gz \
+  -g 0 1 5 \
+  -e 1e-10 \
+  -r intestinalis_50506 \
+  -o $SYNY \
+  --custom_preset blues
+```
+
+##### Plotting comparisons with Circos:
+```
+CIRCOS=~/CIRCOS  ## Replace by desired Circos output directory
+mkdir -p $CIRCOS
+
+## Default orientation
+circos \
+  -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
+  -outputdir $CIRCOS \
+  -outputfile encephalitozoon_blues.png
+```
+
+##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using the blues custom color preset):
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_blues.png">
+</p>
+
 
 ## <b>References</b>
 [Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi:10.1038/s41592-021-01101-x
