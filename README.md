@@ -400,7 +400,7 @@ GPK93_01g00270  -       J0A71_11g23150  -
 </p>
 
 #### Example 3 - <i>Encephalitozoon</i> with custom colors
-Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Circos/custom_color_1.txt) for an example) containing color names and their associated RGB values. A few custom presets are also available to use.
+Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files containing color names and their associated RGB values (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Circos/custom_color_1.txt) for an example). A few custom presets are also available to use in SYNY.
 
 ##### Running SYNY with custom colors loaded from a tab-delimited file:
 ```Bash
