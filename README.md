@@ -41,7 +41,18 @@ export PATH=$PATH:$(pwd)
 
 #### <b>Installing dependencies</b>
 ##### To install PerlIO::gzip:
+On Ubuntu:
 ```Bash
+sudo apt install libperlio-gzip-perl
+```
+
+On Fedora
+```Bash
+sudo dnf install perl-App-cpanminus
+sudo cpanm PerlIO::gzip
+
+or
+
 sudo cpan
   cpan[1]> install PerlIO::gzip
 ```
@@ -62,17 +73,16 @@ export PATH=$PATH:$DIR
 ```
 
 ##### To install Circos:
-On Ubuntu:
 ```Bash
-sudo apt install circos
-```
+## Dependencies (Ubuntu)
+sudo apt install cpanminus
+sudo apt install libgd-perl
 
-On Fedora:
-```Bash
-## Dependencies
+## Dependencies (Fedora)
 sudo dnf install perl-App-cpanminus
 sudo dnf install perl-GD
 
+## Dependencies (Ubuntu/Fedora)
 sudo cpanm \
   Config::General \
   Font::TTF::Font \
@@ -93,7 +103,8 @@ wget \
 tar -zxvf circos-0.69-9.tgz
 cd circos-0.69-9/bin
 
-export PATH=$PATH:$(pwd) >> ~/.bash_profile
+export PATH=$PATH:$(pwd) >> ~/.profile      ## Ubuntu
+export PATH=$PATH:$(pwd) >> ~/.bash_profile ## Fedora
 ```
 
 ## <b>Using SYNY</b>
@@ -209,7 +220,7 @@ curl \
 
 ##### Running SYNY:
 ```Bash
-SYNY=~/SYNY      ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS      ## Replace by desired SYNY output directory
 
 run_syny.pl \
   -a $DATA/*.gbff.gz \
