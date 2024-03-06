@@ -1,0 +1,14 @@
+### Custom 11-colors palette (E. intestinalis) from Pombert et al. (2012)
+### https://pubmed.ncbi.nlm.nih.gov/22802648/
+# Color name	RGB value
+ei-01	0,162,120
+ei-02	0,165,180
+ei-03	91,202,244
+ei-04	139,162,211
+ei-05	121,97,169
+ei-06	162,25,141
+ei-07	235,0,139
+ei-08	240,102,129
+ei-09	241,101,80
+ei-10	245,138,32
+ei-11	164,115,11
