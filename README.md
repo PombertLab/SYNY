@@ -405,7 +405,7 @@ Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from
 ##### Running SYNY with custom colors loaded from a tab-delimited file:
 ```Bash
 SYNY=~/SYNY_ENCE_CC         ## Replace by desired SYNY output directory
-COLORS=~/custom_color_2.txt ## Repplace de desired custom color file
+COLORS=~/custom_color_2.txt ## Replace by desired custom color file
 
 run_syny.pl \
   -a $DATA/*.gbff.gz \
@@ -433,7 +433,7 @@ circos \
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_cc.png">
 </p>
 
-##### Listing available custom color presets:
+##### Listing custom color presets available in SYNY:
 ```
 run_syny.pl --list_preset
 
@@ -443,7 +443,7 @@ chloropicon     20 colors
 encephalitozoon 11 colors
 ```
 
-##### Running SYNY with a custom colors preset:
+##### Running SYNY with a custom color preset:
 ```Bash
 SYNY=~/SYNY_ENCE_CC_PRESET   ## Replace by desired SYNY output directory
 
@@ -468,7 +468,7 @@ circos \
   -outputfile encephalitozoon_blues.png
 ```
 
-##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using the blues custom color preset):
+##### Example of an image generated with the blues custom color preset:
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_blues.png">
 </p>
