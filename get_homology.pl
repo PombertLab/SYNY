@@ -1,15 +1,15 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 ## Pombert Lab, 2022
+
+my $name = "get_homology.pl";
+my $version = "0.1.6b";
+my $updated = "2024-03-06";
 
 use warnings;
 use strict;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
-
-my $name = "get_homology.pl";
-my $version = "0.1.6a";
-my $updated = "2023-10-19";
 
 my $usage = << "EXIT";
 NAME		${name}
@@ -91,7 +91,7 @@ foreach my $file (@input_files){
 		system ("
 			diamond makedb \\
 			  --in $file \\
-			  --db $db_dir/$file_prefix &> /dev/null
+			  --db $db_dir/$file_prefix 1> /dev/null
 		");
 	}
 	$db_files{$file_prefix} = "$db_dir/$file_prefix";
@@ -128,7 +128,7 @@ foreach my $file (sort(@input_files)){
 						-o $blast_file \\
 						-e $e_value \\
 						-k 1 \\
-						-f 6 &> /dev/null
+						-f 6 1> /dev/null
 				")
 			}
 			
