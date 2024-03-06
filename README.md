@@ -63,12 +63,12 @@ export PATH=$PATH:$DIR
 
 ##### To install Circos:
 On Ubuntu:
-```
+```Bash
 sudo apt install circos
 ```
 
 On Fedora:
-```
+```Bash
 ## Dependencies
 sudo dnf install perl-App-cpanminus
 sudo dnf install perl-GD
