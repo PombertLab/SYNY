@@ -61,6 +61,41 @@ rm diamond-linux64.tar.gz
 export PATH=$PATH:$DIR
 ```
 
+##### To install Circos:
+On Ubuntu:
+```
+sudo apt install circos
+```
+
+On Fedora:
+```
+## Dependencies
+sudo dnf install perl-App-cpanminus
+sudo dnf install perl-GD
+
+sudo cpanm \
+  Config::General \
+  Font::TTF::Font \
+  Math::Bezier \
+  Math::Round \
+  Math::VecStat \
+  Regexp::Common \
+  Set::IntSpan \
+  Statistics::Basic \
+  SVG \
+  Text::Format
+
+## Circos
+wget \
+  --no-check-certificate \
+  https://circos.ca/distribution/circos-0.69-9.tgz
+
+tar -zxvf circos-0.69-9.tgz
+cd circos-0.69-9/bin
+
+export PATH=$PATH:$(pwd) >> ~/.bash_profile
+```
+
 ## <b>Using SYNY</b>
 ### Command line options
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
