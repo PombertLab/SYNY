@@ -2,7 +2,7 @@
 
 The SYNY pipeline investigates gene colinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches.
 
-<a href="https://zenodo.org/doi/10.5281/zenodo.10790180"><p align="right"><img src="https://zenodo.org/badge/491274225.svg" alt="DOI"></a>
+[![DOI](https://zenodo.org/badge/491274225.svg)](https://zenodo.org/doi/10.5281/zenodo.10790180)
 
 ## <b>Table of contents</b>
 * [Introduction](#Introduction)
