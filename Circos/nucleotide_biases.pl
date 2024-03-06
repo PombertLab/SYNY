@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.5';
-my $updated = '2024-03-05';
+my $version = '0.5a';
+my $updated = '2024-03-06';
 
 use strict;
 use warnings;
@@ -29,18 +29,25 @@ COMMAND		$name \\
 		  -gap 0 \\
 		  -custom chloropicon
 
+OPTIONS (Main)
 -f (--fasta)		Fasta file(s) to process
 -o (--outdir)		Output directory [Default: ntBiases]
 -w (--winsize)		Sliding window size [Default: 10000]
 -s (--step)		Sliding window step [Default: 5000]
--r (--reference)	Genome reference for Circos plotting
 -n (--ncheck)		Check for ambiguous/masked (Nn) nucleotides
+-t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
+
+OPTIONS (Circos)
 -c (--circos)		Run Circos to plot images
+-r (--reference)	Genome reference for Circos plotting
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
 -u (--unit)		Size unit (Kb or Mb) [Default: Mb]
--t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
--custom			Use a custom color palette ## Can be added/customized in the subroutine
-			# chloropicon - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
+-custom_file		Load custom colors from file
+-list_preset		List available custom color presets
+-custom_preset		Use a custom color preset; e.g.
+			# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
+			# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+			### presets can be added to the cc_colors subroutine
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
@@ -53,7 +60,9 @@ my $ncheck;
 my $gap = 0;
 my $unit = 'Mb';
 my $circos_plot;
+my $custom_file;
 my $custom_cc;
+my $list_preset;
 my $tsv;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
@@ -65,9 +74,27 @@ GetOptions(
 	'u|unit=s' => \$unit,
 	'r|reference=s' => \$reference,
 	'g|gap=i' => \$gap,
-	'custom=s' => \$custom_cc,
+	'custom_file=s' => \$custom_file,
+	'custom_preset=s' => \$custom_cc,
+	'list_preset'	=> \$list_preset,
 	't|tsv' => \$tsv
 );
+
+### List presets and stop
+if ($list_preset){
+
+	print "\n".'Available color presets:'."\n";
+
+	my %available_colors = cc_colors();
+	foreach my $color_key (sort (keys %available_colors)){
+		my $color_number = scalar (keys %{$available_colors{$color_key}});
+		print $color_key."\t".$color_number." colors\n";
+	}
+
+	print "\n";
+	exit;
+
+}
 
 ### Check if output directory / subdirs can be created
 $outdir =~ s/\/$//;
@@ -409,6 +436,23 @@ my @bowgrey = (@rainbow,@greys); ## 49 colors total
 my %custom_colors = cc_colors();
 my @custom_set;
 
+if ($custom_file){
+
+	open CC, '<', $custom_file or die "Can't read $custom_file: $!\n";
+	my ($basename) = fileparse($custom_file);
+	$custom_cc = $basename;
+
+	while (my $line = <CC>){
+		chomp $line;
+		unless ($line =~ /^#/){
+			my ($color,$rgb) = split("\t", $line);
+			$custom_colors{$basename}{$color} = $rgb;
+		}
+
+	}
+
+}
+
 if ($custom_cc){
 	@custom_set = sort (keys %{$custom_colors{$custom_cc}});
 } 
@@ -707,6 +751,34 @@ sub cc_colors {
 			'c18' => '94,104,176',
 			'c19' => '108,82,162',
 			'c20' => '122,42,144'
+		},
+		'encephalitozoon' => { # from Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+			'ei-01' => '0,162,120',
+			'ei-02' => '0,165,180',
+			'ei-03' => '91,202,244',
+			'ei-04' => '139,162,211',
+			'ei-05' => '121,97,169',
+			'ei-06' => '162,25,141',
+			'ei-07' => '235,0,139',
+			'ei-08' => '240,102,129',
+			'ei-09' => '241,101,80',
+			'ei-10' => '245,138,32',
+			'ei-11' => '164,115,11'
+		},
+		'blues' => { # A simple blue gradient (13 hues)
+			'bl-01' => '245,255,255',
+			'bl-02' => '190,233,244',
+			'bl-03' => '180,212,233',
+			'bl-04' => '170,191,222',
+			'bl-05' => '160,171,211',
+			'bl-06' => '149,150,200',
+			'bl-07' => '138,130,190',
+			'bl-08' => '127,111,179',
+			'bl-09' => '115,91,168',
+			'bl-10' => '103,71,157',
+			'bl-11' => '91,52,146',
+			'bl-12' => '77,30,136',
+			'bl-13' => '63,0,125'
 		},
 		### add custom colors as desired
 		# 'custom_name_2' => {

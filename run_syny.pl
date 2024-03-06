@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.4b';
-my $updated = '2024-03-05';
+my $version = '0.5.4c';
+my $updated = '2024-03-06';
 
 use strict;
 use warnings;
@@ -39,11 +39,16 @@ OPTIONS (MAIN):
 OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 -r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)	Size unit (Kb or Mb) [Default: Mb]
--c (--circos)	Generate Circos plots; currently buggy
+
+-custom_file	Load custom colors from file
+-list_preset	List available custom color presets
+-custom_preset	Use a custom color preset; e.g.
+		# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
+		# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+
+-c (--circos)	Generate Circos plots automatically; currently buggy
 		# works if run independently on configuration files generated, e.g.:
 		# circos --conf concatenated.conf
--custom		Use a custom color palette ## Customizable in nucleotide_biases.pl (in sub cc_colors {})
-		# chloropicon - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 EXIT
 
 ## No yet implemented:
@@ -63,7 +68,9 @@ my $outdir = 'SYNY';
 my $reference;
 my $unit = 'Mb';
 my $circos;
+my $custom_file;
 my $custom_colors;
+my $list_preset;
 my @formats;
 
 GetOptions(
@@ -75,7 +82,9 @@ GetOptions(
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
 	'c|circos' => \$circos,
-	'custom=s' => \$custom_colors,
+	'custom_file=s' => \$custom_file,
+	'custom_preset=s' => \$custom_colors,
+	'list_preset'	=> \$list_preset,
 	'f|format=s{1,}' => \@formats,
 );
 
@@ -84,11 +93,30 @@ unless(@gaps){
 }
 
 ###################################################################################################
+## List available custom presets for Circos then exit
+###################################################################################################
+
+
+
+###################################################################################################
 ## Output directory creation and setup
 ###################################################################################################
 
 my ($script,$path) = fileparse($0);
 my $circos_path = "$path/Circos";
+
+### List available custom presets for Circos, then exit
+if ($list_preset){
+
+	system("
+		$circos_path/nucleotide_biases.pl \\
+		--list_preset
+	");
+	exit;
+
+}
+
+### Otherwize create output dir
 
 unless(-d $outdir){
 	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
@@ -348,6 +376,7 @@ system("
 
 print ERROR "\n### nucleotide_biases.pl ###\n";
 
+# Option flags
 my $ref = '';
 if ($reference){
 	$ref = "--reference $reference";
@@ -358,9 +387,14 @@ if ($circos){
 	$circos_plot = '--circos';
 }
 
+my $custom_cc_file = '';
+if ($custom_file){
+	$custom_cc_file = "--custom_file $custom_file";
+}
+
 my $custom_cc = '';
 if ($custom_colors){
-	$custom_cc = "--custom $custom_colors";
+	$custom_cc = "--custom_preset $custom_colors";
 }
 
 my $unit_size = '';
@@ -370,6 +404,7 @@ if ($unit){
 
 my $gap = $gaps[0];
 
+# Running nucleotide_biases.pl
 system("
 	$circos_path/nucleotide_biases.pl \\
 	--outdir $outdir/CIRCOS \\
@@ -380,6 +415,7 @@ system("
 	$ref \\
 	$unit_size \\
 	$circos_plot \\
+	$custom_cc_file \\
 	$custom_cc \\
 	2>> $outdir/error.log
 ");
