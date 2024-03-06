@@ -12,7 +12,7 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
   * [Step by step examples](#Step-by-step-examples)
     * [Example 1: <i>Cryptococcus</i>](#Example-1---Cryptococcus)
     * [Example 2: <i>Encephalitozoon</i>](#Example-2---Encephalitozoon)
-    * [Example 3: <i>Encephalitozoon</i> with (custom colors)](#Example-3---Encephalitozoon-with-custom-colors)
+    * [Example 3: <i>Encephalitozoon</i> (with custom colors)](#Example-3---Encephalitozoon-with-custom-colors)
 * [References](#References)
 
 ## <b>Introduction</b>
