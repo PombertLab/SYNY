@@ -56,8 +56,8 @@ curl \
   -L https://github.com/bbuchfink/diamond/releases/download/$version/diamond-linux64.tar.gz \
   -o $DIR/diamond-linux64.tar.gz
 
-tar -zxvf diamond-linux64.tar.gz --directory $DIR
-rm diamond-linux64.tar.gz
+tar -zxvf $DIR/diamond-linux64.tar.gz --directory $DIR
+rm $DIR/diamond-linux64.tar.gz
 export PATH=$PATH:$DIR
 ```
 
