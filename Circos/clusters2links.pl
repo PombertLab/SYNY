@@ -2,8 +2,8 @@
 ## Pombert Lab, Illinois Tech 2023
 
 my $name = 'clusters2links.pl';
-my $version = '0.1a';
-my $updated = '2023-02-11';
+my $version = '0.1b';
+my $updated = '2023-03-07';
 
 use strict;
 use warnings;
@@ -70,6 +70,8 @@ while (my $list = shift @lists){
         $loci_db{$locus}{'end'} = $end;
 
     }
+    close LIST;
+
 }
 
 
