@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5';
+my $version = '0.5.5a';
 my $updated = '2024-03-07';
 
 use strict;
@@ -81,6 +81,28 @@ GetOptions(
 
 unless(@gaps){
 	@gaps = (0);
+}
+
+###################################################################################################
+## Checking dependencies
+###################################################################################################
+
+# Diamond
+my $diamond_check = `echo \$(command -v diamond)`;
+chomp $diamond_check;
+if ($diamond_check eq ''){
+	print STDERR "\n[E]: Cannot find diamond. Please install diamond in your \$PATH. Exiting..\n\n";
+	exit;
+}
+
+# Circos
+if ($circos){
+	my $circos_check = `echo \$(command -v circos)`;
+	chomp $circos_check;
+	if ($diamond_check eq ''){
+		print STDERR "\n[E]: Cannot find circos. Please install circos in your \$PATH. Exiting..\n\n";
+		exit;
+	}
 }
 
 ###################################################################################################
