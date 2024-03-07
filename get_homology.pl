@@ -2,7 +2,7 @@
 ## Pombert Lab, 2022
 
 my $name = "get_homology.pl";
-my $version = "0.1.6d";
+my $version = "0.1.6e";
 my $updated = "2024-03-07";
 
 use warnings;
@@ -25,7 +25,7 @@ USAGE		${name} \\
 
 OPTIONS
 -i (--input)	Input protein files
--a (--annot)	Input annotation files
+-l (--list)	Directory containing tab-delimited lists of features [Default = LISTS]
 -e (--evalue)	Evalue [Default = 1e-10]
 -o (--outdir)	Diamond searches output directory [Default = DIAMOND]
 -s (--shared)	Shared proteins output directory [Default = SHARED]
@@ -38,7 +38,6 @@ die("\n$usage\n") unless (@ARGV);
 ###################################################################################################
 
 my @input_files;
-my @annotation_files;
 my $e_value = "1e-10";
 my $outdir = "DIAMOND";
 my $shared_dir = "SHARED";
@@ -46,7 +45,6 @@ my $list_dir = "LISTS";
 
 GetOptions(
 	'i|input=s@{2,}' => \@input_files,
-	'a|annot=s@{1,}' => \@annotation_files,
 	'e|evalue=s' => \$e_value,
 	'o|outdir=s' => \$outdir,
 	's|shared=s' => \$shared_dir,
@@ -145,22 +143,6 @@ foreach my $file (sort(@input_files)){
 # Parsing homology searches / getting shared and unique proteins based on e-value cutoff
 ###################################################################################################
 
-##### Loading annotations
-
-my %annotations;
-
-foreach my $annot (@annotation_files){
-
-	open ANN, '<', $annot or die "Can't read $annot: $!\n";
-
-	while (my $line = <ANN>){
-		chomp $line;
-		my ($locus, $description) = split("\t", $line);
-		$annotations{$locus} = $description;
-	}
-
-}
-
 ##### Parsing diamond output files
 
 my %hom_results;
@@ -246,9 +228,10 @@ foreach my $prefix (@prefixes){
 
 		my @data = split("\t", $line);
 		my $protein = $data[0]; 
+		my $prot_desc = $data[-1];
 
 		my $found;
-		my $line_out = $protein."\t".$annotations{$protein};
+		my $line_out = $protein."\t".$prot_desc;
 
 		foreach my $key (sort (keys %hom_results)){
 
@@ -273,7 +256,7 @@ foreach my $prefix (@prefixes){
 			print ALL $line_out."\n";
 		}
 		else {
-			print UNI $protein."\t".$annotations{$protein}."\n";
+			print UNI $protein."\t".$prot_desc."\n";
 			print ALL $line_out."\n";
 		}
 

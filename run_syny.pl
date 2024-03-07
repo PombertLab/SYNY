@@ -1,8 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.4e';
+my $version = '0.5.4f';
 my $updated = '2024-03-07';
 
 use strict;
@@ -30,11 +30,10 @@ USAGE		${name} \\
 		  -r CCMP1205
 
 OPTIONS (MAIN):
--a (--annot)	Annotation files (Supported files: gbff, gff, embl)
+-a (--annot)	GenBank GBF/GBFF Annotation files (GZIP files are supported)
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
--p (--prot)	Protein files # Now generated automatically from GenBank gbff files
 
 OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 -r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
@@ -51,17 +50,11 @@ OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 		# circos --conf concatenated.conf
 EXIT
 
-## No yet implemented:
-# -f (--format)	Figure format(s) [Default: .svg]
-# .png,.eps,.jpg,.jpeg,.pdf,.pgf,.ps,.raw,.rgba,.svg,.svgz,.tif,.tiff
-# -n (--name)	Figure file prefix [Default: PHYLOGENETIC_FIGURE]
-
 die ("\n$usage\n") unless (@ARGV);
 
 my @commands = @ARGV;
 
 my @annot_files;
-my @prot_files;
 my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
@@ -75,7 +68,6 @@ my @formats;
 
 GetOptions(
 	'a|annot=s@{1,}' => \@annot_files,
-	'p|proteins=s@{1,}' => \@prot_files,
 	'e|evalue=s' => \$evalue,
 	'g|gaps=s{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
@@ -123,14 +115,13 @@ if ($outdir !~ /^\//){
 
 my $list_dir = "$outdir/LISTS";
 my $prot_dir = "$outdir/PROT_SEQ";
-my $annot_dir = "$outdir/ANNOTATIONS";
 my $diamond_dir = "$outdir/DIAMOND";
 my $db_dir = "$diamond_dir/DB";
 my $shared_dir = "$outdir/SHARED";
 my $synteny_dir = "$outdir/SYNTENY";
 my $conserved_dir = "$outdir/CONSERVED";
 
-my @outdirs = ($list_dir,$prot_dir,$annot_dir,$diamond_dir,$db_dir,$synteny_dir);
+my @outdirs = ($list_dir,$prot_dir,$diamond_dir,$db_dir,$synteny_dir);
 
 foreach my $dir (@outdirs){
 	unless (-d $dir){
@@ -169,23 +160,18 @@ system("
 ###################################################################################################
 
 my %linked_files;
+my @prot_files;
 
-### Checking the $outdir/PROT_SEQ for files
-### unless the -prot command line switch is invoked
+opendir (FAA, "$outdir/PROT_SEQ") or die "\n\n[ERROR]\tCan't open $outdir/PROT_SEQ: $!\n\n";
 
-unless (@prot_files){
-
-	opendir (FAA, "$outdir/PROT_SEQ") or die "\n\n[ERROR]\tCan't open $outdir/PROT_SEQ: $!\n\n";
-
-	while (my $file = readdir(FAA)){
-		if ($file =~ /\.faa$/){
-			push (@prot_files, "$outdir/PROT_SEQ/$file");
-		}
+while (my $file = readdir(FAA)){
+	if ($file =~ /\.faa$/){
+		push (@prot_files, "$outdir/PROT_SEQ/$file");
 	}
-
 }
 
 link_files();
+
 print ERROR "\n### get_homology.pl ###\n";
 
 system("
@@ -195,7 +181,6 @@ system("
 	--outdir $diamond_dir \\
 	--shared $shared_dir \\
 	--list $list_dir \\
-	--annot $annot_dir/*.annotations \\
 	2>> $outdir/error.log
 ") == 0 or checksig();
 
