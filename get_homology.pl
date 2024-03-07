@@ -2,8 +2,8 @@
 ## Pombert Lab, 2022
 
 my $name = "get_homology.pl";
-my $version = "0.1.6b";
-my $updated = "2024-03-06";
+my $version = "0.1.6c";
+my $updated = "2024-03-07";
 
 use warnings;
 use strict;
@@ -91,7 +91,8 @@ foreach my $file (@input_files){
 		system ("
 			diamond makedb \\
 			  --in $file \\
-			  --db $db_dir/$file_prefix 1> /dev/null
+			  --db $db_dir/$file_prefix \\
+			  --quiet
 		");
 	}
 	$db_files{$file_prefix} = "$db_dir/$file_prefix";
@@ -128,7 +129,8 @@ foreach my $file (sort(@input_files)){
 						-o $blast_file \\
 						-e $e_value \\
 						-k 1 \\
-						-f 6 1> /dev/null
+						-f 6 \\
+						--quiet
 				")
 			}
 			
