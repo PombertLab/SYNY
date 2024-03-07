@@ -2,7 +2,7 @@
 ## Pombert Lab, 2022
 
 my $name = "get_homology.pl";
-my $version = "0.1.6c";
+my $version = "0.1.6d";
 my $updated = "2024-03-07";
 
 use warnings;
@@ -93,7 +93,7 @@ foreach my $file (@input_files){
 			  --in $file \\
 			  --db $db_dir/$file_prefix \\
 			  --quiet
-		");
+		") == 0 or checksig();
 	}
 	$db_files{$file_prefix} = "$db_dir/$file_prefix";
 }
@@ -131,7 +131,7 @@ foreach my $file (sort(@input_files)){
 						-k 1 \\
 						-f 6 \\
 						--quiet
-				")
+				") == 0 or checksig();
 			}
 			
 		}
@@ -283,3 +283,18 @@ foreach my $prefix (@prefixes){
 
 }
 
+sub checksig {
+
+	my $exit_code = $?;
+	my $modulo = $exit_code % 255;
+
+	if ($modulo == 2) {
+		print "\nSIGINT detected: Ctrl+C => exiting...\n\n";
+		exit(2);
+	}
+	elsif ($modulo == 131) {
+		print "\nSIGTERM detected: Ctrl+\\ => exiting...\n\n";
+		exit(131);
+	}
+
+}

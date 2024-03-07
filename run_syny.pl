@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.4d';
+my $version = '0.5.4e';
 my $updated = '2024-03-07';
 
 use strict;
@@ -105,7 +105,7 @@ if ($list_preset){
 	system("
 		$circos_path/nucleotide_biases.pl \\
 		--list_preset
-	");
+	") == 0 or checksig();
 	exit;
 
 }
@@ -162,7 +162,7 @@ system("
 	  --input @annot_files \\
 	  --outdir $outdir \\
 	  2>> $outdir/error.log
-");
+") == 0 or checksig();
 
 ###################################################################################################
 ## Run get_homology.pl
@@ -197,7 +197,7 @@ system("
 	--list $list_dir \\
 	--annot $annot_dir/*.annotations \\
 	2>> $outdir/error.log
-");
+") == 0 or checksig();
 
 ###################################################################################################
 ## Run get_synteny.pl
@@ -207,18 +207,22 @@ print ERROR "\n### get_synteny.pl ###\n";
 
 my $clu_sum_file = $synteny_dir.'/'.'clusters_summary.tsv';
 if (-f $clu_sum_file){
-	system("rm $clu_sum_file");
+	system("rm $clu_sum_file") == 0 or checksig();
 }
 
 foreach my $annot_file_1 (sort(@annot_files)){
+
 	my ($file_name_1,$dir,$ext) = fileparse($annot_file_1,'\..*');
 	my $linked_file_1 = $linked_files{$annot_file_1};
 	print "\nIdentifying synteny between $file_name_1\n"; 
+
 	foreach my $annot_file_2 (sort(@annot_files)){
 		if($annot_file_1 ne $annot_file_2){
+
 			my ($file_name_2,$dir,$ext) = fileparse($annot_file_2,'\..*');
 			my $linked_file_2 = $linked_files{$annot_file_2};
 			print "\t$file_name_2\n";
+
 			foreach my $gap (@gaps){
 				system("
 					$path/get_synteny.pl \\
@@ -230,13 +234,14 @@ foreach my $annot_file_1 (sort(@annot_files)){
 					--outdir $synteny_dir/gap_$gap \\
 					--sumdir $synteny_dir \\
 					2>> $outdir/error.log
-				");
+				") == 0 or checksig();
 			}
 		}
 		else{
 			print "\t. . .\n";
 		}
 	}
+
 }
 
 ### Grabbing total number of entries in .list files
@@ -360,7 +365,7 @@ system("
 	--blasts $diamond_dir \\
 	--outdir $conserved_dir \\
 	2>> $outdir/error.log
-");
+") == 0 or checksig();
 
 ###################################################################################################
 ## Create links files, karyotypes and nucleotide biases for Circos
@@ -412,7 +417,7 @@ system("
 	$custom_cc_file \\
 	$custom_cc \\
 	2>> $outdir/error.log
-");
+") == 0 or checksig();
 
 ## links files
 
@@ -438,7 +443,7 @@ foreach my $cluster_subdir (@cluster_dirs){
 		--list $list_dir/*.list \\
 		--outdir $outdir/CIRCOS \\
 		2>> $outdir/error.log
-	");
+	") == 0 or checksig();
 }
 
 ###################################################################################################
@@ -476,6 +481,22 @@ sub link_files {
 		unless($linked_files{$annot_file}){
 			print("[W]  No matching protein file was found for $annot_file. It will be skipped as a consequence.\n");
 		}
+	}
+
+}
+
+sub checksig {
+
+	my $exit_code = $?;
+	my $modulo = $exit_code % 255;
+
+	if ($modulo == 2) {
+		print "\nSIGINT detected: Ctrl+C => exiting...\n\n";
+		exit(2);
+	}
+	elsif ($modulo == 131) {
+		print "\nSIGTERM detected: Ctrl+\\ => exiting...\n\n";
+		exit(131);
 	}
 
 }
