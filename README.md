@@ -149,7 +149,6 @@ OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 ```
 The output directory will be structured as follows: 
 ```Bash
-drwxr-xr-x. 2 julian julian 4.0K May 10 18:18 ANNOTATIONS
 drwxr-xr-x. 2 julian julian 4.0K May 10 18:18 CIRCOS
 drwxr-xr-x. 2 julian julian 4.0K May 10 18:18 CONSERVED
 drwxr-xr-x. 3 julian julian 4.0K May 10 18:18 DIAMOND
