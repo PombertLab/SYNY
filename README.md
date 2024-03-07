@@ -431,7 +431,7 @@ run_syny.pl \
   -e 1e-10 \
   -r intestinalis_50506 \
   -o $SYNY \
-  --custom_file $COLORS
+  --custom_file $COLORS \
   --circos \
   --circos_prefix encephalitozoon_cc
 ```
