@@ -128,18 +128,10 @@ run_SYNY.pl \
 Options for run_SYNY.pl are:
 ```
 OPTIONS (MAIN):
--a (--annot)    Annotation files (Supported files: gbff, gff, embl)
+-a (--annot)    GenBank GBF/GBFF Annotation files (GZIP files are supported)
 -e (--evalue)   BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)     Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)   Output directory [Default = SYNY]
--p (--prot)     Protein files # Now generated automatically from GenBank gbff files
-
-OPTIONS (MAIN):
--a (--annot)    Annotation files (Supported files: gbff, gff, embl)
--e (--evalue)   BLAST evalue cutoff [Default = 1e-10]
--g (--gaps)     Allowable number of gaps between pairs [Default = 0]
--o (--outdir)   Output directory [Default = SYNY]
--p (--prot)     Protein files # Now generated automatically from GenBank gbff files
 
 OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 -r (--ref)      Genome to use as reference (defaults to first one alphabetically if none provided)
@@ -169,8 +161,6 @@ drwxr-xr-x. 3 julian julian 4.0K May 10 18:18 SYNTENY
 ```
 
 The contents of the subdirectories are:
-- ANNOTATIONS:
-	- Tab-delimited lists of locus_tags and their products
 - CIRCOS:
 	- Configuration files for Circos plots
 - CONSERVED:
