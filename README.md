@@ -134,29 +134,36 @@ OPTIONS (MAIN):
 -o (--outdir)   Output directory [Default = SYNY]
 
 OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
+-c (--circos)   Generate Circos plots automatically
+-p (--prefix)   Desired Circos plot prefix; defaults to the name of the output directory if ommitted
 -r (--ref)      Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
-
 -custom_file    Load custom colors from file
 -list_preset    List available custom color presets
 -custom_preset  Use a custom color preset; e.g.
                 # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
                 # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
-
--c (--circos)   Generate Circos plots automatically; currently buggy
-                # works if run independently on configuration files generated, e.g.:
-                # circos --conf concatenated.conf
 ```
 The output directory will be structured as follows: 
 ```Bash
-drwxr-xr-x. 2 julian julian 4.0K May 10 18:18 CIRCOS
-drwxr-xr-x. 2 julian julian 4.0K May 10 18:18 CONSERVED
-drwxr-xr-x. 3 julian julian 4.0K May 10 18:18 DIAMOND
-drwxr-xr-x. 2 julian julian 4.0K May 10 18:18 GENOME
-drwxr-xr-x. 3 julian julian 4.0K May 10 19:29 LISTS
-drwxr-xr-x. 2 julian julian 4.0K May 10 19:29 PROT_SEQ
-drwxr-xr-x. 3 julian julian 4.0K May 10 18:18 SHARED
-drwxr-xr-x. 3 julian julian 4.0K May 10 18:18 SYNTENY
+ls -lah SYNY/
+
+drwxr-xr-x 10 jpombert jpombert 4.0K Mar  7 12:30 .
+drwx------ 22 jpombert jpombert 4.0K Mar  7 12:30 ..
+drwxr-xr-x  9 jpombert jpombert 4.0K Mar  7 12:30 CIRCOS
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 CONSERVED
+drwxr-xr-x  3 jpombert jpombert 4.0K Mar  7 12:30 DIAMOND
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 GENOME
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 LISTS
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 PROT_SEQ
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 SHARED
+drwxr-xr-x  5 jpombert jpombert 4.0K Mar  7 12:30 SYNTENY
+-rw-r--r--  1 jpombert jpombert  162 Mar  7 12:30 error.log
+-rw-r--r--  1 jpombert jpombert  353 Mar  7 12:30 syny.log
+-rw-r--r--  1 jpombert jpombert 1.1M Mar  7 12:30 circos.inverted.png
+-rw-r--r--  1 jpombert jpombert 3.3M Mar  7 12:30 circos.inverted.svg
+-rw-r--r--  1 jpombert jpombert 1.1M Mar  7 12:30 circos.normal.png
+-rw-r--r--  1 jpombert jpombert 3.3M Mar  7 12:30 circos.normal.svg
 ```
 
 The contents of the subdirectories are:
@@ -209,7 +216,7 @@ curl \
   -o $DATA/WM276.gbff.gz
 ```
 
-##### Running SYNY:
+##### Running SYNY and plotting comparisons with Circos:
 ```Bash
 SYNY=~/SYNY_RESULTS      ## Replace by desired SYNY output directory
 
@@ -218,25 +225,9 @@ run_syny.pl \
   -g 0 1 5 \
   -e 1e-10 \
   -r JEC21 \
-  -o $SYNY
-```
-
-##### Plotting comparisons with Circos:
-```Bash
-CIRCOS=~/CIRCOS  ## Replace by desired Circos output directory
-mkdir -p $CIRCOS
-
-## Default orientation
-circos \
-  -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
-  -outputdir $CIRCOS \
-  -outputfile WM276_vs_JEC21.png
-
-## Inverted orientation
-circos \
-  -conf $SYNY/CIRCOS/concatenated/concatenated.inverted.conf \
-  -outputdir $CIRCOS \
-  -outputfile WM276_vs_JEC21.inverted.png
+  -o $SYNY \
+  --circos \
+  --circos_prefix WM276_vs_JEC21.png
 ```
 
 ##### Example of clusters identified with SYNY
@@ -307,7 +298,7 @@ CNA00220	+	CGB_B0220W	+
 
 ##### Example of an image generated with Circos and SYNY (using defaults):
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.normal.png">
 </p>
 
 ##### Example of an image generated with Circos and SYNY (using the inverted karyotype):
@@ -341,7 +332,7 @@ curl \
 
 ```
 
-##### Running SYNY:
+##### Running SYNY and plotting comparisons with Circos:
 ```Bash
 SYNY=~/SYNY_ENCE      ## Replace by desired SYNY output directory
 
@@ -350,19 +341,9 @@ run_syny.pl \
   -g 0 1 5 \
   -e 1e-10 \
   -r intestinalis_50506 \
-  -o $SYNY
-```
-
-##### Plotting comparisons with Circos:
-```Bash
-CIRCOS=~/CIRCOS  ## Replace by desired Circos output directory
-mkdir -p $CIRCOS
-
-## Default orientation
-circos \
-  -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
-  -outputdir $CIRCOS \
-  -outputfile encephalitozoon.png
+  -o $SYNY \
+  --circos \
+  --circos_prefix encephalitozoon
 ```
 
 ##### Example of clusters identified with SYNY
@@ -451,18 +432,8 @@ run_syny.pl \
   -r intestinalis_50506 \
   -o $SYNY \
   --custom_file $COLORS
-```
-
-##### Plotting comparisons with Circos:
-```Bash
-CIRCOS=~/CIRCOS  ## Replace by desired Circos output directory
-mkdir -p $CIRCOS
-
-## Default orientation
-circos \
-  -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
-  -outputdir $CIRCOS \
-  -outputfile encephalitozoon_cc.png
+  --circos \
+  --circos_prefix encephalitozoon_cc
 ```
 
 ##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using a custom color set):
@@ -490,19 +461,9 @@ run_syny.pl \
   -e 1e-10 \
   -r intestinalis_50506 \
   -o $SYNY \
+  --circos \
+  --circos_prefix encephalitozoon_blues \
   --custom_preset blues
-```
-
-##### Plotting comparisons with Circos:
-```
-CIRCOS=~/CIRCOS  ## Replace by desired Circos output directory
-mkdir -p $CIRCOS
-
-## Default orientation
-circos \
-  -conf $SYNY/CIRCOS/concatenated/concatenated.conf \
-  -outputdir $CIRCOS \
-  -outputfile encephalitozoon_blues.png
 ```
 
 ##### Example of an image generated with the blues custom color preset:
