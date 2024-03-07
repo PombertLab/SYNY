@@ -227,7 +227,7 @@ run_syny.pl \
   -r JEC21 \
   -o $SYNY \
   --circos \
-  --circos_prefix WM276_vs_JEC21.png
+  --circos_prefix WM276_vs_JEC21
 ```
 
 ##### Example of clusters identified with SYNY
