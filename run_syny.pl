@@ -37,7 +37,7 @@ OPTIONS (MAIN):
 
 OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 -c (--circos)	Generate Circos plots automatically
--p (--prefix)	Desired Circos plot prefix [Default: circos]
+-circos_prefix	Desired Circos plot prefix [Default: circos]
 -r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)	Size unit (Kb or Mb) [Default: Mb]
 -custom_file	Load custom colors from file
@@ -72,7 +72,7 @@ GetOptions(
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
 	'c|circos' => \$circos,
-	'p|prefix=s' => \$circos_prefix,
+	'circos_prefix=s' => \$circos_prefix,
 	'custom_file=s' => \$custom_file,
 	'custom_preset=s' => \$custom_colors,
 	'list_preset'	=> \$list_preset,
