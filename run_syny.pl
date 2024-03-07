@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.4c';
-my $updated = '2024-03-06';
+my $version = '0.5.4d';
+my $updated = '2024-03-07';
 
 use strict;
 use warnings;
@@ -93,12 +93,6 @@ unless(@gaps){
 }
 
 ###################################################################################################
-## List available custom presets for Circos then exit
-###################################################################################################
-
-
-
-###################################################################################################
 ## Output directory creation and setup
 ###################################################################################################
 
@@ -116,7 +110,7 @@ if ($list_preset){
 
 }
 
-### Otherwize create output dir
+### Otherwize, create output dir
 
 unless(-d $outdir){
 	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
