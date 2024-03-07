@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.4f';
+my $version = '0.5.5';
 my $updated = '2024-03-07';
 
 use strict;
@@ -36,18 +36,15 @@ OPTIONS (MAIN):
 -o (--outdir)	Output directory [Default = SYNY]
 
 OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
+-c (--circos)	Generate Circos plots automatically
+-p (--prefix)	Desired Circos plot prefix [Default: circos]
 -r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)	Size unit (Kb or Mb) [Default: Mb]
-
 -custom_file	Load custom colors from file
 -list_preset	List available custom color presets
 -custom_preset	Use a custom color preset; e.g.
 		# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 		# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
-
--c (--circos)	Generate Circos plots automatically; currently buggy
-		# works if run independently on configuration files generated, e.g.:
-		# circos --conf concatenated.conf
 EXIT
 
 die ("\n$usage\n") unless (@ARGV);
@@ -61,6 +58,7 @@ my $outdir = 'SYNY';
 my $reference;
 my $unit = 'Mb';
 my $circos;
+my $circos_prefix = 'circos';
 my $custom_file;
 my $custom_colors;
 my $list_preset;
@@ -74,6 +72,7 @@ GetOptions(
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
 	'c|circos' => \$circos,
+	'p|prefix=s' => \$circos_prefix,
 	'custom_file=s' => \$custom_file,
 	'custom_preset=s' => \$custom_colors,
 	'list_preset'	=> \$list_preset,
@@ -356,19 +355,39 @@ system("
 ## Create links files, karyotypes and nucleotide biases for Circos
 ###################################################################################################
 
-## Karyotypes and nucleotide biases
+## Circos links files
+print ERROR "\n### clusters2links.pl ###\n";
 
+my $cluster_dir = "$outdir/SYNTENY";
+
+my @cluster_dirs;
+opendir (CDIR, $cluster_dir) or die "Can't open $cluster_dir: $!\n";
+while (my $dname = readdir(CDIR)) {
+	if (-d "$cluster_dir/$dname"){
+		unless (($dname eq '.') or ($dname eq '..')){
+			push (@cluster_dirs, "$cluster_dir/$dname");
+		}
+	}
+}
+
+foreach my $cluster_subdir (@cluster_dirs){
+	my ($basedir) = fileparse($cluster_subdir);
+	system("
+		$circos_path/clusters2links.pl \\
+		--cluster $cluster_subdir/CLUSTERS/*.clusters \\
+		--list $list_dir/*.list \\
+		--outdir $outdir/CIRCOS \\
+		2>> $outdir/error.log
+	") == 0 or checksig();
+}
+
+## Karyotypes and nucleotide biases
 print ERROR "\n### nucleotide_biases.pl ###\n";
 
 # Option flags
 my $ref = '';
 if ($reference){
 	$ref = "--reference $reference";
-}
-
-my $circos_plot = '';
-if ($circos){
-	$circos_plot = '--circos';
 }
 
 my $custom_cc_file = '';
@@ -398,37 +417,33 @@ system("
 	--gap $gap \\
 	$ref \\
 	$unit_size \\
-	$circos_plot \\
 	$custom_cc_file \\
 	$custom_cc \\
 	2>> $outdir/error.log
 ") == 0 or checksig();
 
-## links files
+# Running Circos
+if ($circos){
 
-print ERROR "\n### clusters2links.pl ###\n";
+	my $normal_circos = "$circos_prefix.normal.png";
+	my $invert_circos = "$circos_prefix.inverted.png";
 
-my $cluster_dir = "$outdir/SYNTENY";
+	print "\nRunning Circos on genotype (normal): $normal_circos\n\n";
 
-my @cluster_dirs;
-opendir (CDIR, $cluster_dir) or die "Can't open $cluster_dir: $!\n";
-while (my $dname = readdir(CDIR)) {
-	if (-d "$cluster_dir/$dname"){
-		unless (($dname eq '.') or ($dname eq '..')){
-			push (@cluster_dirs, "$cluster_dir/$dname");
-		}
-	}
-}
+	system ("
+	  circos \\
+	  -conf $outdir/CIRCOS/concatenated/concatenated.conf \\
+	  -outputdir $outdir \\
+	  -outputfile $normal_circos");
 
-foreach my $cluster_subdir (@cluster_dirs){
-	my ($basedir) = fileparse($cluster_subdir);
-	system("
-		$circos_path/clusters2links.pl \\
-		--cluster $cluster_subdir/CLUSTERS/*.clusters \\
-		--list $list_dir/*.list \\
-		--outdir $outdir/CIRCOS \\
-		2>> $outdir/error.log
-	") == 0 or checksig();
+	print "\nRunning Circos on genotype (inverted): $invert_circos\n\n";
+
+	system ("
+	  circos \\
+	  -conf $outdir/CIRCOS/concatenated/concatenated.inverted.conf \\
+	  -outputdir $outdir \\
+	  -outputfile $invert_circos");
+	
 }
 
 ###################################################################################################
