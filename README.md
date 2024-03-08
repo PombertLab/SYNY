@@ -1,6 +1,6 @@
 ## <b>Synopsis</b>
 
-The SYNY pipeline investigates gene colinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches.
+The SYNY pipeline investigates gene colinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches. It also infers colinearity from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
 
 [![DOI](https://zenodo.org/badge/491274225.svg)](https://zenodo.org/doi/10.5281/zenodo.10790180)
 
@@ -28,6 +28,7 @@ Synteny inferences can be used to:
 
 ## <b>Requirements</b>
 - [DIAMOND](https://github.com/bbuchfink/diamond)
+- [minimap2](https://github.com/lh3/minimap2)
 - [Perl5](https://www.perl.org/)
 - [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip)
 
@@ -71,6 +72,21 @@ curl \
 
 tar -zxvf $DIR/diamond-linux64.tar.gz --directory $DIR
 rm $DIR/diamond-linux64.tar.gz
+export PATH=$PATH:$DIR
+```
+
+##### To install minimap2:
+```Bash
+version=2.26        ## Replace with desired minimap2 version
+DIR=/opt/minimap2   ## Replace with desired installation directory
+mkdir -p $DIR
+
+curl \
+  -L https://github.com/lh3/minimap2/releases/download/v${version}/minimap2-${version}_x64-linux.tar.bz2 \
+  -o $DIR/minimap2-${version}_x64-linux.tar.bz
+
+tar -jxvf $DIR/minimap2-${version}_x64-linux.tar.bz --directory $DIR
+rm $DIR/minimap2-${version}_x64-linux.tar.bz
 export PATH=$PATH:$DIR
 ```
 
@@ -148,25 +164,34 @@ The output directory will be structured as follows:
 ```Bash
 ls -lah SYNY/
 
-drwxr-xr-x 10 jpombert jpombert 4.0K Mar  7 12:30 .
-drwx------ 22 jpombert jpombert 4.0K Mar  7 12:30 ..
-drwxr-xr-x  9 jpombert jpombert 4.0K Mar  7 12:30 CIRCOS
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 CONSERVED
-drwxr-xr-x  3 jpombert jpombert 4.0K Mar  7 12:30 DIAMOND
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 GENOME
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 LISTS
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 PROT_SEQ
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  7 12:30 SHARED
-drwxr-xr-x  5 jpombert jpombert 4.0K Mar  7 12:30 SYNTENY
--rw-r--r--  1 jpombert jpombert  162 Mar  7 12:30 error.log
--rw-r--r--  1 jpombert jpombert  353 Mar  7 12:30 syny.log
--rw-r--r--  1 jpombert jpombert 1.1M Mar  7 12:30 circos.inverted.png
--rw-r--r--  1 jpombert jpombert 3.3M Mar  7 12:30 circos.inverted.svg
--rw-r--r--  1 jpombert jpombert 1.1M Mar  7 12:30 circos.normal.png
--rw-r--r--  1 jpombert jpombert 3.3M Mar  7 12:30 circos.normal.svg
+drwxr-xr-x 11 jpombert jpombert 4.0K Mar  8 14:46 .
+drwx------ 23 jpombert jpombert 4.0K Mar  8 14:45 ..
+drwxr-xr-x  5 jpombert jpombert 4.0K Mar  8 14:45 ALIGNMENTS
+drwxr-xr-x  9 jpombert jpombert 4.0K Mar  8 14:45 CIRCOS
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 CONSERVED
+drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DIAMOND
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 GENOME
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 LISTS
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 PROT_SEQ
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 SHARED
+drwxr-xr-x  5 jpombert jpombert 4.0K Mar  8 14:45 SYNTENY
+-rw-r--r--  1 jpombert jpombert  182 Mar  8 14:45 error.log
+-rw-r--r--  1 jpombert jpombert  397 Mar  8 14:46 syny.log
+-rw-r--r--  1 jpombert jpombert 2.5M Mar  8 14:46 circos.paf.inverted.png
+-rw-r--r--  1 jpombert jpombert 3.4M Mar  8 14:46 circos.paf.inverted.svg
+-rw-r--r--  1 jpombert jpombert 2.4M Mar  8 14:46 circos.paf.normal.png
+-rw-r--r--  1 jpombert jpombert 3.4M Mar  8 14:46 circos.paf.normal.svg
+-rw-r--r--  1 jpombert jpombert 1.2M Mar  8 14:46 circos.syny.inverted.png
+-rw-r--r--  1 jpombert jpombert 3.3M Mar  8 14:46 circos.syny.inverted.svg
+-rw-r--r--  1 jpombert jpombert 1.1M Mar  8 14:45 circos.syny.normal.png
+-rw-r--r--  1 jpombert jpombert 3.3M Mar  8 14:45 circos.syny.normal.svg
 ```
 
+In the above, colinearity plots inferred from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2) are indicated with the `.paf.` tag. Colinearity plots inferred from shared protein clusters identified with [SYNY](https://github.com/PombertLab/SYNY) are indicated with the `.syny.` tag.
+
 The contents of the subdirectories are:
+- ALIGNMENTS:
+	- Pairwise minimap2 genome alignments in MAF, PAF and ALN formats
 - CIRCOS:
 	- Configuration files for Circos plots
 - CONSERVED:
@@ -474,6 +499,8 @@ run_syny.pl \
 
 ## <b>References</b>
 [Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi:10.1038/s41592-021-01101-x
+
+[Minimap2: pairwise alignment for nucleotide sequences](https://pubmed.ncbi.nlm.nih.gov/29750242/). Li H. <b>Bioinformatics.</b> 2018 Sep 15;34(18):3094-3100. doi: 10.1093/bioinformatics/bty191.
 
 [Circos: an information aesthetic for comparative genomics](https://pubmed.ncbi.nlm.nih.gov/19541911/). Krzywinski M, Schein J, Birol I, Connors J, Gascoyne R, Horsman D, Jones SJ, Marra MA. <b>Genome Res.</b> 2009 Sep;19(9):1639-45. doi:10.1101/gr.092759.109
 
