@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5a';
-my $updated = '2024-03-07';
+my $version = '0.5.5b';
+my $updated = '2024-03-08';
 
 use strict;
 use warnings;
@@ -92,6 +92,14 @@ my $diamond_check = `echo \$(command -v diamond)`;
 chomp $diamond_check;
 if ($diamond_check eq ''){
 	print STDERR "\n[E]: Cannot find diamond. Please install diamond in your \$PATH. Exiting..\n\n";
+	exit;
+}
+
+# minimap2
+my $minimap2_check = `echo \$(command -v minimap2)`;
+chomp $minimap2_check;
+if ($minimap2_check eq ''){
+	print STDERR "\n[E]: Cannot find minimap2. Please install minimap2 in your \$PATH. Exiting..\n\n";
 	exit;
 }
 
