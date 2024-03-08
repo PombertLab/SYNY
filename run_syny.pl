@@ -177,6 +177,63 @@ system("
 ") == 0 or checksig();
 
 ###################################################################################################
+## Get PAF files with minimap2
+###################################################################################################
+
+print ERROR "\n### get_paf.pl ###\n";
+
+my $genome_dir = "$outdir/GENOME";
+my $minimap2_dir = "$outdir/ALIGNMENTS";
+my $circos_dir = "$outdir/CIRCOS";
+my $circos_cat_dir = "$outdir/CIRCOS/concatenated";
+
+unless (-d $circos_dir){
+	mkdir ($circos_dir, 0755) or die "Can't create $circos_dir: $!\n";
+}
+unless (-d $circos_cat_dir){
+	mkdir ($circos_cat_dir, 0755) or die "Can't create $circos_cat_dir: $!\n";
+}
+
+## Running minimap2
+system("
+	$path/get_paf.pl \\
+	  --fasta $genome_dir/*.fasta \\
+	  --outdir $minimap2_dir
+") == 0 or checksig();
+
+## Creating Circos links file
+my $paf_dir = "$minimap2_dir/PAF";
+opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
+
+my @paf_files;
+while (my $file = readdir(PAFDIR)){
+	if ($file =~ /\.paf$/){
+		push (@paf_files, "$paf_dir/$file");
+	}
+}
+
+my $paf_links = "$circos_cat_dir/paf_links.txt";
+open PLINK, '>', $paf_links or die "Can't create $paf_links: $!\n";
+print PLINK '#locus1 start end locus2 start end'."\n";
+
+for my $paf_file (@paf_files){
+	open PAF, '<', $paf_file or die "Can't read $paf_file: $!\n";
+	while (my $line = <PAF>){
+		chomp $line;
+		my @data = split("\t", $line);
+		my $locus1 = $data[0];
+		my $l1_start = $data[2];
+		my $l1_end = $data[3];
+		my $locus2 = $data[5];
+		my $l2_start = $data[7];
+		my $l2_end = $data[8];
+		print PLINK "$locus1 $l1_start $l1_end $locus2 $l2_start $l2_end"."\n";
+	}
+	close PAF;
+}
+close PLINK;
+
+###################################################################################################
 ## Run get_homology.pl
 ###################################################################################################
 
@@ -444,28 +501,79 @@ system("
 	2>> $outdir/error.log
 ") == 0 or checksig();
 
+## Creating configuration files with PAF-inferred links
+my $circos_conf_f = "$outdir/CIRCOS/concatenated/concatenated.conf";
+my $circos_conf_f_paf = "$outdir/CIRCOS/concatenated/concatenated.paf.conf";
+open S_CONF_F, '<', $circos_conf_f or die "Can't read $circos_conf_f: $!\n";
+open P_CONF_F, '>', $circos_conf_f_paf or die "Can't create $circos_conf_f_paf: $!\n";
+
+while (my $line = <S_CONF_F>){
+	if ($line =~ /^file.*.links$/){
+		print P_CONF_F "file          = $paf_links"."\n";
+	}
+	else {
+		print P_CONF_F $line."\n";
+	}
+}
+
+my $circos_conf_i = "$outdir/CIRCOS/concatenated/concatenated.inverted.conf";
+my $circos_conf_i_paf = "$outdir/CIRCOS/concatenated/concatenated.inverted.paf.conf";
+open S_CONF_I, '<', $circos_conf_i or die "Can't read $circos_conf_i: $!\n";
+open P_CONF_I, '>', $circos_conf_i_paf or die "Can't create $circos_conf_i_paf: $!\n";
+
+while (my $line = <S_CONF_I>){
+	if ($line =~ /^file.*.links$/){
+		print P_CONF_I "file          = $paf_links"."\n";
+	}
+	else {
+		print P_CONF_I $line."\n";
+	}
+}
+
+
 # Running Circos
 if ($circos){
 
-	my $normal_circos = "$circos_prefix.normal.png";
-	my $invert_circos = "$circos_prefix.inverted.png";
+	my $syny_normal_circos = "$circos_prefix.syny.normal.png";
+	my $syny_invert_circos = "$circos_prefix.syny.inverted.png";
+	my $paf_normal_circos = "$circos_prefix.paf.normal.png";
+	my $paf_invert_circos = "$circos_prefix.paf.inverted.png";
 
-	print "\nRunning Circos on genotype (normal): $normal_circos\n\n";
+	## Synteny inferred with SYNY
+	print "\nRunning Circos on genotype (syny; normal): $syny_normal_circos\n\n";
 
 	system ("
 	  circos \\
 	  -conf $outdir/CIRCOS/concatenated/concatenated.conf \\
 	  -outputdir $outdir \\
-	  -outputfile $normal_circos");
+	  -outputfile $syny_normal_circos");
 
-	print "\nRunning Circos on genotype (inverted): $invert_circos\n\n";
+	print "\nRunning Circos on genotype (syny; inverted): $syny_invert_circos\n\n";
 
 	system ("
 	  circos \\
 	  -conf $outdir/CIRCOS/concatenated/concatenated.inverted.conf \\
 	  -outputdir $outdir \\
-	  -outputfile $invert_circos");
+	  -outputfile $syny_invert_circos");
+
+	## Synteny inferred from minimap2 PAF files
+	print "\nRunning Circos on genotype (paf; normal): $paf_normal_circos\n\n";
+
+	system ("
+	  circos \\
+	  -conf $outdir/CIRCOS/concatenated/concatenated.paf.conf \\
+	  -outputdir $outdir \\
+	  -outputfile $paf_normal_circos");
+
+	print "\nRunning Circos on genotype (paf; inverted): $paf_invert_circos\n\n";
+
+	system ("
+	  circos \\
+	  -conf $outdir/CIRCOS/concatenated/concatenated.inverted.paf.conf \\
+	  -outputdir $outdir \\
+	  -outputfile $paf_invert_circos");
 	
+
 }
 
 ###################################################################################################
