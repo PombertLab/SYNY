@@ -77,17 +77,19 @@ export PATH=$PATH:$DIR
 
 ##### To install minimap2:
 ```Bash
-version=2.26        ## Replace with desired minimap2 version
-DIR=/opt/minimap2   ## Replace with desired installation directory
-mkdir -p $DIR
+## On Ubuntu
+sudo apt install build-essential
+sudo apt install zlib1g-dev
 
-curl \
-  -L https://github.com/lh3/minimap2/releases/download/v${version}/minimap2-${version}_x64-linux.tar.bz2 \
-  -o $DIR/minimap2-${version}_x64-linux.tar.bz
+## On Fedora
+sudo dnf group install "C Development Tools and Libraries"
+sudo dnf install zlib-devel
 
-tar -jxvf $DIR/minimap2-${version}_x64-linux.tar.bz --directory $DIR
-rm $DIR/minimap2-${version}_x64-linux.tar.bz
-export PATH=$PATH:$DIR
+## Ubuntu/Fedora
+git clone https://github.com/lh3/minimap2
+cd minimap2 && make
+
+export PATH=$PATH:$(pwd)
 ```
 
 ##### To install Circos:
