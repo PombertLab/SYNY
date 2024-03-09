@@ -96,7 +96,7 @@ sudo dnf install zlib-devel
 git clone https://github.com/lh3/minimap2
 cd minimap2 && make
 
-export PATH=$PATH:$(pwd)
+export PATH=$PATH:$(pwd):$(pwd)/misc ## misc => path to paftools.js
 ```
 
 ##### To install Circos:
