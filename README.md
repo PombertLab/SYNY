@@ -31,6 +31,8 @@ Synteny inferences can be used to:
 - [minimap2](https://github.com/lh3/minimap2)
 - [Perl5](https://www.perl.org/)
 - [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip)
+- [Python3](https://www.python.org/)
+- [matplotlib](https://matplotlib.org/)
 
 ##### <b>Optional</b>
 - [Circos](https://circos.ca/)
@@ -58,6 +60,11 @@ or
 
 sudo cpan
   cpan[1]> install PerlIO::gzip
+```
+
+##### To install matplolib:
+```
+pip install matplotlib
 ```
 
 ##### To install DIAMOND:
@@ -172,6 +179,7 @@ drwxr-xr-x  5 jpombert jpombert 4.0K Mar  8 14:45 ALIGNMENTS
 drwxr-xr-x  9 jpombert jpombert 4.0K Mar  8 14:45 CIRCOS
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 CONSERVED
 drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DIAMOND
+drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DOTPLOTS
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 GENOME
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 LISTS
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 PROT_SEQ
@@ -204,6 +212,8 @@ The contents of the subdirectories are:
 	- DB
 		- BLASTP databases
 	- Round-robin BLASTP results (.diamond.6)
+- DOTPLOTS:
+	- Dotplots (in png format) generated from the minimap2 PAF alignments
 - GENOME:
 	- FASTA files from the investigated genomes
 - LISTS:
