@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5b';
-my $updated = '2024-03-08';
+my $version = '0.5.5c';
+my $updated = '2024-03-10';
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ UPDATED		${updated}
 SYNOPSIS	Runs all the components of the SYNY pipeline and
 		creates configuration files for Circos plots
 
-REQS		PerlIO::gzip
+REQS		PerlIO::gzip - https://metacpan.org/pod/PerlIO::gzip
 		Diamond - https://github.com/bbuchfink/diamond
 
 USAGE		${name} \\
@@ -34,9 +34,11 @@ OPTIONS (MAIN):
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
+--no_map	Skip minimap2 pairwise genome alignments
 
-OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
--c (--circos)	Generate Circos plots automatically
+OPTIONS (PLOTS):
+### Circos
+-c (--circos)	Generate Circos plots automatically - http://circos.ca/
 -circos_prefix	Desired Circos plot prefix [Default: circos]
 -r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)	Size unit (Kb or Mb) [Default: Mb]
@@ -45,16 +47,24 @@ OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 -custom_preset	Use a custom color preset; e.g.
 		# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 		# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+
+### Dotplots
+-m (--multi)	Axes units multiplier [Default: 1e5]
+-h (--height)	Figure height in inches [Default: 10.8]
+-w (--width)	Figure width in inches [Default: 19.2]
 EXIT
 
 die ("\n$usage\n") unless (@ARGV);
 
 my @commands = @ARGV;
 
+# Main
 my @annot_files;
 my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
+my $nomap;
+# Circos
 my $reference;
 my $unit = 'Mb';
 my $circos;
@@ -63,20 +73,31 @@ my $custom_file;
 my $custom_colors;
 my $list_preset;
 my @formats;
+# Dotplots
+my $multiplier = '1e5';
+my $height = 10.8;
+my $width = 19.2;
 
 GetOptions(
+	# Main
 	'a|annot=s@{1,}' => \@annot_files,
 	'e|evalue=s' => \$evalue,
 	'g|gaps=s{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
+	'no_map' => \$nomap,
+	# circos
+	'c|circos' => \$circos,
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
-	'c|circos' => \$circos,
 	'circos_prefix=s' => \$circos_prefix,
 	'custom_file=s' => \$custom_file,
 	'custom_preset=s' => \$custom_colors,
 	'list_preset'	=> \$list_preset,
 	'f|format=s{1,}' => \@formats,
+	# dotplots
+	'm|multiplier=s' => \$multiplier, 
+	'h|height=s' => \$height,
+	'w|width=s' => \$width,
 );
 
 unless(@gaps){
@@ -188,6 +209,10 @@ system("
 ## Get PAF files with minimap2
 ###################################################################################################
 
+if ($nomap){
+	goto HOMOLOGY;
+}
+
 print ERROR "\n### get_paf.pl ###\n";
 
 my $genome_dir = "$outdir/GENOME";
@@ -250,12 +275,17 @@ my $dotplot_dir = "$outdir/DOTPLOTS";
 system("
 	$path/paf_to_dotplot.py \\
 	--paf $paf_dir/*.paf \\
-	--outdir $dotplot_dir
+	--outdir $dotplot_dir \\
+	--unit $multiplier \\
+	--height $height \\
+	--width $width
 ") == 0 or checksig();
 
 ###################################################################################################
 ## Run get_homology.pl
 ###################################################################################################
+
+HOMOLOGY:
 
 my %linked_files;
 my @prot_files;
@@ -521,35 +551,38 @@ system("
 	2>> $outdir/error.log
 ") == 0 or checksig();
 
-## Creating configuration files with PAF-inferred links
-my $circos_conf_f = "$outdir/CIRCOS/concatenated/concatenated.conf";
-my $circos_conf_f_paf = "$outdir/CIRCOS/concatenated/concatenated.paf.conf";
-open S_CONF_F, '<', $circos_conf_f or die "Can't read $circos_conf_f: $!\n";
-open P_CONF_F, '>', $circos_conf_f_paf or die "Can't create $circos_conf_f_paf: $!\n";
+unless ($nomap){
 
-while (my $line = <S_CONF_F>){
-	if ($line =~ /^file.*.links$/){
-		print P_CONF_F "file          = $paf_links"."\n";
+	## Creating configuration files with PAF-inferred links
+	my $circos_conf_f = "$outdir/CIRCOS/concatenated/concatenated.conf";
+	my $circos_conf_f_paf = "$outdir/CIRCOS/concatenated/concatenated.paf.conf";
+	open S_CONF_F, '<', $circos_conf_f or die "Can't read $circos_conf_f: $!\n";
+	open P_CONF_F, '>', $circos_conf_f_paf or die "Can't create $circos_conf_f_paf: $!\n";
+
+	while (my $line = <S_CONF_F>){
+		if ($line =~ /^file.*.links$/){
+			print P_CONF_F "file          = $paf_links"."\n";
+		}
+		else {
+			print P_CONF_F $line."\n";
+		}
 	}
-	else {
-		print P_CONF_F $line."\n";
+
+	my $circos_conf_i = "$outdir/CIRCOS/concatenated/concatenated.inverted.conf";
+	my $circos_conf_i_paf = "$outdir/CIRCOS/concatenated/concatenated.inverted.paf.conf";
+	open S_CONF_I, '<', $circos_conf_i or die "Can't read $circos_conf_i: $!\n";
+	open P_CONF_I, '>', $circos_conf_i_paf or die "Can't create $circos_conf_i_paf: $!\n";
+
+	while (my $line = <S_CONF_I>){
+		if ($line =~ /^file.*.links$/){
+			print P_CONF_I "file          = $paf_links"."\n";
+		}
+		else {
+			print P_CONF_I $line."\n";
+		}
 	}
+
 }
-
-my $circos_conf_i = "$outdir/CIRCOS/concatenated/concatenated.inverted.conf";
-my $circos_conf_i_paf = "$outdir/CIRCOS/concatenated/concatenated.inverted.paf.conf";
-open S_CONF_I, '<', $circos_conf_i or die "Can't read $circos_conf_i: $!\n";
-open P_CONF_I, '>', $circos_conf_i_paf or die "Can't create $circos_conf_i_paf: $!\n";
-
-while (my $line = <S_CONF_I>){
-	if ($line =~ /^file.*.links$/){
-		print P_CONF_I "file          = $paf_links"."\n";
-	}
-	else {
-		print P_CONF_I $line."\n";
-	}
-}
-
 
 # Running Circos
 if ($circos){
@@ -577,22 +610,23 @@ if ($circos){
 	  -outputfile $syny_invert_circos");
 
 	## Synteny inferred from minimap2 PAF files
-	print "\nRunning Circos on genotype (paf; normal): $paf_normal_circos\n\n";
+	unless ($nomap){
+		print "\nRunning Circos on genotype (paf; normal): $paf_normal_circos\n\n";
 
-	system ("
-	  circos \\
-	  -conf $outdir/CIRCOS/concatenated/concatenated.paf.conf \\
-	  -outputdir $outdir \\
-	  -outputfile $paf_normal_circos");
+		system ("
+		circos \\
+		-conf $outdir/CIRCOS/concatenated/concatenated.paf.conf \\
+		-outputdir $outdir \\
+		-outputfile $paf_normal_circos");
 
-	print "\nRunning Circos on genotype (paf; inverted): $paf_invert_circos\n\n";
+		print "\nRunning Circos on genotype (paf; inverted): $paf_invert_circos\n\n";
 
-	system ("
-	  circos \\
-	  -conf $outdir/CIRCOS/concatenated/concatenated.inverted.paf.conf \\
-	  -outputdir $outdir \\
-	  -outputfile $paf_invert_circos");
-	
+		system ("
+		circos \\
+		-conf $outdir/CIRCOS/concatenated/concatenated.inverted.paf.conf \\
+		-outputdir $outdir \\
+		-outputfile $paf_invert_circos");
+	}
 
 }
 
