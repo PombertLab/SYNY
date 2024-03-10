@@ -350,7 +350,7 @@ CNA00220	+	CGB_B0220W	+
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.inverted.png">
 </p>
 
-##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults)
+##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.png">
 </p>
