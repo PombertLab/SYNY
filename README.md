@@ -157,10 +157,12 @@ OPTIONS (MAIN):
 -e (--evalue)   BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)     Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)   Output directory [Default = SYNY]
+--no_map        Skip minimap2 pairwise genome alignments
 
-OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
--c (--circos)   Generate Circos plots automatically
--p (--prefix)   Desired Circos plot prefix; defaults to the name of the output directory if ommitted
+OPTIONS (PLOTS):
+### Circos
+-c (--circos)   Generate Circos plots automatically - http://circos.ca/
+-circos_prefix  Desired Circos plot prefix [Default: circos]
 -r (--ref)      Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
 -custom_file    Load custom colors from file
@@ -168,6 +170,11 @@ OPTIONS (PLOTS): ##### Requires Circos - http://circos.ca/ #####
 -custom_preset  Use a custom color preset; e.g.
                 # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
                 # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+
+### Dotplots
+-m (--multi)    Axes units multiplier [Default: 1e5]
+-h (--height)   Figure height in inches [Default: 10.8]
+-w (--width)    Figure width in inches [Default: 19.2]
 ```
 The output directory will be structured as follows: 
 ```Bash
@@ -343,6 +350,10 @@ CNA00220	+	CGB_B0220W	+
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.inverted.png">
 </p>
 
+##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults)
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.png">
+</p>
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
