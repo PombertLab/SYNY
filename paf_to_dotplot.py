@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1'
-updated = '2024-03-09'
+version = '0.1a'
+updated = '2024-03-10'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -28,6 +28,7 @@ COMMAND    {name} \\
 OPTIONS:
 -p (--paf)      PAF file(s) to plot
 -o (--outdir)   Output directory [Default: ./]
+-u (--unit)     Units divider [Default: 1e3]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
 """
@@ -44,12 +45,14 @@ if (len(sys.argv) <= 1):
 cmd = argparse.ArgumentParser(add_help=False)
 cmd.add_argument("-p", "--paf", nargs='*')
 cmd.add_argument("-o", "--outdir", default='./')
+cmd.add_argument("-u", "--unit", default='1e3')
 cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
 args = cmd.parse_args()
 
 paf_files = args.paf
 outdir = args.outdir
+unit = args.unit
 height = args.height
 width = args.width
 
@@ -99,6 +102,10 @@ for paf in paf_files:
             if subject not in dataframe[query]:
                 dataframe[query][subject] = {}
 
+            # Alignments includes gaps: no. of bases
+            # in query/subject often differs =>
+            # creating a slope so that numbers of
+            # x and y variables are the same for plotting
             q_span = q_end - q_start + 1
             s_span = s_end - s_start + 1
             slope = s_span / q_span
@@ -118,7 +125,6 @@ for paf in paf_files:
                     y_start = y_start - slope
 
     ### Plotting
-
     x_axes_total = int(len(query_len_dict))
     y_axes_total = int(len(subject_len_dict))
     subplots_total = x_axes_total * y_axes_total
@@ -137,12 +143,16 @@ for paf in paf_files:
 
     ynum = 0
     xnum = 0
+
+    ## Convert scientific notation to number
+    divider = int(float(unit))
+
     for query in sorted(query_len_dict):
 
         for subject in reversed(sorted(subject_len_dict)):
 
-            xmax = query_len_dict[query] / 1000
-            ymax = subject_len_dict[subject] / 1000
+            xmax = query_len_dict[query] / divider
+            ymax = subject_len_dict[subject] / divider
 
             axes[ynum,xnum].set_xlim(1,xmax)
             axes[ynum,xnum].set_ylim(1,ymax)
@@ -156,15 +166,15 @@ for paf in paf_files:
             if subject in dataframe[query].keys():
                 x1 = dataframe[query][subject].keys()
                 y1 = dataframe[query][subject].values()
-                axes[ynum,xnum].scatter([x / 1000 for x in x1], [y / 1000 for y in y1], s=1)
+                axes[ynum,xnum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1)
 
             ynum += 1
         
         xnum += 1
         ynum = 0
 
-
+    ## Writing to output file
     output = basename
-    filename = outdir + '/' + output.rsplit('.', 1)[0] + '.png'
+    filename = outdir + '/' + output.rsplit('.', 1)[0] + f".{unit}" + '.png'
     print(f"Creating {filename}...")
     plt.savefig(filename)
