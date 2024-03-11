@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5c';
-my $updated = '2024-03-10';
+my $version = '0.5.5d';
+my $updated = '2024-03-11';
 
 use strict;
 use warnings;
@@ -52,6 +52,7 @@ OPTIONS (PLOTS):
 -m (--multi)	Axes units multiplier [Default: 1e5]
 -h (--height)	Figure height in inches [Default: 10.8]
 -w (--width)	Figure width in inches [Default: 19.2]
+--color		Scatter plot color [Default: blue]
 EXIT
 
 die ("\n$usage\n") unless (@ARGV);
@@ -77,6 +78,7 @@ my @formats;
 my $multiplier = '1e5';
 my $height = 10.8;
 my $width = 19.2;
+my $color = 'blue';
 
 GetOptions(
 	# Main
@@ -98,6 +100,7 @@ GetOptions(
 	'm|multiplier=s' => \$multiplier, 
 	'h|height=s' => \$height,
 	'w|width=s' => \$width,
+	'color=s' => \$color
 );
 
 unless(@gaps){
@@ -278,7 +281,8 @@ system("
 	--outdir $dotplot_dir \\
 	--unit $multiplier \\
 	--height $height \\
-	--width $width
+	--width $width \\
+	--color $color
 ") == 0 or checksig();
 
 ###################################################################################################

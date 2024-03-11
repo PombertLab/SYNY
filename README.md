@@ -175,6 +175,7 @@ OPTIONS (PLOTS):
 -m (--multi)    Axes units multiplier [Default: 1e5]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
+-c (--color)    Color [Default: blue]
 ```
 The output directory will be structured as follows: 
 ```Bash

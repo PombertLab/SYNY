@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1a'
-updated = '2024-03-10'
+version = '0.1b'
+updated = '2024-03-11'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -31,6 +31,7 @@ OPTIONS:
 -u (--unit)     Units divider [Default: 1e3]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
+-c (--color)    Color [Default: blue]
 """
 
 # Print custom message if argv is empty
@@ -48,6 +49,7 @@ cmd.add_argument("-o", "--outdir", default='./')
 cmd.add_argument("-u", "--unit", default='1e3')
 cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
+cmd.add_argument("-c", "--color", default='blue')
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -55,6 +57,7 @@ outdir = args.outdir
 unit = args.unit
 height = args.height
 width = args.width
+ccolor = args.color
 
 ################################################################################
 ## Working on output directory
@@ -166,7 +169,7 @@ for paf in paf_files:
             if subject in dataframe[query].keys():
                 x1 = dataframe[query][subject].keys()
                 y1 = dataframe[query][subject].values()
-                axes[ynum,xnum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1)
+                axes[ynum,xnum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1, color=ccolor)
 
             ynum += 1
         
