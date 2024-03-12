@@ -90,7 +90,16 @@ sudo dnf install zlib-devel
 git clone https://github.com/lh3/minimap2
 cd minimap2 && make
 
-export PATH=$PATH:$(pwd):$(pwd)/misc ## misc => path to paftools.js
+# To install the k8 javascript shell inside the minimap2 dir
+curl \
+  -L https://github.com/attractivechaos/k8/releases/download/v0.2.4/k8-0.2.4.tar.bz2 \
+  -o k8-0.2.4.tar.bz2
+
+tar -jxf k8-0.2.4.tar.bz2
+cp k8-0.2.4/k8-`uname -s` k8
+
+export PATH=$PATH:$(pwd)      ## minimap2 install directory
+export PATH=$PATH:$(pwd)/misc ## minimap2 subdir containing paftools.js
 ```
 
 ##### To install Circos:
