@@ -53,13 +53,7 @@ sudo apt install libperlio-gzip-perl
 
 On Fedora
 ```Bash
-sudo dnf install perl-App-cpanminus
-sudo cpanm PerlIO::gzip
-
-or
-
-sudo cpan
-  cpan[1]> install PerlIO::gzip
+sudo dnf install perl-PerlIO-gzip
 ```
 
 ##### To install matplolib:
