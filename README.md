@@ -143,7 +143,7 @@ printf "\nexport PATH=$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ## <b>Using SYNY</b>
 ### Command line options
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
-1. Extracts protein sequences from provided annotation files (currently supported: .gbf, .gbff, .prot, .embl).
+1. Extracts protein sequences from provided GenBank annotation files (currently supported: .gbf, .gbff).
 2. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches.
 3. Generates gene pairs and reconstruct gene clusters.
 4. Identifies sample-wide conserved genes, as well as missing or unique proteins for each species.
