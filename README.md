@@ -116,9 +116,12 @@ sudo dnf install perl-GD
 sudo cpanm \
   Config::General \
   Font::TTF::Font \
+  List::MoreUtils \
   Math::Bezier \
   Math::Round \
   Math::VecStat \
+  Params::Validate \
+  Readonly \
   Regexp::Common \
   Set::IntSpan \
   Statistics::Basic \
