@@ -352,6 +352,15 @@ CNA00220	+	CGB_B0220W	+
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.normal.png">
 </p>
 
+In this figure, nucleotides biases are plotted in the concentric rings (from outer to inner rings):
+- AT and GC nucleotide biases (grey and red lines)
+- GT and AC nucleotide biases (blue and green lines)
+- GA and CT nucleotide biases (purple and yellow lines)
+
+Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. The reference genome can be specified with the --ref commmand line switch. If omitted, the  first genome encountered alphabetically will be used as the default reference.
+
+Data and configuration files for these plots are located in the CIRCOS/ subdirectory.
+
 ##### Example of an image generated with Circos and SYNY (using the inverted karyotype):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.inverted.png">
