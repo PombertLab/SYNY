@@ -366,12 +366,16 @@ Data and configuration files for these plots are located in the CIRCOS/ subdirec
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.inverted.png">
 </p>
 
-In the inverted karyotype image, the order of the karyotype(s) to be compared to the reference one are reversed. This option can be useful when comparing genomes whose chromosomes have been assigned similar numbers based on various inference methods (this does not appear to be the case in the above example). In such instances, inverting the karyotypes can help improve legibility.
+In the inverted karyotype image, the order of the karyotype(s) to be compared to the reference one are reversed. This option can be useful when comparing genomes whose chromosomes have been assigned similar numbers based on various inference methods (this does not appear to be the case in the above example). In such instances, inverting the karyotypes can help improve figure legibility.
 
 ##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.png">
 </p>
+
+If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/).
+
+In these plots, each chromosome/contig from the query is plotted as a column (x-axis) against each chromosome/contig from the subject (y-axis). In the above example, a total of 196 subplots (14 x 14 chromosomes) are plotted using matplotlib's [subplot](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html) function. In these plots, matches identified with minimap2 are scatter-plotted using the selected color (defaut = blue).
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
