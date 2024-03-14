@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1b'
-updated = '2024-03-11'
+version = '0.1c'
+updated = '2024-03-14'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -165,12 +165,21 @@ for paf in paf_files:
             axes[ynum,xnum].set_xlim(1,xmax)
             axes[ynum,xnum].set_ylim(1,ymax)
 
+            ## x-axes labels and ticks
             if (ynum + 1) == len(subject_len_dict):
                 axes[ynum,xnum].set_xlabel(query, rotation=45, ha='right')
 
+            if (ynum + 1) < len(subject_len_dict):
+                axes[ynum,xnum].get_xaxis().set_visible(False)
+
+            # y-axes labels and ticks
             if (xnum == 0):
                 axes[ynum,xnum].set_ylabel(subject, rotation=45, ha='right')
 
+            if (xnum > 0):
+                axes[ynum,xnum].get_yaxis().set_visible(False)
+
+            # subplots daat
             if subject in dataframe[query].keys():
                 x1 = dataframe[query][subject].keys()
                 y1 = dataframe[query][subject].values()
