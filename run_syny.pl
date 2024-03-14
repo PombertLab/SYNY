@@ -53,6 +53,7 @@ OPTIONS (PLOTS):
 -h (--height)	Figure height in inches [Default: 10.8]
 -w (--width)	Figure width in inches [Default: 19.2]
 --color		Scatter plot color [Default: blue]
+--noticks	Turn off ticks on x and y axes
 EXIT
 
 die ("\n$usage\n") unless (@ARGV);
@@ -79,6 +80,7 @@ my $multiplier = '1e5';
 my $height = 10.8;
 my $width = 19.2;
 my $color = 'blue';
+my $noticks;
 
 GetOptions(
 	# Main
@@ -100,7 +102,8 @@ GetOptions(
 	'm|multiplier=s' => \$multiplier, 
 	'h|height=s' => \$height,
 	'w|width=s' => \$width,
-	'color=s' => \$color
+	'color=s' => \$color,
+	'noticks' => \$noticks
 );
 
 unless(@gaps){
@@ -275,6 +278,11 @@ close PLINK;
 
 my $dotplot_dir = "$outdir/DOTPLOTS";
 
+my $tick_flag = '';
+if ($noticks){
+	$tick_flag = '--noticks'
+}
+
 system("
 	$path/paf_to_dotplot.py \\
 	--paf $paf_dir/*.paf \\
@@ -282,7 +290,8 @@ system("
 	--unit $multiplier \\
 	--height $height \\
 	--width $width \\
-	--color $color
+	--color $color \\
+	$tick_flag
 ") == 0 or checksig();
 
 ###################################################################################################

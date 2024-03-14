@@ -181,7 +181,8 @@ OPTIONS (PLOTS):
 -m (--multi)    Axes units multiplier [Default: 1e5]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
--c (--color)    Color [Default: blue]
+--color		Scatter plot color [Default: blue]
+--noticks	Turn off ticks on x and y axes
 ```
 The output directory will be structured as follows: 
 ```Bash
@@ -383,6 +384,8 @@ Because large numbers quickly overlap in the small subplots, to improve legibili
 1e4: n x 10000 bp
 1e5: n x 100000 bp
 ```
+
+Alternatively, ticks/numbers in the x and y axes can be turned off with the --noticks command line option.
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.

@@ -50,6 +50,7 @@ cmd.add_argument("-u", "--unit", default='1e3')
 cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
 cmd.add_argument("-c", "--color", default='blue')
+cmd.add_argument("-n", "--noticks", action='store_true')
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -58,6 +59,7 @@ unit = args.unit
 height = args.height
 width = args.width
 ccolor = args.color
+noticks = args.noticks
 
 ################################################################################
 ## Working on output directory
@@ -139,10 +141,13 @@ for paf in paf_files:
     basename = os.path.basename(paf)
     fig.suptitle(basename)
 
-    print("\nWorking on", basename, '=> ', end='')
-    print('total subplots:', subplots_total)
+    if noticks:
+        plt.setp(axes, xticks=[], yticks=[])
 
     plt.rcParams.update({'font.size': 8})
+
+    print("\nWorking on", basename, '=> ', end='')
+    print('total subplots:', subplots_total)
 
     ynum = 0
     xnum = 0
@@ -172,9 +177,11 @@ for paf in paf_files:
                 axes[ynum,xnum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1, color=ccolor)
 
             ynum += 1
-        
+
+
         xnum += 1
         ynum = 0
+
 
     ## Writing to output file
     output = basename
