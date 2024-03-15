@@ -379,7 +379,7 @@ Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are c
 
 Data and configuration files for these plots are located in the CIRCOS/ subdirectory.
 
-##### Example of an image generated with Circos and SYNY from shared proteins clusters(using the inverted karyotype):
+##### Example of an image generated with Circos and SYNY from shared proteins clusters (using the inverted karyotype):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.inverted.png">
 </p>
@@ -390,6 +390,8 @@ In the inverted karyotype image, the order of the karyotype(s) to be compared to
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.paf.normal.png">
 </p>
+
+In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. 
 
 ##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
 <p align="left">
