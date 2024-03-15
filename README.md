@@ -160,9 +160,9 @@ The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SY
 
 When working with well-annotated, closely related genomes, colinear regions inferred from pairwise genome alignments and shared protein cluster reconstructions should yield similar results.
 
-However, when working with genomes featuring high levels of sequence divergence, pairwise genome alignments may struggle. In those instances, colinear regions inferred from protein cluster reconstructions should outperform those from genome alignments; silent mutations/codon biases do not affect amino acid sequences and hypervariable intergenic regions are not considered in protein cluster reconstructions.
+However, when working with genomes featuring high levels of sequence divergence, pairwise genome alignments may struggle. In those instances, colinear regions inferred from protein cluster reconstructions should outperform those from genome alignments; silent mutations/codon usage biases do not affect amino acid sequences and hypervariable intergenic regions are not considered in protein cluster reconstructions.
 
-Conversely, when working with poorly or unannotated genomes, colinear regions inferred from genome alignments should outperform those inferred from protein cluster reconstructions (if there is sufficient sequence similarity to perform pairwise alignments).
+Conversely, when working with poorly annotated or unannotated genomes, colinear regions inferred from genome alignments should outperform those inferred from protein cluster reconstructions (if there is sufficient sequence similarity to perform pairwise alignments).
 
 ### Command line options
 
