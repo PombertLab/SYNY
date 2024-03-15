@@ -365,9 +365,9 @@ CNA00220	+	CGB_B0220W	+
 ```
 
 
-##### Example of an image generated with Circos and SYNY (using defaults):
+##### Example of an image generated with Circos and SYNY from shared proteins clusters:
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.normal.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.normal.png">
 </p>
 
 In this figure, nucleotides biases are plotted in the concentric rings (from outer to inner rings):
@@ -379,12 +379,17 @@ Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are c
 
 Data and configuration files for these plots are located in the CIRCOS/ subdirectory.
 
-##### Example of an image generated with Circos and SYNY (using the inverted karyotype):
+##### Example of an image generated with Circos and SYNY from shared proteins clusters(using the inverted karyotype):
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.inverted.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.inverted.png">
 </p>
 
 In the inverted karyotype image, the order of the karyotype(s) to be compared to the reference one are reversed. This option can be useful when comparing genomes whose chromosomes have been assigned similar numbers based on various inference methods (this does not appear to be the case in the above example). In such instances, inverting the karyotypes can help improve figure legibility.
+
+##### Example of an image generated with Circos and SYNY from pairwise genome alignments:
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.paf.normal.png">
+</p>
 
 ##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
 <p align="left">
