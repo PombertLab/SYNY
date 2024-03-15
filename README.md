@@ -46,18 +46,25 @@ export PATH=$PATH:$(pwd)
 
 #### <b>Installing dependencies</b>
 ##### To install PerlIO::gzip:
-On Ubuntu:
-```Bash
-sudo apt install libperlio-gzip-perl
-```
 
-On Fedora
 ```Bash
+## On Ubuntu:
+sudo apt install libperlio-gzip-perl
+
+## On Fedora:
 sudo dnf install perl-PerlIO-gzip
 ```
 
+
 ##### To install matplolib:
-```
+```Bash
+## On Ubuntu:
+sudo apt install python3-matplotlib
+
+## On Fedora:
+sudo dnf install python3-matplotlib
+
+## Or via pip (Ubuntu/Fedora):
 pip install matplotlib
 ```
 
@@ -143,11 +150,10 @@ printf "\nexport PATH=$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ## <b>Using SYNY</b>
 ### Command line options
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
-1. Extracts protein sequences from provided GenBank annotation files (currently supported: .gbf, .gbff).
-2. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches.
-3. Generates gene pairs and reconstruct gene clusters.
-4. Identifies sample-wide conserved genes, as well as missing or unique proteins for each species.
-5. Generates configuration files/templates for plotting with [Circos](https://circos.ca/).
+1. Extracts genome and protein sequences from GenBank (.gbf/.gbff) annotation files.
+2. Performs round-robin pairwize genome alignments with [minimap2](https://github.com/lh3/minimap2) and plots them with [matplotlib](https://matplotlib.org/).
+3. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches, identifies conserved protein gene pairs, and reconstructs colinear clusters from these searches.
+4. Generates [Circos](https://circos.ca/) plots highlighting colinear regions inferred from pairwise genome alignments and from shared protein cluster reconstructions.
 
 SYNY can be run from the master script as follows:<br>
 ```Bash
@@ -212,7 +218,7 @@ drwxr-xr-x  5 jpombert jpombert 4.0K Mar  8 14:45 SYNTENY
 -rw-r--r--  1 jpombert jpombert 3.3M Mar  8 14:45 circos.syny.normal.svg
 ```
 
-In the above, colinearity plots inferred from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2) are indicated with the `.paf.` tag. Colinearity plots inferred from shared protein clusters identified with [SYNY](https://github.com/PombertLab/SYNY) are indicated with the `.syny.` tag.
+In the above, Circos colinearity plots inferred from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2) are indicated with the `.paf.` tag. Colinearity plots inferred from shared protein clusters identified with [SYNY](https://github.com/PombertLab/SYNY) are indicated with the `.syny.` tag.
 
 The contents of the subdirectories are:
 - ALIGNMENTS:
@@ -228,13 +234,13 @@ The contents of the subdirectories are:
 		- BLASTP databases
 	- Round-robin BLASTP results (.diamond.6)
 - DOTPLOTS:
-	- Dotplots (in png format) generated from the minimap2 PAF alignments
+	- Dotplots (in PNG format) generated from the minimap2 PAF alignments
 - GENOME:
-	- FASTA files from the investigated genomes
+	- FASTA files containing the sequences of the investigated genomes
 - LISTS:
 	- Lists of protein coding genes with location details (.list)
 - PROT_SEQ:
-	- Protein sequences for each species (.faa)
+	- Protein sequences for each species (.faa) in FASTA format
 - SHARED:
 	- Lists of all proteins and their top homologs (if any) in other species (.shared.tsv)
 	- Lists of proteins that are unique to each species (.uniques.tsv)
@@ -243,7 +249,7 @@ The contents of the subdirectories are:
 	- Tab-delimited cluster summary table (clusters_summary_table.tsv)
 	- Subdirectory per specified gap allowance (gap_#) containing:
 		- CLUSTERS:
-			- Round-robin reconstructed syntetic clusters for each species
+			- Round-robin reconstructed syntenic clusters for each species
 		- PAIRS:
 			- Round-robin identified gene pairs for each species
 
@@ -358,7 +364,7 @@ In this figure, nucleotides biases are plotted in the concentric rings (from out
 - GT and AC nucleotide biases (blue and green lines)
 - GA and CT nucleotide biases (purple and yellow lines)
 
-Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. The reference genome can be specified with the --ref commmand line switch. If omitted, the  first genome encountered alphabetically will be used as the default reference.
+Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. The reference genome can be specified with the `--ref` commmand line switch. If omitted, the  first genome encountered alphabetically will be used as the default reference.
 
 Data and configuration files for these plots are located in the CIRCOS/ subdirectory.
 
@@ -378,16 +384,16 @@ If pairwise genome alignments are performed with [minimap2](https://github.com/l
 
 In these plots, each chromosome/contig from the query is plotted as a column (x-axis) against each chromosome/contig from the subject (y-axis). In the above example, a total of 196 subplots (14 x 14 chromosomes) are plotted using matplotlib's [subplot](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html) function. In these plots, matches identified with minimap2 are scatter-plotted using the selected color (defaut: blue).
 
-Because large numbers quickly overlap in the small subplots, to improve legibility, numbers in the x and y axes are scaled down using a desired scale with the --multi command line switch (default: 1e5). For example:
+Because large numbers quickly overlap in the small subplots, to improve legibility, numbers in the x and y axes are scaled down using a desired scale with the `--multi` command line switch (default: 1e5). For example:
 ```bash
 1e3: n x 1000 bp
 1e4: n x 10000 bp
 1e5: n x 100000 bp
 ```
 
-Alternatively, ticks/numbers in the x and y axes can be turned off with the --noticks command line option.
+Alternatively, ticks/numbers in the x and y axes can be turned off with the `--noticks` command line option.
 
-By default, the plots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the --height and --width command lines.
+By default, the plots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command lines.
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
