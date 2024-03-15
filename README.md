@@ -10,6 +10,7 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
   * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
   * [Installing dependencies](#installing-dependencies)
 * [Using SYNY](#Using-SYNY)
+  * [Why use two distinct approaches?](#Why-use-two-distinct-approaches?)
   * [Command line options](#Command-line-options)
   * [Step by step examples](#Step-by-step-examples)
     * [Example 1: <i>Cryptococcus</i>](#Example-1---Cryptococcus)
@@ -148,12 +149,22 @@ printf "\nexport PATH=$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ```
 
 ## <b>Using SYNY</b>
-### Command line options
+
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
 1. Extracts genome and protein sequences from GenBank (.gbf/.gbff) annotation files.
 2. Performs round-robin pairwize genome alignments with [minimap2](https://github.com/lh3/minimap2) and plots them with [matplotlib](https://matplotlib.org/).
 3. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches, identifies conserved protein gene pairs, and reconstructs colinear clusters from these searches.
 4. Generates [Circos](https://circos.ca/) plots highlighting colinear regions inferred from pairwise genome alignments and from shared protein cluster reconstructions.
+
+#### Why use two distinct approaches?
+
+When working with well-annotated, closely related genomes, colinear regions inferred from pairwise genome alignments and shared protein cluster reconstructions should yield similar results.
+
+However, when working with genomes featuring high levels of sequence divergence, pairwise genome alignments may struggle. In those instances, colinear regions inferred from protein cluster reconstructions should outperform those from genome alignments; silent mutations/codon biases do not affect amino acid sequences and hypervariable intergenic regions are not considered in protein cluster reconstructions.
+
+Conversely, when working with poorly or unannotated genomes, colinear regions inferred from genome alignments should outperform those inferred from protein cluster reconstructions (if there is sufficient sequence similarity to perform pairwise alignments).
+
+### Command line options
 
 SYNY can be run from the master script as follows:<br>
 ```Bash
