@@ -426,7 +426,7 @@ By default, the plots are formatted for a widescreen (landscape) output (width/h
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.barplot.png">
 </p>
 
-This image was generated using the default [seaborn](https://seaborn.pydata.org/tutorial/color_palettes.html) Spectral color palette. This palette can be replaced using the `--palette` command line switch; <i>e.g.</i> `--palette husl`. Height and width can also be adjusted with the `--height` and `--width` command line switches. 
+This image was generated using the Spectral color palette from [seaborn](https://seaborn.pydata.org/tutorial/color_palettes.html) (set as default in SYNY). This palette can be replaced using the `--palette` command line switch; <i>e.g.</i> `--palette husl`. Height and width can also be adjusted with the `--height` and `--width` command line switches. 
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
