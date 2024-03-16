@@ -34,6 +34,7 @@ Synteny inferences can be used to:
 - [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip)
 - [Python3](https://www.python.org/)
 - [matplotlib](https://matplotlib.org/)
+- [seaborn](https://seaborn.pydata.org/)
 
 ##### <b>Optional</b>
 - [Circos](https://circos.ca/)
@@ -57,16 +58,19 @@ sudo dnf install perl-PerlIO-gzip
 ```
 
 
-##### To install matplolib:
+##### To install matplolib/seaborn:
 ```Bash
 ## On Ubuntu:
 sudo apt install python3-matplotlib
+sudo apt install python3-seaborn
 
 ## On Fedora:
 sudo dnf install python3-matplotlib
+sudo dnf install python3-seaborn
 
 ## Or via pip (Ubuntu/Fedora):
 pip install matplotlib
+pip install seaborn
 ```
 
 ##### To install DIAMOND:
@@ -194,12 +198,13 @@ OPTIONS (PLOTS):
                 # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
                 # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
 
-### Dotplots
+### Barplots/Dotplots
 -m (--multi)    Axes units multiplier [Default: 1e5]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
---color		Scatter plot color [Default: blue]
---noticks	Turn off ticks on x and y axes
+--palette       Seaborn color palette (for barplots) [Default: Spectral]
+--color         Scatter plot color (for dotplots) [Default: blue]
+--noticks       Turn off ticks on x and y axes
 ```
 The output directory will be structured as follows: 
 ```Bash
@@ -208,6 +213,7 @@ ls -lah SYNY/
 drwxr-xr-x 11 jpombert jpombert 4.0K Mar  8 14:46 .
 drwx------ 23 jpombert jpombert 4.0K Mar  8 14:45 ..
 drwxr-xr-x  5 jpombert jpombert 4.0K Mar  8 14:45 ALIGNMENTS
+drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 BARPLOTS
 drwxr-xr-x  9 jpombert jpombert 4.0K Mar  8 14:45 CIRCOS
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 CONSERVED
 drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DIAMOND
@@ -234,6 +240,8 @@ In the above, Circos colinearity plots inferred from pairwise genome alignments 
 The contents of the subdirectories are:
 - ALIGNMENTS:
 	- Pairwise minimap2 genome alignments in MAF, PAF and ALN formats
+- BARPLOTS:
+	- Barplots (in PNG format) generated from the minimap2 PAF alignments
 - CIRCOS:
 	- Configuration files for Circos plots
 - CONSERVED:
@@ -412,6 +420,11 @@ Because large numbers quickly overlap in the small subplots, to improve legibili
 Alternatively, ticks/numbers in the x and y axes can be turned off with the `--noticks` command line option.
 
 By default, the plots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command lines.
+
+##### Example of a barplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.barplot.png">
+</p>
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.

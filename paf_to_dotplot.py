@@ -32,6 +32,7 @@ OPTIONS:
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
 -c (--color)    Color [Default: blue]
+-n (--noticks)  Turn off ticks on x and y axes
 """
 
 # Print custom message if argv is empty

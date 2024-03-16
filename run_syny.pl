@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5d';
-my $updated = '2024-03-11';
+my $version = '0.5.5e';
+my $updated = '2024-03-16';
 
 use strict;
 use warnings;
@@ -48,11 +48,12 @@ OPTIONS (PLOTS):
 		# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 		# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
 
-### Dotplots
+### Barplots/Dotplots
 -m (--multi)	Axes units multiplier [Default: 1e5]
 -h (--height)	Figure height in inches [Default: 10.8]
 -w (--width)	Figure width in inches [Default: 19.2]
---color		Scatter plot color [Default: blue]
+--palette	Seaborn color palette (for barplots) [Default: Spectral]
+--color		Scatter plot color (for dotplots) [Default: blue]
 --noticks	Turn off ticks on x and y axes
 EXIT
 
@@ -75,7 +76,8 @@ my $custom_file;
 my $custom_colors;
 my $list_preset;
 my @formats;
-# Dotplots
+# Barplots/Dotplots
+my $palette = 'Spectral';
 my $multiplier = '1e5';
 my $height = 10.8;
 my $width = 19.2;
@@ -98,7 +100,8 @@ GetOptions(
 	'custom_preset=s' => \$custom_colors,
 	'list_preset'	=> \$list_preset,
 	'f|format=s{1,}' => \@formats,
-	# dotplots
+	# Barplots/dotplots
+	'palette=s' => \$palette,
 	'm|multiplier=s' => \$multiplier, 
 	'h|height=s' => \$height,
 	'w|width=s' => \$width,
@@ -273,9 +276,10 @@ for my $paf_file (@paf_files){
 close PLINK;
 
 ###################################################################################################
-## Creating dotplots from PAF files
+## Creating barplots/dotplots from PAF files
 ###################################################################################################
 
+my $barplot_dir = "$outdir/BARPLOTS";
 my $dotplot_dir = "$outdir/DOTPLOTS";
 
 my $tick_flag = '';
@@ -283,6 +287,18 @@ if ($noticks){
 	$tick_flag = '--noticks'
 }
 
+# Barplots
+system("
+	$path/paf_to_barplot.py \\
+	--paf $paf_dir/*.paf \\
+	--outdir $barplot_dir \\
+	--height $height \\
+	--width $width \\
+	--palette $palette \\
+	$tick_flag
+") == 0 or checksig();
+
+# Doplots
 system("
 	$path/paf_to_dotplot.py \\
 	--paf $paf_dir/*.paf \\
