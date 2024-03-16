@@ -24,6 +24,8 @@ UPDATED     {updated}
 SYNOPSIS    Create genome alignment dotplots from PAF files with matplotlib
 
 REQS        matplotlib, seaborn
+            # See https://www.practicalpythonfordatascience.com/ap_seaborn_palette
+            # for a list of color palettes
 
 COMMAND    {name} \\
             -p *.paf \\
