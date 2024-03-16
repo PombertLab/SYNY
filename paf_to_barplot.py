@@ -24,8 +24,6 @@ UPDATED     {updated}
 SYNOPSIS    Create genome alignment dotplots from PAF files with matplotlib
 
 REQS        matplotlib, seaborn
-            # See https://www.practicalpythonfordatascience.com/ap_seaborn_palette
-            # for a list of color palettes
 
 COMMAND    {name} \\
             -p *.paf \\
@@ -37,6 +35,8 @@ OPTIONS:
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
 -c (--palette)  Seaborn color palette [Default: Spectral]
+                # See https://www.practicalpythonfordatascience.com/ap_seaborn_palette
+                # for a list of color palettes
 """
 
 # Print custom message if argv is empty
@@ -114,13 +114,12 @@ for paf in paf_files:
             dataframe[query][subject][s_start] = y_width
 
 
-    ### Plotting 
+    ##### Plotting data
     palette = sns.color_palette(color_palette, len(query_len_dict))
 
     # Setting default image to widescreen by default
     plt.rcParams["figure.figsize"] = (width,height)
     plt.rcParams.update({'font.size': 8})
-
 
     # Defining Matplotlib figure and axis
     fig, ax = plt.subplots()
@@ -141,7 +140,7 @@ for paf in paf_files:
         x += 2
         ydata.append(x + 0.5)
 
-    ## 
+    ## Filling bar plots
     x = 0.5
     cnum = 0
     legend = []
@@ -171,7 +170,6 @@ for paf in paf_files:
     ax.set_yticks(ydata)
     ax.set_yticks(ax.get_yticks()[:-1])
     ax.set_yticklabels(ylabels)
-
 
     ## Writing to output file
     basename = os.path.basename(paf)
