@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1'
+version = '0.1a'
 updated = '2024-03-16'
 name = 'paf_to_barplot.py'
 
@@ -178,5 +178,10 @@ for paf in paf_files:
 
     plt.legend(handles=legend, loc='center left', bbox_to_anchor=(1, 0.5))
     filename = outdir + '/' + output.rsplit('.', 1)[0] + '.barplot.png'
+    svg = outdir + '/' + output.rsplit('.', 1)[0] + '.barplot.svg'
+
     print(f"Creating {filename}...")
     plt.savefig(filename)
+
+    print(f"Creating {svg}...")
+    plt.savefig(svg)
