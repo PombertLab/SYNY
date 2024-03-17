@@ -42,6 +42,8 @@ OPTIONS (PLOTS):
 -circos_prefix	Desired Circos plot prefix [Default: circos]
 -r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)	Size unit (Kb or Mb) [Default: Mb]
+--winsize	Sliding windows size (nucleotide biases) [Default: 10000]
+--stepsize	Sliding windows step (nucleotide biases) [Default: 5000]
 -custom_file	Load custom colors from file
 -list_preset	List available custom color presets
 -custom_preset	Use a custom color preset; e.g.
@@ -74,6 +76,8 @@ my $reference;
 my $unit = 'Mb';
 my $circos;
 my $circos_prefix = 'circos';
+my $winsize = 10000;
+my $stepsize = 5000;
 my $custom_file;
 my $custom_colors;
 my $list_preset;
@@ -99,6 +103,8 @@ GetOptions(
 	'c|circos' => \$circos,
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
+	'winsize=i' => \$winsize,
+	'stepsize=i' => \$stepsize,
 	'circos_prefix=s' => \$circos_prefix,
 	'custom_file=s' => \$custom_file,
 	'custom_preset=s' => \$custom_colors,
@@ -307,7 +313,8 @@ system("
 	--width $width \\
 	--palette $palette \\
 	$tick_flag \\
-	$monobar_flag
+	$monobar_flag \\
+	2>> $outdir/error.log
 ") == 0 or checksig();
 
 # Doplots
@@ -325,7 +332,8 @@ system("
 	--width $width \\
 	--color $color \\
 	$tick_flag \\
-	$dotpal_flag
+	$dotpal_flag \\
+	2>> $outdir/error.log
 ") == 0 or checksig();
 
 ###################################################################################################
@@ -588,8 +596,8 @@ system("
 	$circos_path/nucleotide_biases.pl \\
 	--outdir $outdir/CIRCOS \\
 	--fasta $outdir/GENOME/*.fasta \\
-	--winsize 10000 \\
-	--step 5000 \\
+	--winsize $winsize \\
+	--step $stepsize \\
 	--gap $gap \\
 	$ref \\
 	$unit_size \\

@@ -192,6 +192,8 @@ OPTIONS (PLOTS):
 -circos_prefix  Desired Circos plot prefix [Default: circos]
 -r (--ref)      Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
+--winsize       Sliding windows size (nucleotide biases) [Default: 10000]
+--stepsize      Sliding windows step (nucleotide biases) [Default: 5000]
 -custom_file    Load custom colors from file
 -list_preset    List available custom color presets
 -custom_preset  Use a custom color preset; e.g.
