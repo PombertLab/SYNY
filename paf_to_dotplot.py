@@ -207,10 +207,15 @@ for paf in paf_files:
     ## Writing to output file
     output = basename
 
+    acolor = ccolor
     affix = unit
+
+    if color_palette:
+        acolor = color_palette
+
     if noticks:
         affix = 'noticks'
 
-    filename = outdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + '.png'
+    filename = outdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + f".{acolor}" + '.png'
     print(f"Creating {filename}...")
     plt.savefig(filename)
