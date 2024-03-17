@@ -199,11 +199,13 @@ OPTIONS (PLOTS):
                 # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
 
 ### Barplots/Dotplots
--m (--multi)    Axes units multiplier [Default: 1e5]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
---palette       Seaborn color palette (for barplots) [Default: Spectral]
+-m (--multi)    Axes units multiplier (for dotplots) [Default: 1e5]
+--palette       Color palette (for barplots) [Default: Spectral]
+--monobar       Use a specified color for barplots instead of color palette: e.g. --monobar blue
 --color         Scatter plot color (for dotplots) [Default: blue]
+--dotpalette    Use a specified color palette instead for dotplots: e.g. --dotpalette inferno
 --noticks       Turn off ticks on x and y axes
 ```
 The output directory will be structured as follows: 
@@ -241,7 +243,7 @@ The contents of the subdirectories are:
 - ALIGNMENTS:
 	- Pairwise minimap2 genome alignments in MAF, PAF and ALN formats
 - BARPLOTS:
-	- Barplots (in PNG format) generated from the minimap2 PAF alignments
+	- Barplots (in PNG/SVG format) generated from the minimap2 PAF alignments
 - CIRCOS:
 	- Configuration files for Circos plots
 - CONSERVED:

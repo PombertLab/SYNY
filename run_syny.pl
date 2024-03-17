@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5e';
-my $updated = '2024-03-16';
+my $version = '0.5.5f';
+my $updated = '2024-03-17';
 
 use strict;
 use warnings;
@@ -49,11 +49,13 @@ OPTIONS (PLOTS):
 		# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
 
 ### Barplots/Dotplots
--m (--multi)	Axes units multiplier [Default: 1e5]
 -h (--height)	Figure height in inches [Default: 10.8]
 -w (--width)	Figure width in inches [Default: 19.2]
---palette	Seaborn color palette (for barplots) [Default: Spectral]
+-m (--multi)	Axes units multiplier (for dotplots) [Default: 1e5]
+--palette	Color palette (for barplots) [Default: Spectral]
+--monobar	Use a specified color for barplots instead of color palette: e.g. --monobar blue
 --color		Scatter plot color (for dotplots) [Default: blue]
+--dotpalette	Use a specified color palette instead for dotplots: e.g. --dotpalette inferno
 --noticks	Turn off ticks on x and y axes
 EXIT
 
@@ -77,11 +79,13 @@ my $custom_colors;
 my $list_preset;
 my @formats;
 # Barplots/Dotplots
-my $palette = 'Spectral';
 my $multiplier = '1e5';
 my $height = 10.8;
 my $width = 19.2;
+my $palette = 'Spectral';
+my $monobar;
 my $color = 'blue';
+my $dotpalette;
 my $noticks;
 
 GetOptions(
@@ -101,11 +105,13 @@ GetOptions(
 	'list_preset'	=> \$list_preset,
 	'f|format=s{1,}' => \@formats,
 	# Barplots/dotplots
-	'palette=s' => \$palette,
 	'm|multiplier=s' => \$multiplier, 
 	'h|height=s' => \$height,
 	'w|width=s' => \$width,
+	'palette=s' => \$palette,
+	'monobar=s' => \$monobar,
 	'color=s' => \$color,
+	'dotpalette=s' => \$dotpalette,
 	'noticks' => \$noticks
 );
 
@@ -288,6 +294,11 @@ if ($noticks){
 }
 
 # Barplots
+my $monobar_flag = '';
+if ($monobar){
+	$monobar_flag = "--mono $monobar";
+}
+
 system("
 	$path/paf_to_barplot.py \\
 	--paf $paf_dir/*.paf \\
@@ -295,10 +306,16 @@ system("
 	--height $height \\
 	--width $width \\
 	--palette $palette \\
-	$tick_flag
+	$tick_flag \\
+	$monobar_flag
 ") == 0 or checksig();
 
 # Doplots
+my $dotpal_flag = '';
+if ($dotpalette){
+	$dotpal_flag = "--palette $dotpalette";
+}
+
 system("
 	$path/paf_to_dotplot.py \\
 	--paf $paf_dir/*.paf \\
@@ -307,7 +324,8 @@ system("
 	--height $height \\
 	--width $width \\
 	--color $color \\
-	$tick_flag
+	$tick_flag \\
+	$dotpal_flag
 ") == 0 or checksig();
 
 ###################################################################################################
