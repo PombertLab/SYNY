@@ -196,8 +196,13 @@ for paf in paf_files:
     else:
         plt.legend(handles=legend, loc='center left', bbox_to_anchor=(1, 0.5))
 
-    png = pngdir + '/' + output.rsplit('.', 1)[0] + '.barplot.png'
-    svg = svgdir + '/' + output.rsplit('.', 1)[0] + '.barplot.svg'
+
+    affix_color = color_palette
+    if monochrome:
+        affix_color = monochrome
+
+    png = pngdir + '/' + output.rsplit('.', 1)[0] + '.barplot.' + f"{affix_color}" + '.png'
+    svg = svgdir + '/' + output.rsplit('.', 1)[0] + '.barplot.' + f"{affix_color}" + '.svg'
 
     print(f"Creating {png}...")
     plt.savefig(png)
