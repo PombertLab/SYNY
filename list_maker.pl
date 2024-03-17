@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.3';
-my $updated = '2024-03-07';
+my $version = '0.5.3a';
+my $updated = '2024-03-17';
 
 use strict;
 use warnings;
@@ -208,6 +208,10 @@ foreach my $input_file (@input_files){
 						print OUT $end."\t";
 						print OUT $strand."\t";
 						print OUT $gene_num."\t";
+
+						if (!defined $features{$locus}{'product'}){
+							$features{$locus}{'product'} = 'undefined product in accession';
+						}
 						print OUT $features{$locus}{'product'}."\n";
 
 						print PROT ">$locus \[$features{$locus}{'product'}\]\n"; #\t$contig\t$start\t$end\t$strand\n";
