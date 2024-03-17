@@ -2,7 +2,7 @@
 ## Pombert Lab, Illinois Tech 2023
 
 my $name = 'clusters2links.pl';
-my $version = '0.1c';
+my $version = '0.1d';
 my $updated = '2023-03-17';
 
 use strict;
@@ -60,10 +60,8 @@ while (my $list = shift @lists){
         my @data = split("\t", $line);
         my $locus = $data[0];
         my $contig = $data[1];
-        my ($start) = $data[2] =~ s/\)|complement\(//;
-        $start = $start - 1; ## Adjusting position for Circos (starts at zero)
-        my ($end) = $data[3] =~ s/\)|complement\(//;
-        $end = $end - 1; ## Same
+        my $start = $data[2] - 1; ## Adjusting position for Circos (starts at zero)
+        my $end = $data[3] - 1; ## Same
         my $strand = $data[4];
         my $gene_number = $data[5];
 
