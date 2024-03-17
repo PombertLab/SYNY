@@ -203,9 +203,9 @@ OPTIONS (PLOTS):
 -w (--width)    Figure width in inches [Default: 19.2]
 -m (--multi)    Axes units multiplier (for dotplots) [Default: 1e5]
 --palette       Color palette (for barplots) [Default: Spectral]
---monobar       Use a specified color for barplots instead of color palette: e.g. --monobar blue
+--monobar       Use a monochrome color for barplots instead of color palette: e.g. --monobar blue
 --color         Scatter plot color (for dotplots) [Default: blue]
---dotpalette    Use a specified color palette instead for dotplots: e.g. --dotpalette inferno
+--dotpalette    Use a color palette instead of a monochrome color for dotplots: e.g. --dotpalette inferno
 --noticks       Turn off ticks on x and y axes
 ```
 The output directory will be structured as follows: 
