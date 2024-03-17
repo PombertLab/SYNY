@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1a'
-updated = '2024-03-16'
+version = '0.1b'
+updated = '2024-03-17'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -37,6 +37,8 @@ OPTIONS:
 -c (--palette)  Seaborn color palette [Default: Spectral]
                 # See https://www.practicalpythonfordatascience.com/ap_seaborn_palette
                 # for a list of color palettes
+-m (--mono)     Use a single specified mochochrome color for all chromosomes instead
+                of a color palette
 """
 
 # Print custom message if argv is empty
@@ -55,6 +57,7 @@ cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
 cmd.add_argument("-c", "--palette", default='Spectral')
 cmd.add_argument("-n", "--noticks", action='store_true')
+cmd.add_argument("-m", "--mono")
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -63,20 +66,29 @@ height = args.height
 width = args.width
 color_palette = args.palette
 noticks = args.noticks
+monochrome = args.mono
 
 ################################################################################
 ## Working on output directory
 ################################################################################
 
-if os.path.isdir(outdir) == False:
-    try:
-        os.makedirs(outdir)
-    except:
-        sys.exit(f"Can't create directory {outdir}...")
+svgdir = outdir + '/SVG'
+pngdir = outdir + '/PNG'
+
+subdirs = [outdir,svgdir,pngdir]
+
+for dir in subdirs:
+    if os.path.isdir(dir) == False:
+        try:
+            os.makedirs(dir)
+        except:
+            sys.exit(f"Can't create directory {dir}...")
 
 ################################################################################
 ## Parsing and plotting PAF file(s) 
 ################################################################################
+
+print(f"\n" + f"Creating Barplots:\n")
 
 for paf in paf_files:
 
@@ -149,7 +161,10 @@ for paf in paf_files:
 
         for query in dataframe.keys():
 
-            ccolor=palette[cnum]
+            ccolor = palette[cnum]
+            if monochrome:
+                ccolor = monochrome
+
             xlegend = mpatches.Patch(color=ccolor, label=query)
             if query not in dlegend:
                 dlegend[query] = {}
@@ -177,11 +192,12 @@ for paf in paf_files:
     fig.suptitle(basename)
 
     plt.legend(handles=legend, loc='center left', bbox_to_anchor=(1, 0.5))
-    filename = outdir + '/' + output.rsplit('.', 1)[0] + '.barplot.png'
-    svg = outdir + '/' + output.rsplit('.', 1)[0] + '.barplot.svg'
 
-    print(f"Creating {filename}...")
-    plt.savefig(filename)
+    png = pngdir + '/' + output.rsplit('.', 1)[0] + '.barplot.png'
+    svg = svgdir + '/' + output.rsplit('.', 1)[0] + '.barplot.svg'
+
+    print(f"Creating {png}...")
+    plt.savefig(png)
 
     print(f"Creating {svg}...")
     plt.savefig(svg)
