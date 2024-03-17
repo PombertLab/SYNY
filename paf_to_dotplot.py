@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1e'
+version = '0.2'
 updated = '2024-03-17'
 name = 'paf_to_dotplot.py'
 
@@ -124,19 +124,11 @@ for paf in paf_files:
             s_span = s_end - s_start + 1
             slope = s_span / q_span
 
-            y_start = None
+            if orientation == '-':
+                slope = -abs(slope)
+                s_start = s_end
 
-            if orientation == '+':
-                y_start = s_start
-            else:
-                y_start = s_end
-
-            for x in range(q_start, q_end, 1):
-                dataframe[query][subject][x] = y_start
-                if orientation == '+':
-                    y_start = y_start + slope
-                else:
-                    y_start = y_start - slope
+            dataframe[query][subject][q_start] = [q_end,s_start,slope]
 
     ##### Plotting
     x_axes_total = int(len(query_len_dict))
@@ -193,8 +185,22 @@ for paf in paf_files:
 
             # subplots data
             if subject in dataframe[query].keys():
-                x1 = dataframe[query][subject].keys()
-                y1 = dataframe[query][subject].values()
+
+                x1 = []
+                y1 = []
+
+                for q_start in dataframe[query][subject].keys():
+
+                    q_end = dataframe[query][subject][q_start][0]
+                    s_start = dataframe[query][subject][q_start][1]
+                    slope = dataframe[query][subject][q_start][2]
+
+                    y = s_start
+                    for x in range(q_start,q_end):
+                        y += slope
+                        x1.append(x)
+                        y1.append(y)
+
                 axes[ynum,xnum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1, color=ccolor)
 
             ynum += 1
@@ -202,7 +208,6 @@ for paf in paf_files:
         cnum += 1
         xnum += 1
         ynum = 0
-
 
     ## Writing to output file
     output = basename
