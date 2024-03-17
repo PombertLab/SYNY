@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1c'
-updated = '2024-03-14'
+version = '0.1d'
+updated = '2024-03-17'
 name = 'paf_to_dotplot.py'
 
 import sys
 import os
 import matplotlib.pyplot as plt
 import argparse
+import seaborn as sns
 
 ################################################################################
 ## README
@@ -33,6 +34,8 @@ OPTIONS:
 -w (--width)    Figure width in inches [Default: 19.2]
 -c (--color)    Color [Default: blue]
 -n (--noticks)  Turn off ticks on x and y axes
+-a (--palette)  Use a color palette (e.g. Spectral) instead
+                of a monochrome plot
 """
 
 # Print custom message if argv is empty
@@ -51,6 +54,7 @@ cmd.add_argument("-u", "--unit", default='1e3')
 cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
 cmd.add_argument("-c", "--color", default='blue')
+cmd.add_argument("-a", "--palette")
 cmd.add_argument("-n", "--noticks", action='store_true')
 args = cmd.parse_args()
 
@@ -60,6 +64,7 @@ unit = args.unit
 height = args.height
 width = args.width
 ccolor = args.color
+color_palette = args.palette
 noticks = args.noticks
 
 ################################################################################
@@ -130,13 +135,14 @@ for paf in paf_files:
                 else:
                     y_start = y_start - slope
 
-    ### Plotting
+    ##### Plotting
     x_axes_total = int(len(query_len_dict))
     y_axes_total = int(len(subject_len_dict))
     subplots_total = x_axes_total * y_axes_total
 
     # Setting default image to widescreen by default
     plt.rcParams["figure.figsize"] = (width,height)
+    palette = sns.color_palette(color_palette, len(query_len_dict))
 
     fig, axes = plt.subplots(y_axes_total, x_axes_total, sharex='col', sharey='row')
     basename = os.path.basename(paf)
@@ -152,6 +158,7 @@ for paf in paf_files:
 
     ynum = 0
     xnum = 0
+    cnum = 0
 
     ## Convert scientific notation to number
     divider = int(float(unit))
@@ -159,6 +166,9 @@ for paf in paf_files:
     for query in sorted(query_len_dict):
 
         for subject in reversed(sorted(subject_len_dict)):
+
+            if color_palette:
+                ccolor = palette[cnum]
 
             xmax = query_len_dict[query] / divider
             ymax = subject_len_dict[subject] / divider
@@ -180,7 +190,7 @@ for paf in paf_files:
             if (xnum > 0):
                 axes[ynum,xnum].get_yaxis().set_visible(False)
 
-            # subplots daat
+            # subplots data
             if subject in dataframe[query].keys():
                 x1 = dataframe[query][subject].keys()
                 y1 = dataframe[query][subject].values()
@@ -188,7 +198,7 @@ for paf in paf_files:
 
             ynum += 1
 
-
+        cnum += 1
         xnum += 1
         ynum = 0
 
