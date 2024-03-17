@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1d'
+version = '0.1e'
 updated = '2024-03-17'
 name = 'paf_to_dotplot.py'
 
@@ -89,6 +89,9 @@ for paf in paf_files:
 
     with open(paf) as file:
 
+        basename = os.path.basename(paf)
+        print(f"\nWorking on {basename}", end='')
+
         for line in file:
 
             # PAF data structure:
@@ -139,22 +142,20 @@ for paf in paf_files:
     x_axes_total = int(len(query_len_dict))
     y_axes_total = int(len(subject_len_dict))
     subplots_total = x_axes_total * y_axes_total
+    print( '  => ', 'total subplots:', subplots_total)
 
     # Setting default image to widescreen by default
     plt.rcParams["figure.figsize"] = (width,height)
+    plt.rcParams.update({'font.size': 8})
+
+    # color palette
     palette = sns.color_palette(color_palette, len(query_len_dict))
 
     fig, axes = plt.subplots(y_axes_total, x_axes_total, sharex='col', sharey='row')
-    basename = os.path.basename(paf)
     fig.suptitle(basename)
 
     if noticks:
         plt.setp(axes, xticks=[], yticks=[])
-
-    plt.rcParams.update({'font.size': 8})
-
-    print("\nWorking on", basename, '=> ', end='')
-    print('total subplots:', subplots_total)
 
     ynum = 0
     xnum = 0
@@ -205,6 +206,11 @@ for paf in paf_files:
 
     ## Writing to output file
     output = basename
-    filename = outdir + '/' + output.rsplit('.', 1)[0] + f".{unit}" + '.png'
+
+    affix = unit
+    if noticks:
+        affix = 'noticks'
+
+    filename = outdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + '.png'
     print(f"Creating {filename}...")
     plt.savefig(filename)
