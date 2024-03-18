@@ -27,7 +27,7 @@ COMMAND		$name \\
 		  -reference CCMP1205 \\
 		  -circos \\
 		  -gap 0 \\
-		  -custom chloropicon
+		  -custom_preset chloropicon
 
 OPTIONS (Main)
 -f (--fasta)		Fasta file(s) to process
