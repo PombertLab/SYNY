@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.5a';
-my $updated = '2024-03-06';
+my $version = '0.5b';
+my $updated = '2024-03-18';
 
 use strict;
 use warnings;
@@ -47,7 +47,11 @@ OPTIONS (Circos)
 -custom_preset		Use a custom color preset; e.g.
 			# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 			# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
-			### presets can be added to the cc_colors subroutine
+			# presets can be added to the cc_colors subroutine
+-max_ticks		Set max number of ticks [Default: 5000]
+-max_ideograms		Set max number of ideograms [Default: 200]
+-max_links		Set max number of links [Default: 25000]
+-max_points_per_track	Set max number of points per track [Default: 75000]
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
@@ -64,6 +68,10 @@ my $custom_file;
 my $custom_cc;
 my $list_preset;
 my $tsv;
+my $max_ticks = 5000;
+my $max_ideograms = 200;
+my $max_links = 25000;
+my $max_points_per_track = 75000;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
 	'o|outdir=s' => \$outdir,
@@ -77,7 +85,11 @@ GetOptions(
 	'custom_file=s' => \$custom_file,
 	'custom_preset=s' => \$custom_cc,
 	'list_preset'	=> \$list_preset,
-	't|tsv' => \$tsv
+	't|tsv' => \$tsv,
+	'max_ticks=i' => \$max_ticks,
+	'max_ideograms=i' => \$max_ideograms,
+	'max_links=i' => \$max_links,
+	'max_points_per_track=i' => \$max_points_per_track
 );
 
 ### List presets and stop
@@ -614,12 +626,19 @@ for my $genome ((keys %sequences), 'concatenated'){
 		}
 
 		## image.conf
+		print $cg '### Image conf:'."\n";
 		print $cg '<image>'."\n";
-		print $cg '<<include etc/image.conf>>'."\n";
+		image_conf(\*$cg);
 		print $cg '</image>'."\n\n";
-		print $cg '<<include etc/colors_fonts_patterns.conf>>'."\n";
-		print $cg '<<include etc/housekeeping.conf>>'."\n";
 
+		## colors.conf
+		print $cg '<<include etc/colors_fonts_patterns.conf>>'."\n";
+
+		## housekeeping
+		print $cg "\n".'### Housekeeping:'."\n";
+		housekeeping(\*$cg);
+
+		## add custom colors (if requested)
 		if ($custom_cc){
 			print $cg '<colors>'."\n";
 			foreach my $color (@custom_set){
@@ -728,6 +747,19 @@ sub axes {
 	print $fh '</axes>'."\n";
 }
 
+sub image_conf {
+	my $fh = $_[0];
+	print $fh 'background = '.'white'."\n";
+	print $fh 'dir   = . '."\n";
+	print $fh 'file  = '.'circos.png'."\n";
+	print $fh 'png   = '.'yes'."\n";
+	print $fh 'svg   = '.'yes'."\n";
+	print $fh 'radius         = '.'1500p'."\n";
+	print $fh 'angle_offset      = '.'-90'."\n";
+	print $fh 'auto_alpha_colors = '.'yes'."\n";
+	print $fh 'auto_alpha_steps  = '.'5'."\n";
+}
+
 sub cc_colors {
 	%custom_colors = (
 		'chloropicon' => { # from Lemieux et al. (2019) https://www.nature.com/articles/s41467-019-12014-x
@@ -792,4 +824,83 @@ sub cc_colors {
 		# 	'key_3' => 'rgb_value_3',
 		# },
 	)
+}
+
+sub housekeeping {
+	
+	my $fh = $_[0]; 
+
+	print $fh 'anglestep       = '.'0.5'."\n";
+	print $fh 'minslicestep    = '.'10'."\n";
+	print $fh 'beziersamples   = '.'40'."\n";
+	print $fh 'debug           = '.'no'."\n";
+	print $fh 'warnings        = '.'no'."\n";
+	print $fh 'imagemap        = '.'no'."\n";
+	print $fh 'paranoid        = '.'yes'."\n";
+	print $fh 'units_ok        = '.'bupr'."\n";
+	print $fh 'units_nounit    = '.'n'."\n";
+	print $fh 'file_delim = '.'\s'."\n";
+	print $fh 'file_delim_collapse = '.'yes'."\n";
+	print $fh 'list_record_delim = '.'\s*[;,]\s*'."\n";
+	print $fh 'list_field_delim  = '.'\s*[:=]\s*'."\n";
+	print $fh 'options_record_delim = '.'[,;]'."\n";
+	print $fh 'options_field_delim  = '.'='."\n";
+	print $fh 'skip_missing_expression_vars = '.'no'."\n";
+	print $fh 'legacy_underline_expression_syntax = '.'no'."\n";
+	print $fh 'svg_font_scale = '.'1.3'."\n";
+	print $fh 'sup_baseline_shift = '.'40'."\n";
+	print $fh 'sub_baseline_shift = '.'-40'."\n";
+	print $fh 'sup_fontsize = '.'90'."\n";
+	print $fh 'sub_fontsize = '.'90'."\n";
+	print $fh 'default_font   = '.'default'."\n";
+	print $fh 'default_font_name  = '.'Arial'."\n";
+	print $fh 'default_font_color = '.'black'."\n";
+	print $fh 'default_color  = '.'black'."\n";
+	print $fh '<guides>'."\n";
+	print $fh 'thickness      = '.'1'."\n";
+	print $fh 'size           = '.'5'."\n";
+	print $fh 'type           = '.'outline'."\n";
+	print $fh '<object>'."\n";
+	print $fh 'all            = '.'no'."\n";
+	print $fh 'ideogram       = '.'no'."\n";
+	print $fh 'ideogram_label = '.'no'."\n";
+	print $fh '</object>'."\n";
+	print $fh '<color>'."\n";
+	print $fh 'default = '.'lblue'."\n";
+	print $fh 'text    = '.'red'."\n";
+	print $fh '</color>'."\n";
+	print $fh '</guides>'."\n";
+	print $fh 'debug_group = '.'summary,output'."\n";
+	print $fh 'debug_auto_timer_report = '.'30'."\n";
+	print $fh 'debug_word_separator = '.'" "'."\n";
+	print $fh 'debug_undef_text     = '.'_undef_'."\n";
+	print $fh 'debug_empty_text     = '.'_emptylist_'."\n";
+	print $fh 'debug_validate       = '.'yes'."\n";
+	print $fh 'debug_output_tidy    = '.'no'."\n";
+	print $fh 'text_pixel_subsampling = '.'1'."\n";
+	print $fh 'text_snuggle_method    = '.'array'."\n";
+	print $fh 'restrict_parameter_names = '.'no'."\n";
+	print $fh 'case_sensitive_parameter_names = '.'no'."\n";
+	print $fh 'calculate_track_statistics = '.'yes'."\n";
+	print $fh 'color_cache_static = '.'yes'."\n";
+	print $fh 'color_cache_file   = '.'circos.colorlist'."\n";
+	print $fh 'color_lists_use    = '.'yes'."\n";
+	print $fh 'memoize = '.'yes'."\n";
+	print $fh 'quit_on_dump = '.'yes'."\n";
+	print $fh 'offsets = '.'0,0'."\n";
+	print $fh 'max_ticks            = '.$max_ticks."\n";
+	print $fh 'max_ideograms        = '.$max_ideograms."\n";
+	print $fh 'max_links            = '.$max_links."\n";
+	print $fh 'max_points_per_track = '.$max_points_per_track."\n";
+	print $fh 'undefined_ideogram = '.'skip'."\n";
+	print $fh 'relative_scale_iterations = '.'10'."\n";
+	print $fh 'relative_scale_spacing    = '.'mode'."\n";
+	print $fh 'data_out_of_range = '.'trim,warn'."\n";
+	print $fh 'track_defaults = '.'etc/tracks'."\n";
+	print $fh 'round_brush_use           = '.'yes'."\n";
+	print $fh 'round_brush_min_thickness = '.'5'."\n";
+	print $fh 'anti_aliasing = '.'yes'."\n";
+	print $fh 'housekeeping = '.'yes'."\n";
+	print $fh 'auto_eval = '.'no'."\n";
+
 }

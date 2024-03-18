@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5f';
-my $updated = '2024-03-17';
+my $version = '0.5.5g';
+my $updated = '2024-03-18';
 
 use strict;
 use warnings;
@@ -49,6 +49,10 @@ OPTIONS (PLOTS):
 -custom_preset	Use a custom color preset; e.g.
 		# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 		# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+-max_ticks		Set max number of ticks [Default: 5000]
+-max_ideograms		Set max number of ideograms [Default: 200]
+-max_links		Set max number of links [Default: 25000]
+-max_points_per_track	Set max number of points per track [Default: 75000]
 
 ### Barplots/Dotplots
 -h (--height)	Figure height in inches [Default: 10.8]
@@ -82,6 +86,10 @@ my $custom_file;
 my $custom_colors;
 my $list_preset;
 my @formats;
+my $max_ticks = 5000;
+my $max_ideograms = 200;
+my $max_links = 25000;
+my $max_points_per_track = 75000;
 # Barplots/Dotplots
 my $multiplier = '1e5';
 my $height = 10.8;
@@ -110,6 +118,10 @@ GetOptions(
 	'custom_preset=s' => \$custom_colors,
 	'list_preset'	=> \$list_preset,
 	'f|format=s{1,}' => \@formats,
+	'max_ticks=i' => \$max_ticks,
+	'max_ideograms=i' => \$max_ideograms,
+	'max_links=i' => \$max_links,
+	'max_points_per_track=i' => \$max_points_per_track,
 	# Barplots/dotplots
 	'm|multiplier=s' => \$multiplier, 
 	'h|height=s' => \$height,
@@ -603,6 +615,10 @@ system("
 	$unit_size \\
 	$custom_cc_file \\
 	$custom_cc \\
+	--max_ticks $max_ticks \\
+	--max_ideograms $max_ideograms \\
+	--max_links $max_links \\
+	--max_points_per_track $max_points_per_track \\
 	2>> $outdir/error.log
 ") == 0 or checksig();
 

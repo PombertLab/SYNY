@@ -199,6 +199,10 @@ OPTIONS (PLOTS):
 -custom_preset  Use a custom color preset; e.g.
                 # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
                 # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+-max_ticks              Set max number of ticks [Default: 5000]
+-max_ideograms          Set max number of ideograms [Default: 200]
+-max_links              Set max number of links [Default: 25000]
+-max_points_per_track   Set max number of points per track [Default: 75000]
 
 ### Barplots/Dotplots
 -h (--height)   Figure height in inches [Default: 10.8]
