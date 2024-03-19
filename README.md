@@ -410,7 +410,7 @@ In the inverted karyotype image, the order of the karyotype(s) to be compared to
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.paf.normal.png">
 </p>
 
-In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see section below).
+In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see dotplot section below).
 
 ##### Example of a barplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
 <p align="left">
