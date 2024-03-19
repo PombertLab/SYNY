@@ -414,7 +414,7 @@ In pairwise genome alignments, repetitive regions (such as telomeres/subtelomere
 
 ##### Example of a barplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.barplot.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.barplot.Spectral.png">
 </p>
 
 If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), barplots will be generated from the minimap2-generated PAF alignment files with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/).
