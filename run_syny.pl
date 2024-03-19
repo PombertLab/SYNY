@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5i';
+my $version = '0.5.5j';
 my $updated = '2024-03-19';
 
 use strict;
@@ -34,6 +34,7 @@ OPTIONS (MAIN):
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
+--asm		Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --no_map	Skip minimap2 pairwise genome alignments
 
 OPTIONS (PLOTS):
@@ -78,6 +79,7 @@ my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
 my $nomap;
+my $asm;
 
 # Circos
 my $reference;
@@ -115,6 +117,7 @@ GetOptions(
 	'g|gaps=s{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
 	'no_map' => \$nomap,
+	'asm=i' => \$asm,
 	# circos
 	'c|circos' => \$circos,
 	'r|ref|reference=s' => \$reference,
@@ -271,11 +274,17 @@ unless (-d $circos_cat_dir){
 	mkdir ($circos_cat_dir, 0755) or die "Can't create $circos_cat_dir: $!\n";
 }
 
-## Running minimap2
+## Running minimap2 with get_paf.pl
+my $asm_flag = '';
+if ($asm){
+	$asm_flag = "--asm $asm";
+}
+
 system("
 	$path/get_paf.pl \\
 	  --fasta $genome_dir/*.fasta \\
-	  --outdir $minimap2_dir
+	  --outdir $minimap2_dir \\
+	  $asm_flag
 ") == 0 or checksig();
 
 ## Creating Circos links file

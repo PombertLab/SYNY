@@ -184,6 +184,7 @@ OPTIONS (MAIN):
 -e (--evalue)   BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)     Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)   Output directory [Default = SYNY]
+--asm           Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --no_map        Skip minimap2 pairwise genome alignments
 
 OPTIONS (PLOTS):
