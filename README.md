@@ -430,7 +430,7 @@ By default, the plots are formatted for a widescreen (landscape) output (width/h
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.blue.png">
 </p>
 
-If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/) by default. If desired, this step can be skipped entirely with the `--no_dotplot` command line switch.
+If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), by default, dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/). If desired, this step can be skipped entirely with the `--no_dotplot` command line switch.
 
 In these plots, each chromosome/contig from the query is plotted as a column (x-axis) against each chromosome/contig from the subject (y-axis). In the above example, a total of 196 subplots (14 x 14 chromosomes) are plotted using matplotlib's [subplot](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html) function. In these plots, matches identified with minimap2 are scatter-plotted using the selected color (defaut: blue).
 
