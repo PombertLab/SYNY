@@ -439,6 +439,7 @@ Because large numbers quickly overlap in the small subplots, to improve legibili
 1e3: n x 1000 bp
 1e4: n x 10000 bp
 1e5: n x 100000 bp
+1e6: n x 1000000 bp
 ```
 
 Alternatively, ticks/numbers in the x and y axes can be turned off with the `--noticks` command line option.
