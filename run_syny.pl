@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5g';
-my $updated = '2024-03-18';
+my $version = '0.5.5h';
+my $updated = '2024-03-19';
 
 use strict;
 use warnings;
@@ -63,6 +63,8 @@ OPTIONS (PLOTS):
 --color		Scatter plot color (for dotplots) [Default: blue]
 --dotpalette	Use a color palette instead of a monochrome color for dotplots: e.g. --dotpalette inferno
 --noticks	Turn off ticks on x and y axes
+--wdis		Horizontal distance (width) between subplots [Default: 0.05]
+--hdis		Vertical distance (height) between subplots [Default: 0.1]
 EXIT
 
 die ("\n$usage\n") unless (@ARGV);
@@ -75,6 +77,7 @@ my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
 my $nomap;
+
 # Circos
 my $reference;
 my $unit = 'Mb';
@@ -90,6 +93,7 @@ my $max_ticks = 5000;
 my $max_ideograms = 200;
 my $max_links = 25000;
 my $max_points_per_track = 75000;
+
 # Barplots/Dotplots
 my $multiplier = '1e5';
 my $height = 10.8;
@@ -99,6 +103,8 @@ my $monobar;
 my $color = 'blue';
 my $dotpalette;
 my $noticks;
+my $wdis = 0.05;
+my $hdis = 0.1;
 
 GetOptions(
 	# Main
@@ -130,7 +136,9 @@ GetOptions(
 	'monobar=s' => \$monobar,
 	'color=s' => \$color,
 	'dotpalette=s' => \$dotpalette,
-	'noticks' => \$noticks
+	'noticks' => \$noticks,
+	'wdis=s' => \$wdis,
+	'hdis=s' => \$hdis
 );
 
 unless(@gaps){
@@ -345,6 +353,8 @@ system("
 	--color $color \\
 	$tick_flag \\
 	$dotpal_flag \\
+	--wdis $wdis \\
+	--hdis $hdis \\
 	2>> $outdir/error.log
 ") == 0 or checksig();
 

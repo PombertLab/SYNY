@@ -213,6 +213,8 @@ OPTIONS (PLOTS):
 --color         Scatter plot color (for dotplots) [Default: blue]
 --dotpalette    Use a color palette instead of a monochrome color for dotplots: e.g. --dotpalette inferno
 --noticks       Turn off ticks on x and y axes
+--wdis          Horizontal distance (width) between subplots [Default: 0.05]
+--hdis          Vertical distance (height) between subplots [Default: 0.1]
 ```
 The output directory will be structured as follows: 
 ```Bash
@@ -411,7 +413,7 @@ In pairwise genome alignments, repetitive regions (such as telomeres/subtelomere
 
 ##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.blue.png">
 </p>
 
 If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/).

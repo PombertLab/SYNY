@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2'
-updated = '2024-03-17'
+
+version = '0.2a'
+updated = '2024-03-19'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -29,13 +30,15 @@ COMMAND    {name} \\
 OPTIONS:
 -p (--paf)      PAF file(s) to plot
 -o (--outdir)   Output directory [Default: ./]
--u (--unit)     Units divider [Default: 1e3]
+-u (--unit)     Units divider [Default: 1e5]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
 -c (--color)    Color [Default: blue]
 -n (--noticks)  Turn off ticks on x and y axes
 -a (--palette)  Use a color palette (e.g. Spectral) instead
                 of a monochrome plot
+--wdis          Horizontal distance (width) between subplots [Default: 0.05]
+--hdis          Vertical distance (height) between subplots [Default: 0.1]
 """
 
 # Print custom message if argv is empty
@@ -50,12 +53,14 @@ if (len(sys.argv) <= 1):
 cmd = argparse.ArgumentParser(add_help=False)
 cmd.add_argument("-p", "--paf", nargs='*')
 cmd.add_argument("-o", "--outdir", default='./')
-cmd.add_argument("-u", "--unit", default='1e3')
+cmd.add_argument("-u", "--unit", default='1e5')
 cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
 cmd.add_argument("-c", "--color", default='blue')
 cmd.add_argument("-a", "--palette")
 cmd.add_argument("-n", "--noticks", action='store_true')
+cmd.add_argument("--wdis", default=0.05)
+cmd.add_argument("--hdis", default=0.1)
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -66,6 +71,8 @@ width = args.width
 ccolor = args.color
 color_palette = args.palette
 noticks = args.noticks
+wdis = args.wdis
+hdis = args.hdis
 
 ################################################################################
 ## Working on output directory
@@ -203,11 +210,20 @@ for paf in paf_files:
 
                 axes[ynum,xnum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1, color=ccolor)
 
+                ## To help reduce memory footprint
+                del dataframe[query][subject]
+
             ynum += 1
 
         cnum += 1
         xnum += 1
         ynum = 0
+
+    ## Reducing space between subplots
+    plt.subplots_adjust(
+        wspace=float(wdis),
+        hspace=float(hdis)
+    )
 
     ## Writing to output file
     output = basename
@@ -224,3 +240,7 @@ for paf in paf_files:
     filename = outdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + f".{acolor}" + '.png'
     print(f"Creating {filename}...")
     plt.savefig(filename)
+
+    ## Close fig
+    plt.clf()
+    plt.close(fig)
