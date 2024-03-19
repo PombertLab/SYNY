@@ -421,9 +421,9 @@ If pairwise genome alignments are performed with [minimap2](https://github.com/l
 
 In these plots, colinear regions found between the compared genomes are highlighted by colored rectangles. By default, these rectangles are color-coded based on the contigs/chromosomes of the query. The above barplot image was generated using the Spectral color palette from [seaborn](https://seaborn.pydata.org/tutorial/color_palettes.html) (set as default in SYNY). This palette can be replaced using the `--palette` command line switch; <i>e.g.</i> `--palette husl` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
 
-If desired, the barplots can instead be generated using a single color with the `--monobar` command line switch; <i>e.g.</i> `--monobar red`.
+If desired, the barplots can instead be generated using a single monochromatic color with the `--monobar` command line switch; <i>e.g.</i> `--monobar red`.
 
-By default, the plots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command line switches.
+By default, the barplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command line switches.
 
 ##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
 <p align="left">
@@ -444,7 +444,7 @@ Because large numbers quickly overlap in the small subplots, to improve legibili
 
 Alternatively, ticks/numbers in the x and y axes can be turned off with the `--noticks` command line option.
 
-By default, the plots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command line switches (shared with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py)).
+By default, the dotplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command line switches (shared with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py)).
 
 The default monochromatic color (blue) can be changed with the `--color` option (<i>e.g.</i> `--color red`). If desired, dotplots can instead be color-coded based on the query contigs/chromosomes with the the `--dotpalette` option; e.g. `--dotpalette inferno` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
 
