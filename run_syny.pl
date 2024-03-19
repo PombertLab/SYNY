@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5h';
+my $version = '0.5.5i';
 my $updated = '2024-03-19';
 
 use strict;
@@ -65,6 +65,7 @@ OPTIONS (PLOTS):
 --noticks	Turn off ticks on x and y axes
 --wdis		Horizontal distance (width) between subplots [Default: 0.05]
 --hdis		Vertical distance (height) between subplots [Default: 0.1]
+--no_dotplot	Skip dotplot creation
 EXIT
 
 die ("\n$usage\n") unless (@ARGV);
@@ -105,6 +106,7 @@ my $dotpalette;
 my $noticks;
 my $wdis = 0.05;
 my $hdis = 0.1;
+my $no_dotplot;
 
 GetOptions(
 	# Main
@@ -138,7 +140,8 @@ GetOptions(
 	'dotpalette=s' => \$dotpalette,
 	'noticks' => \$noticks,
 	'wdis=s' => \$wdis,
-	'hdis=s' => \$hdis
+	'hdis=s' => \$hdis,
+	'no_dotplot' => \$no_dotplot
 );
 
 unless(@gaps){
@@ -343,20 +346,22 @@ if ($dotpalette){
 	$dotpal_flag = "--palette $dotpalette";
 }
 
-system("
-	$path/paf_to_dotplot.py \\
-	--paf $paf_dir/*.paf \\
-	--outdir $dotplot_dir \\
-	--unit $multiplier \\
-	--height $height \\
-	--width $width \\
-	--color $color \\
-	$tick_flag \\
-	$dotpal_flag \\
-	--wdis $wdis \\
-	--hdis $hdis \\
-	2>> $outdir/error.log
-") == 0 or checksig();
+unless ($no_dotplot){
+	system("
+		$path/paf_to_dotplot.py \\
+		--paf $paf_dir/*.paf \\
+		--outdir $dotplot_dir \\
+		--unit $multiplier \\
+		--height $height \\
+		--width $width \\
+		--color $color \\
+		$tick_flag \\
+		$dotpal_flag \\
+		--wdis $wdis \\
+		--hdis $hdis \\
+		2>> $outdir/error.log
+	") == 0 or checksig();
+}
 
 ###################################################################################################
 ## Run get_homology.pl
