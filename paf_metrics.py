@@ -203,7 +203,7 @@ metrics = metrics.replace("\t","")
 plt.rcParams["figure.figsize"] = (width,height)
 
 # Setting labels
-xlabel = 'Alignment lengths (in Kb)'
+xlabel = 'Alignment length (in Kb)'
 ylabel = 'Sequence identity (%)'
 
 title = os.path.basename(paf)
