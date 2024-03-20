@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5j';
-my $updated = '2024-03-19';
+my $version = '0.5.5k';
+my $updated = '2024-03-20';
 
 use strict;
 use warnings;
@@ -55,14 +55,18 @@ OPTIONS (PLOTS):
 -max_links		Set max number of links [Default: 25000]
 -max_points_per_track	Set max number of points per track [Default: 75000]
 
-### Barplots/Dotplots
--h (--height)	Figure height in inches [Default: 10.8]
--w (--width)	Figure width in inches [Default: 19.2]
+### Barplots
+-h (--height)	Barplot figure height in inches [Default: 10.8]
+-w (--width)	Barplot figure width in inches [Default: 19.2]
+--palette	Barplot color palette [Default: Spectral]
+--monobar	Use a monochrome barplot color instead: e.g. --monobar blue
+
+### Dotplots
+-dh (--dheight)	Dotplot figure height in inches [Default: 10.8]
+-dw (--dwidth)	Dotplot figure width in inches [Default: 19.2]
 -m (--multi)	Axes units multiplier (for dotplots) [Default: 1e5]
---palette	Color palette (for barplots) [Default: Spectral]
---monobar	Use a monochrome color for barplots instead of color palette: e.g. --monobar blue
---color		Scatter plot color (for dotplots) [Default: blue]
---dotpalette	Use a color palette instead of a monochrome color for dotplots: e.g. --dotpalette inferno
+--color		Dotplot color [Default: blue]
+--dotpalette	Use a color palette instead: e.g. --dotpalette inferno
 --noticks	Turn off ticks on x and y axes
 --wdis		Horizontal distance (width) between subplots [Default: 0.05]
 --hdis		Vertical distance (height) between subplots [Default: 0.1]
@@ -97,12 +101,16 @@ my $max_ideograms = 200;
 my $max_links = 25000;
 my $max_points_per_track = 75000;
 
-# Barplots/Dotplots
-my $multiplier = '1e5';
-my $height = 10.8;
-my $width = 19.2;
+# Barplots
+my $bheight = 10.8;
+my $bwidth = 19.2;
 my $palette = 'Spectral';
 my $monobar;
+
+# Dotplots
+my $dheight = 10.8;
+my $dwidth = 19.2;
+my $multiplier = '1e5';
 my $color = 'blue';
 my $dotpalette;
 my $noticks;
@@ -133,12 +141,15 @@ GetOptions(
 	'max_ideograms=i' => \$max_ideograms,
 	'max_links=i' => \$max_links,
 	'max_points_per_track=i' => \$max_points_per_track,
-	# Barplots/dotplots
-	'm|multiplier=s' => \$multiplier, 
-	'h|height=s' => \$height,
-	'w|width=s' => \$width,
+	# Barplots
+	'h|height=s' => \$bheight,
+	'w|width=s' => \$bwidth,
 	'palette=s' => \$palette,
 	'monobar=s' => \$monobar,
+	# Dotplots
+	'dh|dheight=s' => \$dheight,
+	'dw|dwidth=s' => \$dwidth,
+	'm|multiplier=s' => \$multiplier, 
 	'color=s' => \$color,
 	'dotpalette=s' => \$dotpalette,
 	'noticks' => \$noticks,
@@ -341,8 +352,8 @@ system("
 	$path/paf_to_barplot.py \\
 	--paf $paf_dir/*.paf \\
 	--outdir $barplot_dir \\
-	--height $height \\
-	--width $width \\
+	--height $bheight \\
+	--width $bwidth \\
 	--palette $palette \\
 	$tick_flag \\
 	$monobar_flag \\
@@ -361,8 +372,8 @@ unless ($no_dotplot){
 		--paf $paf_dir/*.paf \\
 		--outdir $dotplot_dir \\
 		--unit $multiplier \\
-		--height $height \\
-		--width $width \\
+		--height $dheight \\
+		--width $dwidth \\
 		--color $color \\
 		$tick_flag \\
 		$dotpal_flag \\

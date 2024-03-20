@@ -205,14 +205,18 @@ OPTIONS (PLOTS):
 -max_links              Set max number of links [Default: 25000]
 -max_points_per_track   Set max number of points per track [Default: 75000]
 
-### Barplots/Dotplots
--h (--height)   Figure height in inches [Default: 10.8]
--w (--width)    Figure width in inches [Default: 19.2]
+### Barplots
+-h (--height)   Barplot figure height in inches [Default: 10.8]
+-w (--width)    Barplot figure width in inches [Default: 19.2]
+--palette       Barplot color palette [Default: Spectral]
+--monobar       Use a monochrome barplot color instead: e.g. --monobar blue
+
+### Dotplots
+-dh (--dheight) Dotplot figure height in inches [Default: 10.8]
+-dw (--dwidth)  Dotplot figure width in inches [Default: 19.2]
 -m (--multi)    Axes units multiplier (for dotplots) [Default: 1e5]
---palette       Color palette (for barplots) [Default: Spectral]
---monobar       Use a monochrome color for barplots instead of color palette: e.g. --monobar blue
---color         Scatter plot color (for dotplots) [Default: blue]
---dotpalette    Use a color palette instead of a monochrome color for dotplots: e.g. --dotpalette inferno
+--color         Dotplot color [Default: blue]
+--dotpalette    Use a color palette instead: e.g. --dotpalette inferno
 --noticks       Turn off ticks on x and y axes
 --wdis          Horizontal distance (width) between subplots [Default: 0.05]
 --hdis          Vertical distance (height) between subplots [Default: 0.1]
@@ -445,9 +449,9 @@ Because large numbers quickly overlap in the small subplots, to improve legibili
 
 Alternatively, ticks/numbers in the x and y axes can be turned off with the `--noticks` command line option.
 
-By default, the dotplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command line switches (shared with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py)).
+By default, the dotplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--dheight` and `--dwidth` command line switches.
 
-The default monochromatic color (blue) can be changed with the `--color` option (<i>e.g.</i> `--color red`). If desired, dotplots can instead be color-coded based on the query contigs/chromosomes with the the `--dotpalette` option; e.g. `--dotpalette inferno` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
+The default monochromatic color (blue) can be changed with the `--color` option (<i>e.g.</i> `--color red`). If desired, dotplots can instead be color-coded based on the query contigs/chromosomes with the the `--dotpalette` option; <i>e.g.</i> `--dotpalette inferno` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
 
 Note that plotting large genomes can quickly eat up a lot of memory. When running out of memory, the process will be terminated automatically before a PNG image can be produced.
 
