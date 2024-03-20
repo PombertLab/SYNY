@@ -359,8 +359,9 @@ for my $paf_file (@paf_files){
 		--metrics $aln_metrics \\
 		--height 10.8 \\
 		--width 19.2 \\
-		--color steelblue
-	");
+		--color steelblue \\
+		2>> $outdir/error.log
+	") == 0 or checksig();
 }
 
 ###################################################################################################
