@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1c'
-updated = '2024-03-17'
+version = '0.1d'
+updated = '2024-03-20'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -201,8 +201,8 @@ for paf in paf_files:
     if monochrome:
         affix_color = monochrome
 
-    png = pngdir + '/' + output.rsplit('.', 1)[0] + '.barplot.' + f"{affix_color}" + '.png'
-    svg = svgdir + '/' + output.rsplit('.', 1)[0] + '.barplot.' + f"{affix_color}" + '.svg'
+    png = pngdir + '/' + output.rsplit('.', 1)[0] + '.barplot.' + f"{width}x{height}." + f"{affix_color}" + '.png'
+    svg = svgdir + '/' + output.rsplit('.', 1)[0] + '.barplot.' + f"{width}x{height}." + f"{affix_color}" + '.svg'
 
     print(f"Creating {png}...")
     plt.savefig(png)

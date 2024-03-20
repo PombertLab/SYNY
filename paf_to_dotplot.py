@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.2a'
-updated = '2024-03-19'
+version = '0.2b'
+updated = '2024-03-20'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -237,7 +237,7 @@ for paf in paf_files:
     if noticks:
         affix = 'noticks'
 
-    filename = outdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + f".{acolor}" + '.png'
+    filename = outdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + f".{width}x{height}" + f".{acolor}" + '.png'
     print(f"Creating {filename}...")
     plt.savefig(filename)
 
