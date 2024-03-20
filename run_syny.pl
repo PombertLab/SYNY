@@ -19,8 +19,10 @@ UPDATED		${updated}
 SYNOPSIS	Runs all the components of the SYNY pipeline and
 		creates configuration files for Circos plots
 
-REQS		PerlIO::gzip - https://metacpan.org/pod/PerlIO::gzip
+REQS		Perl / PerlIO::gzip - https://metacpan.org/pod/PerlIO::gzip
+		Python3 / matplotlib / seaborn - https://www.python.org/
 		Diamond - https://github.com/bbuchfink/diamond
+		Minimap2 - https://github.com/lh3/minimap2
 
 USAGE		${name} \\
 		  -a *.gbff \\
