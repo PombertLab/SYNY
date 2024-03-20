@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.6';
+my $version = '0.5.6a';
 my $updated = '2024-03-20';
 
 use strict;
@@ -340,6 +340,28 @@ for my $paf_file (@paf_files){
 	close PAF;
 }
 close PLINK;
+
+#### Calculate/plot PAF metrics
+my $aln_length_dir = $minimap2_dir.'/METRICS';
+
+for my $paf_file (@paf_files){
+
+	my $basename = fileparse($paf_file);
+	$basename =~ s/\.\w+$//;
+	my $aln_png = $basename.'.metrics.png';
+	my $aln_metrics = $basename.'.metrics.txt';
+
+	system ("
+		$path/paf_metrics.py \\
+		--paf $paf_file \\
+		--outdir $aln_length_dir \\
+		--output $aln_png \\
+		--metrics $aln_metrics \\
+		--height 10.8 \\
+		--width 19.2 \\
+		--color steelblue
+	");
+}
 
 ###################################################################################################
 ## Creating barplots/dotplots from PAF files
