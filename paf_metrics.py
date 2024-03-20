@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1'
+version = '0.1a'
 updated = '2024-03-20'
 name = 'paf_metrics.py'
 
@@ -70,11 +70,16 @@ rgb = args.color
 ################################################################################
 
 if output is not None:
-	if os.path.isdir(outdir) == False:
-		try:
-			os.makedirs(outdir)
-		except:
-			sys.exit(f"Can't create directory {outdir}...")
+
+	txtdir = outdir + '/TXT'
+	pngdir = outdir + '/PNG'
+
+	for dir in [outdir,txtdir,pngdir]:
+		if os.path.isdir(dir) == False:
+			try:
+				os.makedirs(dir)
+			except:
+				sys.exit(f"Can't create directory {dir}...")
 
 
 ################################################################################
@@ -83,6 +88,8 @@ if output is not None:
 
 x_aln_sizes = []
 similarity = []
+matches = []
+
 
 FH = open(paf,'r')
 print(f"\nCalculating alignment metrics for: {paf} ...")
@@ -106,7 +113,7 @@ for line in FH:
     n_matches = int(data[9])
     block_len = int(data[10])
 
-    x_aln_size = block_len
+    matches.append(n_matches)
     x_aln_sizes.append(block_len)
 
     sim = (n_matches/block_len)*100
@@ -124,6 +131,8 @@ shortest_aln = "{:,}".format(min(x_aln_sizes))
 average = sum(x_aln_sizes)/len(x_aln_sizes)
 average = int(round(average))
 average = "{:,}".format(average)
+
+average_id = "{:.2f}".format( (sum(matches) / sum(x_aln_sizes)) * 100 )
 
 # Function to calculate n metrics; e.g n50, n75, n90
 def n_metric(list, n):
@@ -156,6 +165,7 @@ median = "{:,}".format(median)
 pmetrics = f"""Metrics for {paf}:
 
 Bases + gaps in aligned blocks:\t{aln_sum}
+Average sequence identity (%):\t{average_id}
 # Alignments:\t{aln_num}
 Longest:\t{longest_aln}
 Shortest:\t{shortest_aln}
@@ -166,7 +176,7 @@ N75:\t\t{n75}
 N90:\t\t{n90}
 """
 
-metrics_output = outdir + '/' + metrics_file
+metrics_output = txtdir + '/' + metrics_file
 METRICS = open(metrics_output,'w')
 print(pmetrics, file=METRICS)
 
@@ -177,7 +187,7 @@ print(pmetrics, file=METRICS)
 ##### Metrics text box
 
 adjust_l = 0
-metrics_list = [aln_sum, aln_num, longest_aln, shortest_aln, average, median, n50, n75, n90]
+metrics_list = [aln_sum, aln_num, longest_aln, shortest_aln, average, average_id, median, n50, n75, n90]
 for metric in metrics_list:
 	if len(metric) > adjust_l:
 		adjust_l = len(metric)
@@ -186,6 +196,7 @@ metrics = f"""
 	PAF metrics
 
 	Bases + gaps in aligned blocks: {aln_sum.rjust(adjust_l + 1)}
+	Average sequence identity (%): {average_id.rjust(adjust_l + 1)}
 	# alignments: {aln_num.rjust(adjust_l + 1)}
 	Longest: {longest_aln.rjust(adjust_l + 1)}
 	Shortest: {shortest_aln.rjust(adjust_l + 1)}
@@ -246,6 +257,6 @@ plt.scatter(
 
 # Creating outfile
 for x in output:
-    filename = outdir + '/' + x 
+    filename = pngdir + '/' + x 
     print(f"Plotting {filename}...")
     plt.savefig(filename)
