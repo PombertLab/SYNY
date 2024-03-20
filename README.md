@@ -585,6 +585,10 @@ GPK93_01g00270  -       J0A71_11g23150  -
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.png">
 </p>
 
+In the above image, links between the reference and the queried genomes are color-coded based on the reference genotype; links between the queried genomes are shown in light gray.
+
+Note that while SYNY can handle multiple genomes, adding too much data can quickly clutter the Circos plots generated. In the above [Circos](https://circos.ca/) plots, each chromosome/contig is plotted as a distinct [ideogram](https://circos.ca/documentation/tutorials/ideograms/ideograms/). Drawing too many ideograms can make the figure illegible and, when comparing genomes featuring many chromosomes/contigs, cluttering can also occur even when comparing a small number of genomes.
+
 #### Example 3 - <i>Encephalitozoon</i> with custom colors
 Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files containing color names and their associated RGB values (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Circos/custom_color_1.txt) for an example). A few custom presets are also available to use in SYNY.
 
