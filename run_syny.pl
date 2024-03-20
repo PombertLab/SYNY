@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.5k';
+my $version = '0.5.6';
 my $updated = '2024-03-20';
 
 use strict;
@@ -37,6 +37,7 @@ OPTIONS (MAIN):
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
 --asm		Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
+--resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
 
 OPTIONS (PLOTS):
@@ -85,6 +86,7 @@ my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
 my $nomap;
+my $resume;
 my $asm;
 
 # Circos
@@ -127,6 +129,7 @@ GetOptions(
 	'g|gaps=s{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
 	'no_map' => \$nomap,
+	'resume' => \$resume,
 	'asm=i' => \$asm,
 	# circos
 	'c|circos' => \$circos,
@@ -293,10 +296,16 @@ if ($asm){
 	$asm_flag = "--asm $asm";
 }
 
+my $resume_flag = '';
+if ($resume){
+	$resume_flag = '--resume';
+}
+
 system("
 	$path/get_paf.pl \\
 	  --fasta $genome_dir/*.fasta \\
 	  --outdir $minimap2_dir \\
+	  $resume_flag \\
 	  $asm_flag
 ") == 0 or checksig();
 

@@ -8,8 +8,8 @@ use Cwd qw(abs_path);
 use Getopt::Long qw(GetOptions);
 
 my $name = 'get_paf.pl';
-my $version = '0.3b';
-my $updated = '2024-03-09';
+my $version = '0.3c';
+my $updated = '2024-03-20';
 
 my $usage =<<"USAGE";
 NAME        ${name}
@@ -20,6 +20,7 @@ SYNOPSIS    Performs pairwize genome colinearity (paf,maf,aln) comparisons using
 EXAMPLE     ${name} \\
               -f *.fasta \\
               -o PAFR_5 \\
+              -resume \\
               -asm 5
 
 PREREQS     Minimap2:     https://github.com/lh3/minimap2
@@ -27,6 +28,7 @@ PREREQS     Minimap2:     https://github.com/lh3/minimap2
 OPTIONS:
 -f (--fasta)    FASTA files to compare
 -o (--outdir)   Output directory [Default: ./PAF]
+-r (--resume)   Resume computation (skip completed alignments)
 -a (--asm)      Specify minimap2 max divergence preset (asm 5, 10 or 20) [Default: off]
 USAGE
 
@@ -35,10 +37,12 @@ my @commands = @ARGV;
 
 my @fasta;
 my $outdir = './PAF';
+my $resume;
 my $asm;
 GetOptions(
     'f|fasta=s@{1,}' => \@fasta,
     'o|outdir=s' => \$outdir,
+    'r|resume' => \$resume,
     'asm=i' => \$asm
 );
 
@@ -110,6 +114,12 @@ foreach my $query (@fasta){
 
             my $map_time_start = time;
 
+            # Skip alignment if paf file is found
+            if ((-e $paf_outfile) && ($resume)){
+                print "Found $paf_outfile, skipping minimap2 alignment ...\n";
+                goto GETMAF;
+            }
+
             # Running minimap2 (PAF output)
             system(
                 "minimap2 \\
@@ -158,6 +168,12 @@ foreach my $query (@fasta){
             system ("rm $tmp_paf_outfile");
 
             ## Creating MAF file
+            GETMAF:
+            if ((-e $maf_outfile) && ($resume)){
+                print "Found $maf_outfile, skipping paftools.js conversion ...\n";
+                goto GETALN;
+            }
+
             system (
                 "paftools.js view \\
                   -f maf \\
@@ -167,6 +183,12 @@ foreach my $query (@fasta){
             ) == 0 or checksig();
 
             ## Creating BLAST file
+            GETALN:
+            if ((-e $blast_outfile) && ($resume)){
+                print "Found $blast_outfile, skipping paftools.js conversion ...\n";
+                goto ENDLOG;
+            }
+
             system (
                 "paftools.js view \\
                   -f aln \\
@@ -175,11 +197,12 @@ foreach my $query (@fasta){
                 "
             ) == 0 or checksig();
 
+            ENDLOG:
             my $map_time_end = time;
             my $map_time_taken = $map_time_end - $map_time_start;
             print LOG "; $map_time_taken seconds\n";
 
-        } 
+        }
     }
 }
 
