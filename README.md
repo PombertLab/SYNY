@@ -258,7 +258,7 @@ The contents of the subdirectories are:
 - ALIGNMENTS:
 	- Pairwise minimap2 genome alignments in MAF, PAF and ALN formats
 	- Pairwise alignments metrics:
-      - Scatter plots: alignment lengths vs. similarities (in PNG format)
+      - Alignment length vs. similarity scatter plots (in PNG format)
       - Alignment metrics summaries (in plain TXT format)
 - BARPLOTS:
 	- Barplots (in PNG/SVG format) generated from the minimap2 PAF alignments
