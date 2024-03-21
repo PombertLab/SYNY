@@ -14,6 +14,10 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
   * [Command line options](#Command-line-options)
   * [Step by step examples](#Step-by-step-examples)
     * [Example 1: <i>Cryptococcus</i>](#Example-1---Cryptococcus)
+      * [Circos plots](#Circos-plots)
+      * [Barplots](#Barplots)
+      * [Dotplots](#Dotplots)
+      * [PAF metrics](#PAF-metrics)
     * [Example 2: <i>Encephalitozoon</i>](#Example-2---Encephalitozoon)
     * [Example 3: <i>Encephalitozoon</i> (with custom colors)](#Example-3---Encephalitozoon-with-custom-colors)
 * [References](#References)
@@ -392,6 +396,9 @@ CNA00210	-	CGB_B0210C	-
 CNA00220	+	CGB_B0220W	+
 ```
 
+#### Circos plots
+
+If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots will be generated from the protein clusters identified with SYNY (`.syny.`) and from the genome alignments computed with minimap2 (`.paf.`), unless the latter alignments are skipped with the `--no_map` option. Two circos plots will be generated for each approach, `.normal.` and `.inverted.`. In the inverted plots, the contigs/chromosomes from the queried genomes are plotted in reversed, from last to first.
 
 ##### Example of an image generated with Circos and SYNY from shared proteins clusters:
 <p align="left">
@@ -412,7 +419,7 @@ Data and configuration files for these plots are located in the CIRCOS/ subdirec
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.inverted.png">
 </p>
 
-In the inverted karyotype image, the order of the karyotype(s) to be compared to the reference one are reversed. This option can be useful when comparing genomes whose chromosomes have been assigned similar numbers based on various inference methods (this does not appear to be the case in the above example). In such instances, inverting the karyotypes can help improve figure legibility.
+In the inverted karyotype image, the order of the karyotype(s) to be compared to the reference one is reversed. This option can be useful when comparing genomes whose chromosomes have been assigned similar numbers based on various inference methods (this does not appear to be the case in the above example). In such instances, inverting the karyotypes can help improve figure legibility.
 
 ##### Example of an image generated with Circos and SYNY from pairwise genome alignments:
 <p align="left">
@@ -421,12 +428,14 @@ In the inverted karyotype image, the order of the karyotype(s) to be compared to
 
 In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see dotplot section below).
 
+#### Barplots
+
+If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), barplots will be generated from the minimap2-generated PAF alignment files with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/).
+
 ##### Example of a barplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.barplot.19.2x10.8.Spectral.png">
 </p>
-
-If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), barplots will be generated from the minimap2-generated PAF alignment files with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/).
 
 In these plots, colinear regions found between the compared genomes are highlighted by colored rectangles. By default, these rectangles are color-coded based on the contigs/chromosomes of the query. The above barplot image was generated using the Spectral color palette from [seaborn](https://seaborn.pydata.org/tutorial/color_palettes.html) (set as default in SYNY). This palette can be replaced using the `--palette` command line switch; <i>e.g.</i> `--palette husl` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
 
@@ -434,12 +443,15 @@ If desired, the barplots can instead be generated using a single monochromatic c
 
 By default, the barplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command line switches.
 
+#### Dotplots
+
+If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), by default, dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/). If desired, this step can be skipped entirely with the `--no_dotplot` command line switch. Note that plotting large genomes can quickly eat up a lot of memory. When running out of memory, this process will be terminated automatically before a PNG image can be produced.
+
 ##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
+
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.19.2x10.8.blue.png">
 </p>
-
-If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), by default, dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/). If desired, this step can be skipped entirely with the `--no_dotplot` command line switch. Note that plotting large genomes can quickly eat up a lot of memory. When running out of memory, this process will be terminated automatically before a PNG image can be produced.
 
 In these dotplots, each chromosome/contig from the query is plotted as a column (x-axis) against each chromosome/contig from the subject (y-axis). In the above example, a total of 196 subplots (14 x 14 chromosomes) are plotted using matplotlib's [subplot](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html) function. In these plots, matches identified with minimap2 are scatter-plotted using the selected color (defaut: blue), with repeated loci indicated by the presence of matches across two or more contigs/chromosomes.
 
@@ -477,6 +489,20 @@ run_syny.pl \
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.19.2x10.8.husl.png">
 </p>
+
+#### PAF metrics
+
+When computing pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2), PAF metrics will also be calculated independently to help assess the outcome of these alignments. These metrics are available in the `ALIGNMENTS/METRICS/` subdirectory, with simple alignment length <i>vs.</i> sequence similarity (%) scatter plots available in PNG format. As a rule of thumb, pairwise alignments featuring low sequence identity (%) might struggle to identify colinear segments.
+
+##### Example of a scatter plot generated from the minimap2 pairwize alignments (PAF) files
+
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.metrics.png">
+</p>
+
+In the above plot, the average sequence identity for each alignment is calculated from the [PAF](https://github.com/lh3/miniasm/blob/master/PAF.md) files as follows:
+
+$(\#\ of\ residue\ matches / Alignment\ block\ length) * 100$
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
