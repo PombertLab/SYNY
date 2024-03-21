@@ -398,7 +398,7 @@ CNA00220	+	CGB_B0220W	+
 
 #### Circos plots
 
-If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots will be generated from the protein clusters identified with SYNY (`.syny.`) and from the genome alignments computed with minimap2 (`.paf.`), unless the latter alignments are skipped with the `--no_map` option. Two circos plots will be generated for each approach, `.normal.` and `.inverted.`. In the inverted plots, the contigs/chromosomes from the queried genomes are plotted in reversed, from last to first.
+If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots will be generated from the protein clusters identified with SYNY (`.syny.`) and from the genome alignments computed with minimap2 (`.paf.`), unless the latter alignments are skipped with the `--no_map` option. Two circos plots will be generated for each approach, `.normal` and `.inverted`. In the inverted plots, the contigs/chromosomes from the queried genomes are plotted in a reversed order, from last to first.
 
 ##### Example of an image generated with Circos and SYNY from shared proteins clusters:
 <p align="left">
@@ -412,7 +412,7 @@ In this figure, nucleotides biases are plotted in the concentric rings (from out
 
 Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. The reference genome can be specified with the `--ref` commmand line switch. If omitted, the  first genome encountered alphabetically will be used as the default reference.
 
-Data and configuration files for these plots are located in the CIRCOS/ subdirectory.
+Data and configuration files for these plots are located in the `CIRCOS/` subdirectory.
 
 ##### Example of an image generated with Circos and SYNY from shared proteins clusters (using the inverted karyotype):
 <p align="left">
@@ -426,7 +426,7 @@ In the inverted karyotype image, the order of the karyotype(s) to be compared to
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.paf.normal.png">
 </p>
 
-In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see dotplot section below).
+In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see [Dotplots](https://github.com/PombertLab/SYNY?tab=readme-ov-file#Dotplots) section below).
 
 #### Barplots
 
@@ -439,7 +439,7 @@ If pairwise genome alignments are performed with [minimap2](https://github.com/l
 
 In these plots, colinear regions found between the compared genomes are highlighted by colored rectangles. By default, these rectangles are color-coded based on the contigs/chromosomes of the query. The above barplot image was generated using the Spectral color palette from [seaborn](https://seaborn.pydata.org/tutorial/color_palettes.html) (set as default in SYNY). This palette can be replaced using the `--palette` command line switch; <i>e.g.</i> `--palette husl` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
 
-If desired, the barplots can instead be generated using a single monochromatic color with the `--monobar` command line switch; <i>e.g.</i> `--monobar red`.
+If desired, the barplots can instead be generated using a single monochromatic color with the `--monobar` command line switch; <i>e.g.</i> `--monobar red`. If this option is selected, the right-bound legend will be omitted from the plot.
 
 By default, the barplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command line switches.
 
