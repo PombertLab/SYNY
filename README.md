@@ -412,7 +412,7 @@ In this figure, nucleotides biases are plotted in the concentric rings (from out
 
 Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. The reference genome can be specified with the `--ref` commmand line switch. If omitted, the first genome encountered alphabetically will be used as the default reference.
 
-Data and configuration files for these plots are located in the `CIRCOS/` subdirectory. If desired, chromosome labels can be furter adjusted by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.genotype`/`concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
+Data and configuration files for these plots are located in the `CIRCOS/` subdirectory. If desired, chromosome labels can be furter adjusted by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
 
 ```Bash
 ## To see the first 5 lines from a karyotype file:
