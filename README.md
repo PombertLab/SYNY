@@ -613,7 +613,7 @@ GPK93_01g00270  -       J0A71_11g23150  -
 ```
 
 
-##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using defaults):
+##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using defaults settings):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.png">
 </p>
