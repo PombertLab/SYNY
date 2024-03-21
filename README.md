@@ -502,7 +502,7 @@ When computing pairwise genome alignments with [minimap2](https://github.com/lh3
 
 In the above plot, the average sequence identity for each alignment is calculated from the [PAF](https://github.com/lh3/miniasm/blob/master/PAF.md) files as follows:
 
-$(\#\ of\ residue\ matches / Alignment\ block\ length) * 100$
+$(\\#\ of\ residue\ matches / Alignment\ block\ length) * 100$
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
