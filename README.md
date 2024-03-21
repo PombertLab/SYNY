@@ -432,7 +432,7 @@ In pairwise genome alignments, repetitive regions (such as telomeres/subtelomere
 
 If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), barplots will be generated from the minimap2-generated PAF alignment files with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/).
 
-##### Example of a barplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
+##### Example of a barplot generated from minimap2 PAF files using defaults settings:
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.barplot.19.2x10.8.Spectral.png">
 </p>
@@ -447,7 +447,7 @@ By default, the barplots are formatted for a widescreen (landscape) output (widt
 
 If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), by default, dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/). If desired, this step can be skipped entirely with the `--no_dotplot` command line switch. Note that plotting large genomes can quickly eat up a lot of memory. When running out of memory, this process will be terminated automatically before a PNG image can be produced.
 
-##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files (using defaults settings):
+##### Example of a dotplot generated from minimap2 PAF files using defaults settings:
 
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.19.2x10.8.blue.png">
@@ -469,7 +469,7 @@ By default, the dotplots are formatted for a widescreen (landscape) output (widt
 
 The default monochromatic color (blue) can be changed with the `--color` option (<i>e.g.</i> `--color red`). If desired, dotplots can instead be color-coded based on the query contigs/chromosomes with the `--dotpalette` option; <i>e.g.</i> `--dotpalette husl` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
 
-##### Example of a dotplot generated from the minimap2 pairwize alignments (PAF) files using the husl color palette:
+##### Example of a dotplot generated from minimap2 PAF files using the husl color palette:
 
 ```Bash
 SYNY=~/SYNY_RESULTS      ## Replace by desired SYNY output directory
