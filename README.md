@@ -504,7 +504,9 @@ In the above plot, the average sequence identity for each alignment is calculate
 
 $(\\#\ of\ residue\ matches / Alignment\ block\ length) * 100$
 
-As a rule of thumb, pairwise alignments featuring low sequence identity (%) might struggle to identify colinear segments.
+Likewise, the total average sequence identity percentage listed in the PAF metrics insert is calculated by dividing the sum of all residue matches by the sum of all aligned block lengths.
+
+As a rule of thumb, pairwise alignments featuring lower sequence identity percentages will produce fewer and/or more fragmented colinear segments.
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
