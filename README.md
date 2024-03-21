@@ -615,7 +615,7 @@ GPK93_01g00270  -       J0A71_11g23150  -
 
 ##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using defaults settings):
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.syny.normal.png">
 </p>
 
 In the above image, links between the reference and the queried genomes are color-coded based on the reference genotype; links between the queried genomes are shown in light gray.
@@ -643,7 +643,7 @@ run_syny.pl \
 
 ##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using a custom color set):
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_cc.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_cc.syny.normal.png">
 </p>
 
 ##### Listing custom color presets available in SYNY:
@@ -673,7 +673,7 @@ run_syny.pl \
 
 ##### Example of an image generated with the blues custom color preset:
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_blues.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_blues.syny.normal.png">
 </p>
 
 
