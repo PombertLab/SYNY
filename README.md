@@ -426,7 +426,7 @@ To faciliate comparisons when working with large datasets, heatmaps displaying t
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.png">
 </p>
 
-Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) and the color of the numbers inside the heatmaps (default: white) can be modified with the `--hmpalette` and `--numcolor` command line switches, respectively.
+Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) and the color of the numbers inside the heatmaps (default: white) can be modified with the `--hmpalette` and `--numcolor` command line switches, respectively (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a list of available color palettes).
 
 #### Circos plots
 
