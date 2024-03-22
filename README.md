@@ -419,14 +419,14 @@ WM276_vs_JEC21  6565    5       5957    90.74   51      477     2       117     
 
 #### Heatmaps
 
-To faciliate comparisons when working with large datasets, heatmaps displaying the percentages of proteins found in clusters between each pair of genomes are generated with matplotlib. In the current example, a small heatmap with 4 datapoints (2 genomes * 2 genomes) will be generated for each gap value investigated (0, 1 and 5). IN these heatmaps, percentages between pairs of genomes will vary based on the total number of proteins encoded in the one being used as query. 
+To faciliate comparisons when working with large datasets, heatmaps displaying the percentages of protein coding-genes found in colinear clusters between each pair of genomes are generated with matplotlib. In the current example, a small heatmap with 4 datapoints (2 * 2 genomes) will be generated for each gap value investigated (0, 1 and 5). In these heatmaps, percentages between pairs of genomes will vary based on the total number of proteins found in the query used: <i>i.e.</i> # proteins in clusters / total # proteins. 
 
-##### Example of a heatmap showing cluster similarities between 2 genomes:
+##### Example of a heatmap showing percentages of colinear protein-coding genes between investigated genomes:
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.png">
 </p>
 
-Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) and the color of the numbers (default: white) inside the heatmaps can be modified with the `--hmpalette` and `--numcolor` command line switches respectively.
+Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) and the color of the numbers inside the heatmaps (default: white) can be modified with the `--hmpalette` and `--numcolor` command line switches, respectively.
 
 #### Circos plots
 
