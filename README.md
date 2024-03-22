@@ -403,7 +403,6 @@ CNA00210	-	CGB_B0210C	-
 CNA00220	+	CGB_B0220W	+
 ```
 
-#### Heatmaps
 Overall metrics for the clusters identified by SYNY are summarized in `SYNTENY/clusters_summary_table.tsv`.
 
 ```Bash
@@ -417,6 +416,8 @@ WM276_vs_JEC21  6565    0       5760    87.74   778     64      2       7       
 WM276_vs_JEC21  6565    1       5923    90.22   229     204     2       26      15      53      26      13
 WM276_vs_JEC21  6565    5       5957    90.74   51      477     2       117     56      260     164     66
 ```
+
+#### Heatmaps
 
 To faciliate comparisons when working with large datasets, heatmaps displaying the percentages of proteins found in clusters between each pair of genomes are generated with matplotlib. In the current example, a small heatmap with 4 datapoints (2 genomes * 2 genomes) will be generated for each gap value investigated (0, 1 and 5). IN these heatmaps, percentages between pairs of genomes will vary based on the total number of proteins encoded in the one being used as query. 
 
