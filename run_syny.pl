@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.6a';
-my $updated = '2024-03-20';
+my $version = '0.5.6b';
+my $updated = '2024-03-22';
 
 use strict;
 use warnings;
@@ -74,6 +74,12 @@ OPTIONS (PLOTS):
 --wdis		Horizontal distance (width) between subplots [Default: 0.05]
 --hdis		Vertical distance (height) between subplots [Default: 0.1]
 --no_dotplot	Skip dotplot creation
+
+### Heatmaps
+-hh (--hheight)	Heatmap figure height in inches [Default: 10]
+-hw (--hwidth)	Heatmap figure width in inches [Default: 10]
+--hmpalette	Heatmap color palette [Default: crest]
+--numcolor	Heatmap float color [Default: white]
 EXIT
 
 die ("\n$usage\n") unless (@ARGV);
@@ -122,6 +128,12 @@ my $wdis = 0.05;
 my $hdis = 0.1;
 my $no_dotplot;
 
+# Heatmaps
+my $hheight = 10;
+my $hwidth = 10;
+my $hmpalette = 'crest';
+my $numcolor = 'white';
+
 GetOptions(
 	# Main
 	'a|annot=s@{1,}' => \@annot_files,
@@ -131,7 +143,7 @@ GetOptions(
 	'no_map' => \$nomap,
 	'resume' => \$resume,
 	'asm=i' => \$asm,
-	# circos
+	# Circos
 	'c|circos' => \$circos,
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
@@ -160,7 +172,12 @@ GetOptions(
 	'noticks' => \$noticks,
 	'wdis=s' => \$wdis,
 	'hdis=s' => \$hdis,
-	'no_dotplot' => \$no_dotplot
+	'no_dotplot' => \$no_dotplot,
+	# Heatmaps
+	'hh|hheight=s' => \$hheight,
+	'hw|hwidth=s' => \$hwidth,
+	'hmpalette=s' => \$hmpalette,
+	'numcolor=s' => \$numcolor
 );
 
 unless(@gaps){
@@ -601,6 +618,18 @@ foreach my $query (sort (keys %cluster_metrics)){
 
 close CLU;
 close TSV;
+
+### Create cluster summary table as heatmap with matplotlib
+my $hm_dir = $outdir.'/HEATMAPS';
+system("
+	$path/protein_cluster_hm.py \\
+	--tsv $clu_sum_table \\
+	--outdir $hm_dir \\
+	--height $hheight \\
+	--width $hwidth \\
+	--palette $hmpalette \\
+	--color $numcolor
+") == 0 or checksig();
 
 ###################################################################################################
 ## Run id_conserved_regions.pl

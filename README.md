@@ -14,6 +14,7 @@ The SYNY pipeline investigates gene colinearity (synteny) between genomes by rec
   * [Command line options](#Command-line-options)
   * [Step by step examples](#Step-by-step-examples)
     * [Example 1: <i>Cryptococcus</i>](#Example-1---Cryptococcus)
+      * [Heatmaps](#Heatmaps)
       * [Circos plots](#Circos-plots)
       * [Barplots](#Barplots)
       * [Dotplots](#Dotplots)
@@ -38,6 +39,7 @@ Synteny inferences can be used to:
 - [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip)
 - [Python3](https://www.python.org/)
 - [matplotlib](https://matplotlib.org/)
+- [numpy](https://numpy.org/)
 - [seaborn](https://seaborn.pydata.org/)
 
 ##### <b>Optional</b>
@@ -67,10 +69,12 @@ sudo dnf install perl-PerlIO-gzip
 ## On Ubuntu:
 sudo apt install python3-matplotlib
 sudo apt install python3-seaborn
+sudo apt install python3-numpy
 
 ## On Fedora:
 sudo dnf install python3-matplotlib
 sudo dnf install python3-seaborn
+sudo dnf install python3-numpy
 
 ## Or via pip (Ubuntu/Fedora):
 pip install matplotlib
@@ -240,6 +244,7 @@ drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 CONSERVED
 drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DIAMOND
 drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DOTPLOTS
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 GENOME
+drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 HEATMAPS
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 LISTS
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 PROT_SEQ
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 SHARED
@@ -280,6 +285,8 @@ The contents of the subdirectories are:
 	- Dotplots (in PNG format) generated from the minimap2 PAF alignments
 - GENOME:
 	- FASTA files containing the sequences of the investigated genomes
+- HEATMAPS:
+	- Heatmaps summarizing the percentages of proteins found in clusters
 - LISTS:
 	- Lists of protein coding genes with location details (.list)
 - PROT_SEQ:
@@ -395,6 +402,30 @@ CNA00200	+	CGB_B0200W	+
 CNA00210	-	CGB_B0210C	-
 CNA00220	+	CGB_B0220W	+
 ```
+
+#### Heatmaps
+Overall metrics for the clusters identified by SYNY are summarized in `SYNTENY/clusters_summary_table.tsv`.
+
+```Bash
+head -n 7 $SYNY/SYNTENY/clusters_summary_table.tsv
+
+### Query       Total # proteins        Allowed Gaps    Total # proteins in clusters    % of proteins in clusters       # of clusters   Longest Shortest        Average  Median  N50     N75     N90
+JEC21_vs_WM276  6863    0       5762    83.96   779     64      2       7       5       10      6       4
+JEC21_vs_WM276  6863    1       5922    86.29   228     204     2       26      15      53      26      13
+JEC21_vs_WM276  6863    5       5957    86.80   53      434     2       112     58      237     163     66
+WM276_vs_JEC21  6565    0       5760    87.74   778     64      2       7       5       10      6       4
+WM276_vs_JEC21  6565    1       5923    90.22   229     204     2       26      15      53      26      13
+WM276_vs_JEC21  6565    5       5957    90.74   51      477     2       117     56      260     164     66
+```
+
+To faciliate comparisons when working with large datasets, heatmaps displaying the percentages of proteins found in clusters between each pair of genomes are generated with matplotlib. In the current example, a small heatmap with 4 datapoints (2 genomes * 2 genomes) will be generated for each gap value investigated (0, 1 and 5). IN these heatmaps, percentages between pairs of genomes will vary based on the total number of proteins encoded in the one being used as query. 
+
+##### Example of a heatmap showing cluster similarities between 2 genomes:
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.png">
+</p>
+
+Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) and the color of the numbers (default: white) inside the heatmaps can be modified with the `--hmpalette` and `--numcolor` command line switches respectively.
 
 #### Circos plots
 
