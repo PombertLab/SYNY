@@ -403,7 +403,7 @@ CNA00210	-	CGB_B0210C	-
 CNA00220	+	CGB_B0220W	+
 ```
 
-Overall metrics for the clusters identified by SYNY are summarized in `SYNTENY/clusters_summary_table.tsv`.
+Overall cluster metrics are summarized in `SYNTENY/clusters_summary_table.tsv`.
 
 ```Bash
 head -n 7 $SYNY/SYNTENY/clusters_summary_table.tsv
