@@ -666,6 +666,11 @@ GPK93_01g00260  -       J0A71_11g23140  -
 GPK93_01g00270  -       J0A71_11g23150  -
 ```
 
+##### Example of a heatmap showing percentages of colinear protein-coding genes between a total 3 genomes:
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0_ence.png">
+</p>
+
 
 ##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using defaults settings):
 <p align="left">
