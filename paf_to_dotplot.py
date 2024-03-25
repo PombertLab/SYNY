@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.2b'
-updated = '2024-03-20'
+version = '0.3'
+updated = '2024-03-25'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -150,82 +150,157 @@ for paf in paf_files:
     # color palette
     palette = sns.color_palette(color_palette, len(query_len_dict))
 
-    fig, axes = plt.subplots(y_axes_total, x_axes_total, sharex='col', sharey='row')
-    fig.suptitle(basename)
-
     if noticks:
         plt.setp(axes, xticks=[], yticks=[])
-
-    ynum = 0
-    xnum = 0
-    cnum = 0
 
     ## Convert scientific notation to number
     divider = int(float(unit))
 
-    for query in sorted(query_len_dict):
+    fig = None
+    axes = None
 
-        for subject in reversed(sorted(subject_len_dict)):
+    ## No subplot
+    if subplots_total == 1:
 
-            if color_palette:
-                ccolor = palette[cnum]
+        xlabel = list(query_len_dict.keys())[0]
+        ylabel = list(subject_len_dict.keys())[0]
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
 
-            xmax = query_len_dict[query] / divider
-            ymax = subject_len_dict[subject] / divider
+        xmax = query_len_dict[xlabel] / divider
+        ymax = subject_len_dict[ylabel] / divider
 
-            axes[ynum,xnum].set_xlim(1,xmax)
-            axes[ynum,xnum].set_ylim(1,ymax)
+        plt.xlim(1,xmax)
+        plt.ylim(1,ymax)
 
-            ## x-axes labels and ticks
-            if (ynum + 1) == len(subject_len_dict):
-                axes[ynum,xnum].set_xlabel(query, rotation=45, ha='right')
+        if color_palette:
+            ccolor = palette[0]
 
-            if (ynum + 1) < len(subject_len_dict):
-                axes[ynum,xnum].get_xaxis().set_visible(False)
+        xmono = []
+        ymono = []
 
-            # y-axes labels and ticks
-            if (xnum == 0):
-                axes[ynum,xnum].set_ylabel(subject, rotation=45, ha='right')
+        for q_start in dataframe[xlabel][ylabel].keys():
 
-            if (xnum > 0):
-                axes[ynum,xnum].get_yaxis().set_visible(False)
+            q_end = dataframe[xlabel][ylabel][q_start][0]
+            s_start = dataframe[xlabel][ylabel][q_start][1]
+            slope = dataframe[xlabel][ylabel][q_start][2]
 
-            # subplots data
-            if subject in dataframe[query].keys():
+            y = s_start
+            for x in range(q_start,q_end):
+                y += slope
+                xmono.append(x)
+                ymono.append(y)
 
-                x1 = []
-                y1 = []
+        fig = plt.scatter([x / divider for x in xmono], [y / divider for y in ymono], s=1, color=ccolor)
 
-                for q_start in dataframe[query][subject].keys():
+    ## With subplots
+    elif subplots_total > 1:
 
-                    q_end = dataframe[query][subject][q_start][0]
-                    s_start = dataframe[query][subject][q_start][1]
-                    slope = dataframe[query][subject][q_start][2]
+        fig, axes = plt.subplots(y_axes_total, x_axes_total, sharex='col', sharey='row')
+        fig.suptitle(basename)
 
-                    y = s_start
-                    for x in range(q_start,q_end):
-                        y += slope
-                        x1.append(x)
-                        y1.append(y)
-
-                axes[ynum,xnum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1, color=ccolor)
-
-                ## To help reduce memory footprint
-                del dataframe[query][subject]
-
-            ynum += 1
-
-        cnum += 1
-        xnum += 1
         ynum = 0
+        xnum = 0
+        cnum = 0
+        znum = 0
 
-    ## Reducing space between subplots
-    plt.subplots_adjust(
-        wspace=float(wdis),
-        hspace=float(hdis)
-    )
+        for query in sorted(query_len_dict):
 
-    ## Writing to output file
+            for subject in reversed(sorted(subject_len_dict)):
+
+                if color_palette:
+                    ccolor = palette[cnum]
+
+                xmax = query_len_dict[query] / divider
+                ymax = subject_len_dict[subject] / divider
+
+                ## 1-dimensional array
+                if ((x_axes_total == 1) or (y_axes_total == 1)):
+
+                    axes[znum].set_xlim(1,xmax)
+                    axes[znum].set_ylim(1,ymax)
+
+                    if y_axes_total > 1:
+
+                        axes[znum].set_ylabel(subject, rotation=45, ha='right')
+
+                        ## x-axes labels and ticks
+                        if (ynum + 1) == len(subject_len_dict):
+                            axes[znum].set_xlabel(query, rotation=45, ha='right')
+
+                        if (ynum + 1) < len(subject_len_dict):
+                            axes[znum].get_xaxis().set_visible(False)
+
+                    else:
+                        axes[znum].set_xlabel(query, rotation=45, ha='right')
+                        axes[znum].set_ylabel(subject, rotation=45, ha='right')
+
+                        if xnum > 0:
+                            axes[znum].get_yaxis().set_visible(False)
+
+                ## multidimensional array
+                else:
+
+                    axes[ynum,xnum].set_xlim(1,xmax)
+                    axes[ynum,xnum].set_ylim(1,ymax)
+
+                    ## x-axes labels and ticks
+                    if (ynum + 1) == len(subject_len_dict):
+                        axes[ynum,xnum].set_xlabel(query, rotation=45, ha='right')
+
+                    if (ynum + 1) < len(subject_len_dict):
+                        axes[ynum,xnum].get_xaxis().set_visible(False)
+
+                    # y-axes labels and ticks
+                    if (xnum == 0):
+                        axes[ynum,xnum].set_ylabel(subject, rotation=45, ha='right')
+
+                    if (xnum > 0):
+                        axes[ynum,xnum].get_yaxis().set_visible(False)
+
+                # subplots data
+                if subject in dataframe[query].keys():
+
+                    x1 = []
+                    y1 = []
+
+                    for q_start in dataframe[query][subject].keys():
+
+                        q_end = dataframe[query][subject][q_start][0]
+                        s_start = dataframe[query][subject][q_start][1]
+                        slope = dataframe[query][subject][q_start][2]
+
+                        y = s_start
+                        for x in range(q_start,q_end):
+                            y += slope
+                            x1.append(x)
+                            y1.append(y)
+
+                    # 1-dimensional array
+                    if ((x_axes_total == 1) or (y_axes_total == 1)):
+                        axes[znum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1, color=ccolor)
+                        znum += 1
+
+                    # multidimensional array
+                    else:
+                        axes[ynum,xnum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1, color=ccolor)
+
+                    ## To help reduce memory footprint
+                    del dataframe[query][subject]
+
+                ynum += 1
+
+            cnum += 1
+            xnum += 1
+            ynum = 0
+
+        ## Reducing space between subplots
+        plt.subplots_adjust(
+            wspace=float(wdis),
+            hspace=float(hdis)
+        )
+
+    ##### Writing to output file
     output = basename
 
     acolor = ccolor
@@ -243,4 +318,4 @@ for paf in paf_files:
 
     ## Close fig
     plt.clf()
-    plt.close(fig)
+    plt.close()
