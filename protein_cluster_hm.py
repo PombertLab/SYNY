@@ -2,8 +2,8 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.1'
-updated = '2024-03-22'
+version = '0.1a'
+updated = '2024-03-27'
 
 import sys
 import os
@@ -75,7 +75,7 @@ if os.path.isdir(outdir) == False:
         sys.exit(f"Can't create directory {outdir}...")
 
 ################################################################################
-## Parsing and plotting summary table 
+## Parsing summary table 
 ################################################################################
 
 dict = {}
@@ -113,17 +113,24 @@ with open (tsv_file) as f:
 
                 dict[gap][query][subject] = percent
 
+## Setting value as zero for missing matches in PAF
+for gap in dict.keys():
+    for query in dict[gap].keys():
+        for subject in dict[gap].keys():
+            if subject not in dict[gap][query]:
+                dict[gap][query][subject] = 0
 
-###############
+
+################################################################################
+## Plotting summary table 
+################################################################################
+
 plt.rcParams["figure.figsize"] = (width,height)
 
 for gap in dict.keys():
 
     ## Creating labels from keys
     labels = sorted(dict[gap].keys())
-
-    ## Debugging statement
-    # print ('gap', gap, labels)
 
     ## Creating numpy array
     array = []
