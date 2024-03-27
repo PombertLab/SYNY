@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.3a';
-my $updated = '2024-03-17';
+my $version = '0.5.3b';
+my $updated = '2024-03-27';
 
 use strict;
 use warnings;
@@ -16,11 +16,11 @@ my $usage = <<"OPTIONS";
 NAME		${name}
 VERSION		${version}
 UPDATED		${updated}
-SYNOPSIS	Creates a list containing all protein-coding genes with their genomic positions from GBF
+SYNOPSIS	Creates a list containing all protein-coding genes with their genomic positions from
 		GenBank GBF/GBFF annotation files. Also creates .faa files containing protein sequences.
 
 USAGE		${name}
-		  -i *.gbf \\
+		  -i *.gbff \\
 		  -o LISTS
 OPTIONS
 
@@ -36,8 +36,8 @@ my %filetypes = (
 	'gbf' => 'gbf',
 	'gbff' => 'gbf',
 	'gb' => '.gbf',
-	'gff' => 'gff',
-	'embl' => 'embl');
+	'gbk' => '.gbf'
+);
 
 my @input_files;
 my $outdir = 'LIST_MAKER';
@@ -302,81 +302,6 @@ foreach my $input_file (@input_files){
 		print "Unrecognized file type: $filetypes{$ext}\n";
 		exit;
 	}
-
-	# GFF
-	# elsif ($filetypes{$ext} eq 'gff'){
-	# 	my %contigs; 
-	# 	my %genes;
-	# 	my $start;
-	# 	my $end;
-	# 	open GFF, $diamond, "$input_file" or die "Can't open input file : $input_file\n";
-	# 	while (my $line = <GFF>){
-	# 		chomp $line;
-	# 		if ($line =~ /^\S+\t\S+\s+\bgene\b\t(\d+)\t(\d+)/){
-	# 			$start = $1;
-	# 			$end = $2;
-	# 		}
-	# 		if ($line =~ /$regex/){
-	# 			my $contig = $1;
-	# 			my $strand = $4;
-	# 			my $gene = $5;
-	# 			my $product = $6;
-	# 			if (!exists $genes{$gene}){
-	# 				$genes{$gene} = $gene;
-	# 				#$start = sprintf("%10d", $start); $end = sprintf("%10d", $end); ## Preventing number ordering SNAFU
-	# 				$contigs{$contig}{$start}[0] = $contig;
-	# 				$contigs{$contig}{$start}[1] = $start;
-	# 				$contigs{$contig}{$start}[2] = $end;
-	# 				$contigs{$contig}{$start}[3] = $strand;
-	# 				$contigs{$contig}{$start}[4] = $gene;
-	# 				$contigs{$contig}{$start}[5] = $product;
-	# 			}
-	# 		}
-	# 	}
-	# 	foreach my $cg (sort keys %contigs) { ## We must reorder genes in case they were entered out of order in the GFF files
-	# 		my $position = 0;
-	# 		foreach my $pos (sort keys %{ $contigs{$cg} }) {
-	# 			$position ++;
-	# 			print OUT "$contigs{$cg}{$pos}[4]\t"; ## Printing gene
-	# 			print OUT "$contigs{$cg}{$pos}[0]\t"; ## Printing contig
-	# 			print OUT "$contigs{$cg}{$pos}[1]\t"; ## Printing $start
-	# 			print OUT "$contigs{$cg}{$pos}[2]\t"; ## Printing $end
-	# 			print OUT "$contigs{$cg}{$pos}[3]\t"; ## Printing $strand
-	# 			print OUT "$position\t";
-	# 			print OUT "$contigs{$cg}{$pos}[5]\n"; ## Printing $product
-	# 		}
-	# 	}
-	# }
-	# # EMBL
-	# elsif ($filetypes{$ext} eq 'embl'){
-	# 	open EMBL, $diamond, "$input_file" or die "Can't open input file : $input_file\n";
-	# 	my $contig = $file_name;
-	# 	my $gene = 0;
-	# 	my $locus_tag;
-	# 	my $product;
-	# 	my $strand;
-	# 	while (my $line = <EMBL>){
-	# 		chomp $line;
-	# 		if ($line =~ /^ID\s+(\w+);/){ $contig = $1 }
-	# 		elsif ($line =~ /FT\s+gene/){ $gene++; }
-	# 		elsif ($line =~ /FT\s+\/locus_tag=\"(\w+)\"/){ $locus_tag = $1; }
-	# 		elsif ($line =~ /FT\s+\/product=\"(.*)\"/){ $product = $1; }
-	# 		elsif ($line =~ /FT\s+CDS/){
-	# 			if ($line =~ /complement/){ $strand = '-';}
-	# 			else { $strand = '+';}
-	# 			my ($start, $end) = $line =~ /\(?(\d+).*\.\.(\d+)/;
-	# 			print OUT $locus_tag."\t";
-	# 			print OUT $contig."\t";
-	# 			print OUT $start."\t";
-	# 			print OUT $end."\t";
-	# 			print OUT $strand."\t";
-	# 			print OUT $gene."\t";
-	# 			print OUT $product."\n";
-	# 		}
-	# 	}
-	# }
-
-	# close OUT;
-
 }
+
 print "\n";
