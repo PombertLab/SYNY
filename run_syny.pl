@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.7a';
+my $version = '0.5.7b';
 my $updated = '2024-03-28';
 
 use strict;
@@ -136,7 +136,7 @@ GetOptions(
 	# Main
 	'a|annot=s@{1,}' => \@annot_files,
 	'e|evalue=s' => \$evalue,
-	'g|gaps=s{0,}' => \@gaps,
+	'g|gaps=i{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
 	'no_map' => \$nomap,
 	'resume' => \$resume,
