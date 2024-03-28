@@ -41,6 +41,7 @@ Synteny inferences can be used to:
 - [matplotlib](https://matplotlib.org/)
 - [numpy](https://numpy.org/)
 - [seaborn](https://seaborn.pydata.org/)
+- [pandas](https://pandas.pydata.org/)
 
 ##### <b>Optional</b>
 - [Circos](https://circos.ca/)
@@ -70,15 +71,19 @@ sudo dnf install perl-PerlIO-gzip
 sudo apt install python3-matplotlib
 sudo apt install python3-seaborn
 sudo apt install python3-numpy
+sudo apt install python3-pandas
 
 ## On Fedora:
 sudo dnf install python3-matplotlib
 sudo dnf install python3-seaborn
 sudo dnf install python3-numpy
+sudo dnf install python3-pandas
 
 ## Or via pip (Ubuntu/Fedora):
 pip install matplotlib
 pip install seaborn
+pip install numpy
+pip install pandas
 ```
 
 ##### To install DIAMOND:
@@ -230,6 +235,11 @@ OPTIONS (PLOTS):
 --wdis          Horizontal distance (width) between subplots [Default: 0.05]
 --hdis          Vertical distance (height) between subplots [Default: 0.1]
 --no_dotplot    Skip dotplot creation
+
+### Heatmaps
+-hh (--hheight) Heatmap figure height in inches [Default: 10]
+-hw (--hwidth)  Heatmap figure width in inches [Default: 10]
+--hmpalette     Heatmap color palette [Default: crest]
 ```
 The output directory will be structured as follows: 
 ```Bash
@@ -426,7 +436,7 @@ To faciliate comparisons when working with large datasets, heatmaps displaying t
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.png">
 </p>
 
-Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) and the color of the numbers inside the heatmaps (default: white) can be modified with the `--hmpalette` and `--numcolor` command line switches, respectively (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a list of available color palettes).
+Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) can be modified with the `--hmpalette` command line switch (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a list of available color palettes).
 
 #### Circos plots
 
