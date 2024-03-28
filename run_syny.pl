@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.7';
+my $version = '0.5.7a';
 my $updated = '2024-03-28';
 
 use strict;
@@ -79,7 +79,6 @@ OPTIONS (PLOTS):
 -hh (--hheight)	Heatmap figure height in inches [Default: 10]
 -hw (--hwidth)	Heatmap figure width in inches [Default: 10]
 --hmpalette	Heatmap color palette [Default: crest]
---numcolor	Heatmap float color [Default: white]
 EXIT
 
 die ("\n$usage\n") unless (@ARGV);
@@ -132,7 +131,6 @@ my $no_dotplot;
 my $hheight = 10;
 my $hwidth = 10;
 my $hmpalette = 'crest';
-my $numcolor = 'white';
 
 GetOptions(
 	# Main
@@ -176,8 +174,7 @@ GetOptions(
 	# Heatmaps
 	'hh|hheight=s' => \$hheight,
 	'hw|hwidth=s' => \$hwidth,
-	'hmpalette=s' => \$hmpalette,
-	'numcolor=s' => \$numcolor
+	'hmpalette=s' => \$hmpalette
 );
 
 unless(@gaps){
