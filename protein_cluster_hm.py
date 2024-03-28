@@ -2,8 +2,8 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.1a'
-updated = '2024-03-27'
+version = '0.2'
+updated = '2024-03-28'
 
 import sys
 import os
@@ -13,6 +13,7 @@ import argparse
 import re
 import numpy as np
 import seaborn as sns
+import pandas as pd
 
 ################################################################################
 ## README
@@ -24,7 +25,7 @@ VERSION     {version}
 UPDATED     {updated}
 SYNOPSIS    Create heatmaps from SYNY summary files with matplotlib
 
-REQS        matplotlib
+REQS        matplotlib, pandas, seaborn
 
 COMMAND    {name} \\
             -t clusters_summary_table.tsv \\
@@ -33,8 +34,7 @@ COMMAND    {name} \\
 OPTIONS:
 -t (--tsv)      clusters_summary_table.tsv
 -o (--outdir)   Output directory [Default: ./HEATMAPS]
--p (--palette)  Color palette [Default: husl]
--c (--color)    Digit colors [Default: crest]
+-p (--palette)  Color palette [Default: crest]
 -h (--height)   Figure height in inches [Default: 10]
 -w (--width)    Figure width in inches [Default: 10]
 """
@@ -54,7 +54,6 @@ cmd.add_argument("-o", "--outdir", default='./HEATMAPS')
 cmd.add_argument("-h", "--height", default=10)
 cmd.add_argument("-w", "--width", default=10)
 cmd.add_argument("-p", "--palette", default='crest')
-cmd.add_argument("-c", "--color", default='white')
 args = cmd.parse_args()
 
 tsv_file = args.tsv
@@ -62,7 +61,6 @@ outdir = args.outdir
 height = args.height
 width = args.width
 color_palette = args.palette
-num_color = args.color
 
 ################################################################################
 ## Working on output directory
@@ -75,108 +73,41 @@ if os.path.isdir(outdir) == False:
         sys.exit(f"Can't create directory {outdir}...")
 
 ################################################################################
-## Parsing summary table 
-################################################################################
-
-dict = {}
-
-with open (tsv_file) as f:
-
-    for line in f:
-
-        if '### Query' in line:
-            next
-
-        else:
-            data = line.split("\t")
-            comparison = data[0]
-            gap = data[2]
-            percent = data[4]
-
-            if gap not in dict:
-                dict[gap] = {}
-
-            m = re.search(r'^(\w+)_vs_(\w+)$', comparison)
-            if m:
-                query = m.group(1)
-                subject = m.group(2)
-
-                if query not in dict[gap]:
-                    dict[gap][query] = {}
-
-                if subject not in dict[gap][query]:
-                    dict[gap][query][subject] = {}
-
-                ## Adding query against itself since skipped in comparisosn
-                if query not in dict[gap][query]:
-                    dict[gap][query][query] = 100
-
-                dict[gap][query][subject] = percent
-
-## Setting value as zero for missing matches in PAF
-for gap in dict.keys():
-    for query in dict[gap].keys():
-        for subject in dict[gap].keys():
-            if subject not in dict[gap][query]:
-                dict[gap][query][subject] = 0
-
-
-################################################################################
-## Plotting summary table 
+## ### 
 ################################################################################
 
 plt.rcParams["figure.figsize"] = (width,height)
 
-for gap in dict.keys():
+with open (tsv_file) as f:
 
-    ## Creating labels from keys
-    labels = sorted(dict[gap].keys())
+    data = pd.read_csv(tsv_file, sep="\t", header=0, index_col=0)
 
-    ## Creating numpy array
-    array = []
-    for query in sorted(dict[gap].keys()):
-        list = []
-        for subject in sorted(dict[gap][query]):
-            list.append(float(dict[gap][query][subject]))
-        array.append(list)
+    gap = None
+    m = re.search(r'gap_(\d+).tsv', tsv_file)
+    if m:
+        gap = m.group(1)
 
-    dataframe = np.array(array)
+    clustered = outdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered.png'
+    heatmap = outdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap.png'
 
-    ## Plotting data
-    fig, ax = plt.subplots()
-    im = ax.imshow(dataframe, cmap=color_palette)
-    ax.set_title(f"% of proteins found in clusters (gap = {gap})")
-
-    # Show all ticks and label them with the respective list entries
-    ax.set_xticks(np.arange(len(labels)), labels=labels)
-    ax.set_yticks(np.arange(len(labels)), labels=labels)
-
-    # Create colorbar
-    cbar_kw = {}
-    cbar = ax.figure.colorbar(im, ax=ax, **cbar_kw)
-    cbar.ax.set_ylabel('', rotation=-90, va="bottom")
-
-    # Tick labels
-    plt.setp(
-        ax.get_xticklabels(),
-        rotation=45,
-        ha="right",
-        rotation_mode="anchor"
+    cm = sns.clustermap(
+        data[0:],
+        cmap=color_palette,
+        annot=True,
+        fmt='.1f'
     )
 
-    # Loop over data dimensions and create text annotations.
-    for x in range(len(labels)):
-        for y in range(len(labels)):
-            text = ax.text(
-                y,
-                x,
-                dataframe[x, y],
-                ha="center",
-                va="center",
-                color=num_color
-            )
+    cm.figure.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
+    plt.savefig(clustered)
+    plt.close()
 
-    fig.tight_layout()
+    hm = sns.heatmap(
+        data[0:],
+        cmap=color_palette,
+        annot=True,
+        fmt='.1f'
+    )
 
-    filename = outdir + '/' + 'proteins_in_clusters.gap_' + gap + '.png'
-    plt.savefig(filename)
+    hm.figure.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
+    plt.savefig(heatmap)
+    plt.close()
