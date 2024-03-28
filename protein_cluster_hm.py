@@ -2,7 +2,7 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.2'
+version = '0.2a'
 updated = '2024-03-28'
 
 import sys
@@ -87,8 +87,8 @@ with open (tsv_file) as f:
     if m:
         gap = m.group(1)
 
-    clustered = outdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered.png'
-    heatmap = outdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap.png'
+    clustered = outdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered'
+    heatmap = outdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap'
 
     cm = sns.clustermap(
         data[0:],
@@ -98,7 +98,8 @@ with open (tsv_file) as f:
     )
 
     cm.figure.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
-    plt.savefig(clustered)
+    plt.savefig(f"{clustered}.png")
+    plt.savefig(f"{clustered}.svg")
     plt.close()
 
     hm = sns.heatmap(
@@ -109,5 +110,6 @@ with open (tsv_file) as f:
     )
 
     hm.figure.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
-    plt.savefig(heatmap)
+    plt.savefig(f"{heatmap}.png")
+    plt.savefig(f"{heatmap}.svg")
     plt.close()
