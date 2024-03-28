@@ -2,7 +2,7 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.2a'
+version = '0.2b'
 updated = '2024-03-28'
 
 import sys
@@ -23,7 +23,7 @@ usage = f"""
 NAME        {name}
 VERSION     {version}
 UPDATED     {updated}
-SYNOPSIS    Create heatmaps from SYNY summary files with matplotlib
+SYNOPSIS    Create heatmaps from SYNY matrices with matplotlib
 
 REQS        matplotlib, pandas, seaborn
 
@@ -32,7 +32,7 @@ COMMAND    {name} \\
             -o HEATMAPS 
 
 OPTIONS:
--t (--tsv)      clusters_summary_table.tsv
+-t (--tsv)      Matrix in TSV format, e.g. matrix_gap_0.tsv
 -o (--outdir)   Output directory [Default: ./HEATMAPS]
 -p (--palette)  Color palette [Default: crest]
 -h (--height)   Figure height in inches [Default: 10]
@@ -66,11 +66,15 @@ color_palette = args.palette
 ## Working on output directory
 ################################################################################
 
-if os.path.isdir(outdir) == False:
-    try:
-        os.makedirs(outdir)
-    except:
-        sys.exit(f"Can't create directory {outdir}...")
+pngdir = outdir + '/PNG'
+svgdir = outdir + '/SVG'
+
+for dir in [outdir,pngdir,svgdir]:
+    if os.path.isdir(dir) == False:
+        try:
+            os.makedirs(dir)
+        except:
+            sys.exit(f"Can't create directory {dir}...")
 
 ################################################################################
 ## ### 
@@ -87,9 +91,13 @@ with open (tsv_file) as f:
     if m:
         gap = m.group(1)
 
-    clustered = outdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered'
-    heatmap = outdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap'
+    clustered_png = pngdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered.png'
+    clustered_svg = svgdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered.svg'
 
+    heatmap_png = pngdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap.png'
+    heatmap_svg = svgdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap.svg'
+
+    ## Clustered heatmaps
     cm = sns.clustermap(
         data[0:],
         cmap=color_palette,
@@ -98,10 +106,11 @@ with open (tsv_file) as f:
     )
 
     cm.figure.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
-    plt.savefig(f"{clustered}.png")
-    plt.savefig(f"{clustered}.svg")
+    plt.savefig(clustered_png)
+    plt.savefig(clustered_svg)
     plt.close()
 
+    ## Normal heatmaps
     hm = sns.heatmap(
         data[0:],
         cmap=color_palette,
@@ -110,6 +119,6 @@ with open (tsv_file) as f:
     )
 
     hm.figure.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
-    plt.savefig(f"{heatmap}.png")
-    plt.savefig(f"{heatmap}.svg")
+    plt.savefig(heatmap_png)
+    plt.savefig(heatmap_svg)
     plt.close()
