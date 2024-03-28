@@ -433,7 +433,7 @@ To faciliate comparisons when working with large datasets, heatmaps displaying t
 
 ##### Example of a heatmap showing percentages of colinear protein-coding genes between investigated genomes:
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.heatmap.png">
 </p>
 
 Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) can be modified with the `--hmpalette` command line switch (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a list of available color palettes).
@@ -678,7 +678,7 @@ GPK93_01g00270  -       J0A71_11g23150  -
 
 ##### Example of a heatmap showing percentages of colinear protein-coding genes between a total 3 genomes:
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0_ence.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.heatmap_ence.png">
 </p>
 
 
