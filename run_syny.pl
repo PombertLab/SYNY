@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.6b';
-my $updated = '2024-03-22';
+my $version = '0.5.7';
+my $updated = '2024-03-28';
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ SYNOPSIS	Runs all the components of the SYNY pipeline and
 		creates configuration files for Circos plots
 
 REQS		Perl / PerlIO::gzip - https://metacpan.org/pod/PerlIO::gzip
-		Python3 / matplotlib / seaborn - https://www.python.org/
+		Python3 / matplotlib / seaborn / pandas - https://www.python.org/
 		Diamond - https://github.com/bbuchfink/diamond
 		Minimap2 - https://github.com/lh3/minimap2
 
@@ -554,11 +554,16 @@ my %cluster_metrics;
 my $clu_query;
 my $qgap;
 
+my %queries;
+my %matrices;
+
 while (my $line = <CLU>){
 	chomp $line;
 	if ($line =~ /##### (\w+); Gap = (\d+) #####/){
 		$clu_query = $1;
 		$qgap = $2;
+		my ($que) = $clu_query =~ /^(\S+)_vs_(\S+)$/;
+		$queries{$que} = '';
 	}
 	elsif ($line =~ /Total.*\t(\S+)$/){
 		$cluster_metrics{$clu_query}{$qgap}{'total'} = $1;
@@ -604,6 +609,9 @@ foreach my $query (sort (keys %cluster_metrics)){
 		$percent = sprintf("%.2f", $percent);
 		print TSV $percent."\t";
 
+		my ($que, $sub) = $query =~ /^(\S+)_vs_(\S+)$/;
+		$matrices{$gap}{$que}{$sub} = $percent;
+
 		print TSV $cluster_metrics{$query}{$gap}{'total_clu'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'longest'}."\t";
 		print TSV $cluster_metrics{$query}{$gap}{'shortest'}."\t";
@@ -619,17 +627,54 @@ foreach my $query (sort (keys %cluster_metrics)){
 close CLU;
 close TSV;
 
+### Create data matrices
+foreach my $gap (keys %matrices){
+
+	my $matrix_file = $synteny_dir."/gap_$gap"."/matrix_gap_$gap.tsv";
+	open MM, '>', $matrix_file or die $!;
+
+	# header
+	foreach my $query (sort (keys %queries)){
+		print MM "\t".$query;
+	}
+	print MM "\n";
+
+	foreach my $query (sort (keys %queries)){
+		print MM "$query";
+		foreach my $subject (sort (keys %queries)){
+			if ($query eq $subject){
+				print MM "\t".'100';
+			}
+			elsif (exists $matrices{$gap}{$query}{$subject}){
+				print MM "\t".$matrices{$gap}{$query}{$subject};
+			}
+			else {
+				print MM "\t".'0';
+			}
+		}
+		print MM "\n";
+	}
+
+	close MM;
+
+}
+
 ### Create cluster summary table as heatmap with matplotlib
 my $hm_dir = $outdir.'/HEATMAPS';
-system("
-	$path/protein_cluster_hm.py \\
-	--tsv $clu_sum_table \\
-	--outdir $hm_dir \\
-	--height $hheight \\
-	--width $hwidth \\
-	--palette $hmpalette \\
-	--color $numcolor
-") == 0 or checksig();
+foreach my $gap (@gaps){
+
+	my $matrix_file = $synteny_dir."/gap_$gap"."/matrix_gap_$gap.tsv";
+
+	system("
+		$path/protein_cluster_hm.py \\
+		--tsv $matrix_file \\
+		--outdir $hm_dir \\
+		--height $hheight \\
+		--width $hwidth \\
+		--palette $hmpalette
+	") == 0 or checksig();
+
+}
 
 ###################################################################################################
 ## Run id_conserved_regions.pl
