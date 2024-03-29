@@ -439,7 +439,7 @@ To faciliate comparisons when working with large datasets, heatmaps displaying t
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.heatmap.png">
 </p>
 
-Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) can be modified with the `--hmpalette` command line switch (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a list of available color palettes).
+Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) can be modified with the `--hmpalette` command line switch (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a list of available seaborn color palettes).
 
 #### Circos plots
 
@@ -558,7 +558,7 @@ Alternatively, ticks/numbers in the x and y axes can be turned off with the `--n
 
 By default, the dotplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--dheight` and `--dwidth` command line switches.
 
-The default monochromatic color (blue) can be changed with the `--color` option (<i>e.g.</i> `--color red`). If desired, dotplots can instead be color-coded based on the query contigs/chromosomes with the `--dotpalette` option; <i>e.g.</i> `--dotpalette husl` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
+The default monochromatic color (blue) can be changed with the `--color` option (<i>e.g.</i> `--color red`). If desired, dotplots can instead be color-coded based on the query contigs/chromosomes with the `--dotpalette` option; <i>e.g.</i> `--dotpalette husl` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available seaborn palettes).
 
 ##### Example of a dotplot generated from minimap2 PAF files using the husl color palette:
 
@@ -774,11 +774,19 @@ run_syny.pl \
 
 
 ## <b>References</b>
-[Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi:10.1038/s41592-021-01101-x
+[Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi: 10.1038/s41592-021-01101-x
 
 [Minimap2: pairwise alignment for nucleotide sequences](https://pubmed.ncbi.nlm.nih.gov/29750242/). Li H. <b>Bioinformatics.</b> 2018 Sep 15;34(18):3094-3100. doi: 10.1093/bioinformatics/bty191.
 
-[Circos: an information aesthetic for comparative genomics](https://pubmed.ncbi.nlm.nih.gov/19541911/). Krzywinski M, Schein J, Birol I, Connors J, Gascoyne R, Horsman D, Jones SJ, Marra MA. <b>Genome Res.</b> 2009 Sep;19(9):1639-45. doi:10.1101/gr.092759.109
+[Circos: an information aesthetic for comparative genomics](https://pubmed.ncbi.nlm.nih.gov/19541911/). Krzywinski M, Schein J, Birol I, Connors J, Gascoyne R, Horsman D, Jones SJ, Marra MA. <b>Genome Res.</b> 2009 Sep;19(9):1639-45. doi: 10.1101/gr.092759.109.
+
+[Matplotlib: A 2D graphics environment](https://doi.org/10.1109/MCSE.2007.55). Hunter, JD. <b>Computing in Science & Engineering.</b> 2007 9(3):90-95. doi: 10.1109/MCSE.2007.55.
+
+[Seaborn: statistical data visualization](https://doi.org/10.21105/joss.03021). Waskom, ML. <b>Journal of Open Source Software.</b> 2021 6(60): 3021. doi: 10.21105/joss.03021
+
+[Data structures for statistical computing in Python](https://doi.org/10.25080/Majora-92bf1922-00a). McKinney W. <b>Proceedings of the 9th Python in Science Conference.</b> 2010:56-61. doi: 10.25080/Majora-92bf1922-00a.
+
+[Array programming with NumPy](https://pubmed.ncbi.nlm.nih.gov/32939066/). Harris CR, Millman KJ, van der Walt SJ, Gommers R, Virtanen P, Cournapeau D, Wieser E, Taylor J, Berg S, Smith NJ, Kern R, Picus M, Hoyer S, van Kerkwijk MH, Brett M, Haldane A, Del Río JF, Wiebe M, Peterson P, Gérard-Marchant P, Sheppard K, Reddy T, Weckesser W, Abbasi H, Gohlke C, Oliphant TE. <b>Nature.</b> 2020 Sep;585(7825):357-362. doi: 10.1038/s41586-020-2649-2. Epub 2020 Sep 16. PMID: 32939066; PMCID: PMC7759461.
 
 [The genome of the basidiomycetous yeast and human pathogen <i>Cryptococcus neoformans</i>](https://pubmed.ncbi.nlm.nih.gov/15653466/). Loftus BJ, Fung E, Roncaglia P, Rowley D, Amedeo P, Bruno D, Vamathevan J, Miranda M, Anderson IJ, Fraser JA, Allen JE, Bosdet IE, Brent MR, Chiu R, Doering TL, Donlin MJ, D'Souza CA, Fox DS, Grinberg V, Fu J, Fukushima M, Haas BJ, Huang JC, Janbon G, Jones SJ, Koo HL, Krzywinski MI, Kwon-Chung JK, Lengeler KB, Maiti R, Marra MA, Marra RE, Mathewson CA, Mitchell TG, Pertea M, Riggs FR, Salzberg SL, Schein JE, Shvartsbeyn A, Shin H, Shumway M, Specht CA, Suh BB, Tenney A, Utterback TR, Wickes BL, Wortman JR, Wye NH, Kronstad JW, Lodge JK, Heitman J, Davis RW, Fraser CM, Hyman RW. <b>Science.</b> 2005 Feb 25;307(5713):1321-4. doi: 10.1126/science.1103773. Epub 2005 Jan 13. PMID: 15653466; PMCID: PMC3520129.
 
