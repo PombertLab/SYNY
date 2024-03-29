@@ -39,7 +39,6 @@ Synteny inferences can be used to:
 - [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip)
 - [Python3](https://www.python.org/)
 - [matplotlib](https://matplotlib.org/)
-- [numpy](https://numpy.org/)
 - [seaborn](https://seaborn.pydata.org/)
 - [pandas](https://pandas.pydata.org/)
 
@@ -70,19 +69,16 @@ sudo dnf install perl-PerlIO-gzip
 ## On Ubuntu:
 sudo apt install python3-matplotlib
 sudo apt install python3-seaborn
-sudo apt install python3-numpy
 sudo apt install python3-pandas
 
 ## On Fedora:
 sudo dnf install python3-matplotlib
 sudo dnf install python3-seaborn
-sudo dnf install python3-numpy
 sudo dnf install python3-pandas
 
 ## Or via pip (Ubuntu/Fedora):
 pip install matplotlib
 pip install seaborn
-pip install numpy
 pip install pandas
 ```
 
@@ -785,8 +781,6 @@ run_syny.pl \
 [Seaborn: statistical data visualization](https://doi.org/10.21105/joss.03021). Waskom, ML. <b>Journal of Open Source Software.</b> 2021 6(60): 3021. doi: 10.21105/joss.03021
 
 [Data structures for statistical computing in Python](https://doi.org/10.25080/Majora-92bf1922-00a). McKinney W. <b>Proceedings of the 9th Python in Science Conference.</b> 2010:56-61. doi: 10.25080/Majora-92bf1922-00a.
-
-[Array programming with NumPy](https://pubmed.ncbi.nlm.nih.gov/32939066/). Harris CR, Millman KJ, van der Walt SJ, Gommers R, Virtanen P, Cournapeau D, Wieser E, Taylor J, Berg S, Smith NJ, Kern R, Picus M, Hoyer S, van Kerkwijk MH, Brett M, Haldane A, Del Río JF, Wiebe M, Peterson P, Gérard-Marchant P, Sheppard K, Reddy T, Weckesser W, Abbasi H, Gohlke C, Oliphant TE. <b>Nature.</b> 2020 Sep;585(7825):357-362. doi: 10.1038/s41586-020-2649-2. Epub 2020 Sep 16. PMID: 32939066; PMCID: PMC7759461.
 
 [The genome of the basidiomycetous yeast and human pathogen <i>Cryptococcus neoformans</i>](https://pubmed.ncbi.nlm.nih.gov/15653466/). Loftus BJ, Fung E, Roncaglia P, Rowley D, Amedeo P, Bruno D, Vamathevan J, Miranda M, Anderson IJ, Fraser JA, Allen JE, Bosdet IE, Brent MR, Chiu R, Doering TL, Donlin MJ, D'Souza CA, Fox DS, Grinberg V, Fu J, Fukushima M, Haas BJ, Huang JC, Janbon G, Jones SJ, Koo HL, Krzywinski MI, Kwon-Chung JK, Lengeler KB, Maiti R, Marra MA, Marra RE, Mathewson CA, Mitchell TG, Pertea M, Riggs FR, Salzberg SL, Schein JE, Shvartsbeyn A, Shin H, Shumway M, Specht CA, Suh BB, Tenney A, Utterback TR, Wickes BL, Wortman JR, Wye NH, Kronstad JW, Lodge JK, Heitman J, Davis RW, Fraser CM, Hyman RW. <b>Science.</b> 2005 Feb 25;307(5713):1321-4. doi: 10.1126/science.1103773. Epub 2005 Jan 13. PMID: 15653466; PMCID: PMC3520129.
 
