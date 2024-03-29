@@ -2,7 +2,7 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.1';
+my $version = '0.1a';
 my $updated = '2024-03-29';
 
 use strict;
@@ -48,6 +48,7 @@ GetOptions(
 my $init_dir = getcwd();
 $install_dir = abs_path($install_dir);
 $config = abs_path($config);
+my ($script,$syny_path) = fileparse($0);
 
 ###################################################################################################
 ## Installing Linux dependencies (requires sudo)
@@ -61,6 +62,8 @@ if ($linux eq 'ubuntu'){
     system ("
       sudo \\
         apt install -y \\
+        git \\
+        curl \\
         build-essential \\
         zlib1g-dev \\
         python3-matplotlib \\
@@ -78,6 +81,8 @@ elsif ($linux eq 'fedora'){
     system ("
         sudo \\
         dnf install -y \\
+        git \\
+        curl \\
         zlib-devel \\
         python3-matplotlib \\
         python3-seaborn \\
@@ -107,7 +112,10 @@ system ("
         Text::Format
 ");
 
-###
+###################################################################################################
+## Creating installation directory
+###################################################################################################
+
 unless(-d $install_dir){
 	make_path($install_dir,{mode => 0755}) or die "Can't create $install_dir: $!\n";
 }
@@ -123,6 +131,8 @@ if (-e $config){
 
 open CFG, "$diamond", $config or die "Can't open $config: $!\n";
 print CFG "\n";
+print CFG 'PATH=$PATH:'.$syny_path.'                    ## SYNY'."\n";
+
 
 ###################################################################################################
 ## Installing Circos
