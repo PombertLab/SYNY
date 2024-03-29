@@ -11,7 +11,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import argparse
 import re
-import numpy as np
 import seaborn as sns
 import pandas as pd
 
