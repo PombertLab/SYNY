@@ -476,7 +476,7 @@ run_syny.pl \
   --label_font semibold
 ```
 
-##### Example the same Circos plot labelled by contig names intead:
+##### Example of the same Circos plot, this time labelled by contig names intead:
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.normal.names.png">
 </p>
