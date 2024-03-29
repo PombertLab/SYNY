@@ -481,7 +481,7 @@ run_syny.pl \
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.normal.names.png">
 </p>
 
-All data and configuration files for these plots are located in the `CIRCOS/` subdirectory. If desired, chromosome labels can be furter adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
+All data and configuration files for the Circos plots are located in the `CIRCOS/` subdirectory. If desired, chromosome labels can be furter adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
 
 ```Bash
 ## To see the first 5 lines from a karyotype file:
