@@ -53,6 +53,26 @@ export PATH=$PATH:$(pwd)
 ```
 
 #### <b>Installing dependencies</b>
+##### <b>Installing dependencies automatically with setup_syny.pl</b>
+
+Dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [Circos](https://circos.ca/) together with the required dnf/apt packages (this script has been tested on Fedora, Ubuntu and Debian distributions). Note that using this script will require sudo privileges to install the required dnf/apt packages.
+
+```Bash
+LINUX=fedora              ## Replace by Linux distribution: Ubuntu, Debian or Fedora 
+CONFIG=~/.bash_profile    ## Replace by desired configuration file
+DIR=~/TOOLS               ## Replace by desired installation directory
+
+## Installing dependencies
+setup_syny.pl \
+  --linux $LINUX \
+  --config $CONFIG \
+  --install $DIR
+
+## Loading the configuration file
+source $CONFIG
+```
+
+##### <b>Installing dependencies manually</b>
 ##### To install PerlIO::gzip:
 
 ```Bash
