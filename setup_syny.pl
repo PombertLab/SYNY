@@ -130,7 +130,7 @@ if (-e $config){
 }
 
 open CFG, "$diamond", $config or die "Can't open $config: $!\n";
-print CFG "\n";
+print CFG "\n\n";
 print CFG 'PATH=$PATH:'.$syny_path.'                    ## SYNY'."\n";
 
 
