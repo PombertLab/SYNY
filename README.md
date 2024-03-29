@@ -157,8 +157,8 @@ wget \
 tar -zxvf circos-0.69-9.tgz
 cd circos-0.69-9/bin
 
-printf "\nexport PATH=$PATH:$(pwd)" >> ~/.profile      ## Ubuntu
-printf "\nexport PATH=$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
+printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.profile      ## Ubuntu
+printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ```
 
 ## <b>Using SYNY</b>
