@@ -58,7 +58,7 @@ $linux = lc($linux);
 
 print "\nPlease enter sudo password to install $linux dependencies\n\n";
 
-if ($linux eq 'ubuntu'){
+if (($linux eq 'ubuntu') or ($linux eq 'debian')){
     system ("
       sudo \\
         apt install -y \\
