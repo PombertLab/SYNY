@@ -2,7 +2,7 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.1a';
+my $version = '0.1b';
 my $updated = '2024-03-29';
 
 use strict;
@@ -54,7 +54,23 @@ my ($script,$syny_path) = fileparse($0);
 ## Installing Linux dependencies (requires sudo)
 ###################################################################################################
 
+## Linux distro check
+my %linux_distros = (
+    'debian' => '',
+    'fedora' => '',
+    'ubuntu' => ''
+);
+
 $linux = lc($linux);
+
+unless (exists $linux_distros{$linux}){
+    print "\nUnrecognized Linux distribution: $linux\n\n";
+    print "Please use Debian/Ubuntu (apt package manager) or Fedora (dnf package manager)\n";
+    print "Exiting...\n\n";
+    exit();
+}
+
+### Installing deps.
 
 print "\nPlease enter sudo password to install $linux dependencies\n\n";
 
