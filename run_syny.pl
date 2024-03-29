@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.7b';
-my $updated = '2024-03-28';
+my $version = '0.5.7c';
+my $updated = '2024-03-29';
 
 use strict;
 use warnings;
@@ -43,20 +43,22 @@ OPTIONS (MAIN):
 OPTIONS (PLOTS):
 ### Circos
 -c (--circos)	Generate Circos plots automatically - http://circos.ca/
--circos_prefix	Desired Circos plot prefix [Default: circos]
+--circos_prefix	Desired Circos plot prefix [Default: circos]
 -r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)	Size unit (Kb or Mb) [Default: Mb]
 --winsize	Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize	Sliding windows step (nucleotide biases) [Default: 5000]
--custom_file	Load custom colors from file
--list_preset	List available custom color presets
--custom_preset	Use a custom color preset; e.g.
+--labels	Contig label type: numbers or names [Defaut: numbers]
+--label_size	Contig label size [Default: 36]
+--custom_file	Load custom colors from file
+--list_preset	List available custom color presets
+--custom_preset	Use a custom color preset; e.g.
 		# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 		# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
--max_ticks		Set max number of ticks [Default: 5000]
--max_ideograms		Set max number of ideograms [Default: 200]
--max_links		Set max number of links [Default: 25000]
--max_points_per_track	Set max number of points per track [Default: 75000]
+--max_ticks		Set max number of ticks [Default: 5000]
+--max_ideograms		Set max number of ideograms [Default: 200]
+--max_links		Set max number of links [Default: 25000]
+--max_points_per_track	Set max number of points per track [Default: 75000]
 
 ### Barplots
 -h (--height)	Barplot figure height in inches [Default: 10.8]
@@ -97,6 +99,8 @@ my $asm;
 # Circos
 my $reference;
 my $unit = 'Mb';
+my $labels = 'numbers';
+my $label_size = 36;
 my $circos;
 my $circos_prefix = 'circos';
 my $winsize = 10000;
@@ -145,6 +149,8 @@ GetOptions(
 	'c|circos' => \$circos,
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
+	'labels=s' => \$labels,
+	'label_size=i' => \$label_size,
 	'winsize=i' => \$winsize,
 	'stepsize=i' => \$stepsize,
 	'circos_prefix=s' => \$circos_prefix,
@@ -751,6 +757,8 @@ system("
 	--winsize $winsize \\
 	--step $stepsize \\
 	--gap $gap \\
+	--labels $labels \\
+	--label_size $label_size \\
 	$ref \\
 	$unit_size \\
 	$custom_cc_file \\

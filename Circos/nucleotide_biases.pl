@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.5b';
-my $updated = '2024-03-18';
+my $version = '0.5c';
+my $updated = '2024-03-29';
 
 use strict;
 use warnings;
@@ -42,6 +42,8 @@ OPTIONS (Circos)
 -r (--reference)	Genome reference for Circos plotting
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
 -u (--unit)		Size unit (Kb or Mb) [Default: Mb]
+-l (--labels)	Contig label type: numbers or names [Defaut: numbers]
+-label_size		Contig label size [Default: 36]
 -custom_file		Load custom colors from file
 -list_preset		List available custom color presets
 -custom_preset		Use a custom color preset; e.g.
@@ -63,6 +65,8 @@ my $reference;
 my $ncheck;
 my $gap = 0;
 my $unit = 'Mb';
+my $labels = 'numbers';
+my $label_size = 36;
 my $circos_plot;
 my $custom_file;
 my $custom_cc;
@@ -80,6 +84,8 @@ GetOptions(
 	'n|ncheck' => \$ncheck,
 	'c|circos' => \$circos_plot,
 	'u|unit=s' => \$unit,
+	'l|labels=s' => \$labels,
+	'label_size=i' => \$label_size,
 	'r|reference=s' => \$reference,
 	'g|gap=i' => \$gap,
 	'custom_file=s' => \$custom_file,
@@ -294,6 +300,7 @@ foreach my $fileprefix (keys (%sequences)){
 	my $num_of_seq = scalar (@seqs);
 
 	my $id = 0;
+	my $label;
 
 	foreach my $sequence (@seqs){
 
@@ -302,11 +309,19 @@ foreach my $fileprefix (keys (%sequences)){
 
 		my $terminus = $csize - 1;
 		$id++;
-		print KAR "chr - $sequence $id 0 $terminus black\n";
-		print CONCAT "chr - $sequence $id 0 $terminus black\n";
+
+		
+		if ($labels eq 'numbers'){
+			$label = $id;
+		}
+		elsif ($labels eq 'names'){
+			$label = $sequence;
+		}
+		print KAR "chr - $sequence $label 0 $terminus black\n";
+		print CONCAT "chr - $sequence $label 0 $terminus black\n";
 
 		if ($fileprefix eq $reference){
-			print CONCATINV "chr - $sequence $id 0 $terminus black\n";
+			print CONCATINV "chr - $sequence $label 0 $terminus black\n";
 		}
 
 	}
@@ -321,10 +336,17 @@ foreach my $fileprefix (keys (%sequences)){
 		my $csize = length $seq;
 
 		my $terminus = $csize - 1;
-		print KARINV "chr - $sequence $id_rev 0 $terminus black\n";
+
+		if ($labels eq 'numbers'){
+			$label = $id_rev;
+		}
+		elsif ($labels eq 'names'){
+			$label = $sequence;
+		}
+		print KARINV "chr - $sequence $label 0 $terminus black\n";
 
 		if ($fileprefix ne $reference){
-			print CONCATINV "chr - $sequence $id_rev 0 $terminus black\n";
+			print CONCATINV "chr - $sequence $label 0 $terminus black\n";
 		}
 		
 		$id_rev--;
@@ -343,7 +365,7 @@ close CONCATINV;
 my $ideogram = $outdir.'/'.'ideogram.conf';
 open my $id, '>', $ideogram or die $!;
 
-my $ideogram_data = <<'IDEO';
+my $ideogram_data = <<"IDEO";
 <ideogram>
 
 <spacing>
@@ -356,7 +378,7 @@ fill      = yes
 show_label       = yes
 label_font       = bold 
 label_radius     = dims(ideogram,radius) + 0.07r
-label_size       = 36
+label_size       = $label_size
 label_parallel   = yes
 
 </ideogram>

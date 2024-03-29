@@ -204,20 +204,22 @@ OPTIONS (MAIN):
 OPTIONS (PLOTS):
 ### Circos
 -c (--circos)   Generate Circos plots automatically - http://circos.ca/
--circos_prefix  Desired Circos plot prefix [Default: circos]
+--circos_prefix Desired Circos plot prefix [Default: circos]
 -r (--ref)      Genome to use as reference (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
 --winsize       Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize      Sliding windows step (nucleotide biases) [Default: 5000]
--custom_file    Load custom colors from file
--list_preset    List available custom color presets
--custom_preset  Use a custom color preset; e.g.
+--labels        Contig label type: numbers or names [Defaut: numbers]
+--label_size    Contig label size [Default: 36]
+--custom_file   Load custom colors from file
+--list_preset   List available custom color presets
+--custom_preset Use a custom color preset; e.g.
                 # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
                 # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
--max_ticks              Set max number of ticks [Default: 5000]
--max_ideograms          Set max number of ideograms [Default: 200]
--max_links              Set max number of links [Default: 25000]
--max_points_per_track   Set max number of points per track [Default: 75000]
+--max_ticks             Set max number of ticks [Default: 5000]
+--max_ideograms         Set max number of ideograms [Default: 200]
+--max_links             Set max number of links [Default: 25000]
+--max_points_per_track  Set max number of points per track [Default: 75000]
 
 ### Barplots
 -h (--height)   Barplot figure height in inches [Default: 10.8]
@@ -454,7 +456,29 @@ In this figure, nucleotides biases are plotted in the concentric rings (from out
 
 Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. The reference genome can be specified with the `--ref` commmand line switch. If omitted, the first genome encountered alphabetically will be used as the default reference.
 
-Data and configuration files for these plots are located in the `CIRCOS/` subdirectory. If desired, chromosome labels can be furter adjusted by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
+By default, contigs will be labelled by numbers in the Circos plots. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) can be futher adjusted with the `--label_size` command line option.
+
+```
+SYNY=~/SYNY_NAMES      ## Replace by desired SYNY output directory
+
+run_syny.pl \
+  -a $DATA/*.gbff.gz \
+  -g 0 1 5 \
+  -e 1e-10 \
+  -r JEC21 \
+  -o $SYNY \
+  --circos \
+  --circos_prefix WM276_vs_JEC21 \
+  --labels names \
+  --label_size 20
+```
+
+##### Example the same Circos plot labelled by contig names intead:
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.normal.names.png">
+</p>
+
+All data and configuration files for these plots are located in the `CIRCOS/` subdirectory. If desired, chromosome labels can be furter adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
 
 ```Bash
 ## To see the first 5 lines from a karyotype file:
