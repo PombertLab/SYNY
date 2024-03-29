@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.7c';
+my $version = '0.5.7d';
 my $updated = '2024-03-29';
 
 use strict;
@@ -50,6 +50,7 @@ OPTIONS (PLOTS):
 --stepsize	Sliding windows step (nucleotide biases) [Default: 5000]
 --labels	Contig label type: numbers or names [Defaut: numbers]
 --label_size	Contig label size [Default: 36]
+--label_font	Contig label font [Default: bold] - https://circos.ca/documentation/tutorials/ideograms/labels/
 --custom_file	Load custom colors from file
 --list_preset	List available custom color presets
 --custom_preset	Use a custom color preset; e.g.
@@ -101,6 +102,7 @@ my $reference;
 my $unit = 'Mb';
 my $labels = 'numbers';
 my $label_size = 36;
+my $label_font = 'bold';
 my $circos;
 my $circos_prefix = 'circos';
 my $winsize = 10000;
@@ -150,7 +152,8 @@ GetOptions(
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
 	'labels=s' => \$labels,
-	'label_size=i' => \$label_size,
+	'label_size=s' => \$label_size,
+	'label_font=s' => \$label_font,
 	'winsize=i' => \$winsize,
 	'stepsize=i' => \$stepsize,
 	'circos_prefix=s' => \$circos_prefix,

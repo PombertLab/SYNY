@@ -211,6 +211,7 @@ OPTIONS (PLOTS):
 --stepsize      Sliding windows step (nucleotide biases) [Default: 5000]
 --labels        Contig label type: numbers or names [Defaut: numbers]
 --label_size    Contig label size [Default: 36]
+--label_font    Contig label font [Default: bold]
 --custom_file   Load custom colors from file
 --list_preset   List available custom color presets
 --custom_preset Use a custom color preset; e.g.
@@ -456,7 +457,8 @@ In this figure, nucleotides biases are plotted in the concentric rings (from out
 
 Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. The reference genome can be specified with the `--ref` commmand line switch. If omitted, the first genome encountered alphabetically will be used as the default reference.
 
-By default, contigs will be labelled by numbers in the Circos plots. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) can be futher adjusted with the `--label_size` command line option.
+By default, contigs will be labelled by numbers in the Circos plots. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) and fonts can be futher adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
+`normal`, `default`, `semibold`, `bold`, `italic`, `bolditalic`, `italicbold` (see this Circos [tutorial](https://circos.ca/documentation/tutorials/ideograms/labels/) for details).
 
 ```
 SYNY=~/SYNY_NAMES      ## Replace by desired SYNY output directory
@@ -470,7 +472,8 @@ run_syny.pl \
   --circos \
   --circos_prefix WM276_vs_JEC21 \
   --labels names \
-  --label_size 20
+  --label_size 20 \
+  --label_font semibold
 ```
 
 ##### Example the same Circos plot labelled by contig names intead:

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.5c';
+my $version = '0.5d';
 my $updated = '2024-03-29';
 
 use strict;
@@ -44,6 +44,7 @@ OPTIONS (Circos)
 -u (--unit)		Size unit (Kb or Mb) [Default: Mb]
 -l (--labels)	Contig label type: numbers or names [Defaut: numbers]
 -label_size		Contig label size [Default: 36]
+-label_font		Contig label font [Default: bold]
 -custom_file		Load custom colors from file
 -list_preset		List available custom color presets
 -custom_preset		Use a custom color preset; e.g.
@@ -67,6 +68,7 @@ my $gap = 0;
 my $unit = 'Mb';
 my $labels = 'numbers';
 my $label_size = 36;
+my $label_font = 'bold';
 my $circos_plot;
 my $custom_file;
 my $custom_cc;
@@ -85,7 +87,8 @@ GetOptions(
 	'c|circos' => \$circos_plot,
 	'u|unit=s' => \$unit,
 	'l|labels=s' => \$labels,
-	'label_size=i' => \$label_size,
+	'label_size=s' => \$label_size,
+	'label_font=s' => \$label_font,
 	'r|reference=s' => \$reference,
 	'g|gap=i' => \$gap,
 	'custom_file=s' => \$custom_file,
@@ -376,7 +379,7 @@ radius    = 0.9r
 thickness = 5p
 fill      = yes
 show_label       = yes
-label_font       = bold 
+label_font       = $label_font
 label_radius     = dims(ideogram,radius) + 0.07r
 label_size       = $label_size
 label_parallel   = yes
