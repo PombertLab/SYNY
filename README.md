@@ -258,7 +258,7 @@ OPTIONS (PLOTS):
 ### Heatmaps
 -hh (--hheight) Heatmap figure height in inches [Default: 10]
 -hw (--hwidth)  Heatmap figure width in inches [Default: 10]
---hmpalette     Heatmap color palette [Default: crest]
+--hmpalette     Heatmap color palette [Default: winter_r]
 ```
 The output directory will be structured as follows: 
 ```Bash
@@ -455,7 +455,7 @@ To faciliate comparisons when working with large datasets, heatmaps displaying t
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.heatmap.png">
 </p>
 
-Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: crest) can be modified with the `--hmpalette` command line switch (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a list of available seaborn color palettes).
+Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: winter_r) can be modified with the `--hmpalette` command line switch (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a list of available seaborn color palettes).
 
 #### Circos plots
 
