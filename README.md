@@ -55,20 +55,34 @@ export PATH=$PATH:$(pwd)
 #### <b>Installing dependencies</b>
 ##### <b>Installing dependencies automatically with setup_syny.pl</b>
 
-Dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [Circos](https://circos.ca/) together with the required dnf/apt packages (this script has been tested on Fedora, Ubuntu and Debian distributions). Note that using this script will require sudo privileges to install dnf/apt packages.
+Dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
 
 ```Bash
+## Listing supported Linux distributions:
+setup_syny.pl --list_distro
+
+Supported Linux distributions/package managers are:
+
+debian      apt
+fedora      dnf
+kali        apt
+opensuse    zypper
+ubuntu      apt
+```
+
+``` Bash
+## Installing dependencies:
+
 LINUX=fedora              ## Replace by Linux distribution: Ubuntu, Debian or Fedora 
 CONFIG=~/.bash_profile    ## Replace by desired configuration file
 DIR=~/TOOLS               ## Replace by desired installation directory
 
-## Installing dependencies
 setup_syny.pl \
   --linux $LINUX \
   --config $CONFIG \
   --install $DIR
 
-## Loading the configuration file
+## Loading the configuration file:
 source $CONFIG
 ```
 
@@ -90,16 +104,19 @@ sudo dnf install perl-PerlIO-gzip
 sudo apt install python3-matplotlib
 sudo apt install python3-seaborn
 sudo apt install python3-pandas
+sudo apt install python3-scipy
 
 ## On Fedora:
 sudo dnf install python3-matplotlib
 sudo dnf install python3-seaborn
 sudo dnf install python3-pandas
+sudo dnf install python3-scipy
 
 ## Or via pip (Ubuntu/Fedora):
 pip install matplotlib
 pip install seaborn
 pip install pandas
+pip install scipy
 ```
 
 ##### To install DIAMOND:
