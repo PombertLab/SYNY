@@ -114,6 +114,7 @@ if ($package_manager eq 'apt'){
         python3-matplotlib \\
         python3-seaborn \\
         python3-pandas \\
+        python3-scipy \\
         libperlio-gzip-perl \\
         cpanminus \\
         libgd-perl
@@ -133,6 +134,7 @@ elsif ($package_manager eq 'dnf'){
         python3-matplotlib \\
         python3-seaborn \\
         python3-pandas \\
+        python3-scipy \\
         perl-PerlIO-gzip \\
         perl-App-cpanminus \\
         perl-GD
@@ -152,6 +154,7 @@ elsif ($package_manager eq 'zypper'){
         python3-matplotlib \\
         python3-seaborn \\
         python3-pandas \\
+        python3-scipy \\
         perl-PerlIO-gzip \\
         perl-App-cpanminus \\
         perl-GD
