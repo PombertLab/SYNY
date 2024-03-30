@@ -81,7 +81,7 @@ OPTIONS (PLOTS):
 ### Heatmaps
 -hh (--hheight)	Heatmap figure height in inches [Default: 10]
 -hw (--hwidth)	Heatmap figure width in inches [Default: 10]
---hmpalette	Heatmap color palette [Default: crest]
+--hmpalette	Heatmap color palette [Default: winter_r]
 EXIT
 
 die ("\n$usage\n") unless (@ARGV);
@@ -136,7 +136,7 @@ my $no_dotplot;
 # Heatmaps
 my $hheight = 10;
 my $hwidth = 10;
-my $hmpalette = 'crest';
+my $hmpalette = 'winter_r';
 
 GetOptions(
 	# Main
