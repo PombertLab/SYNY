@@ -63,7 +63,6 @@ my %linux_distros = (
     'debian' => 'apt',
     'ubuntu' => 'apt',
     'kali' => 'apt',
-    'suse' => 'zypper',
     'opensuse' => 'zypper',
 );
 
