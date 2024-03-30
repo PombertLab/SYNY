@@ -41,6 +41,7 @@ Synteny inferences can be used to:
 - [matplotlib](https://matplotlib.org/)
 - [seaborn](https://seaborn.pydata.org/)
 - [pandas](https://pandas.pydata.org/)
+- [scipy](https://scipy.org/)
 
 ##### <b>Optional</b>
 - [Circos](https://circos.ca/)
@@ -819,6 +820,8 @@ run_syny.pl \
 [Seaborn: statistical data visualization](https://doi.org/10.21105/joss.03021). Waskom, ML. <b>Journal of Open Source Software.</b> 2021 6(60): 3021. doi: 10.21105/joss.03021
 
 [Data structures for statistical computing in Python](https://doi.org/10.25080/Majora-92bf1922-00a). McKinney W. <b>Proceedings of the 9th Python in Science Conference.</b> 2010:56-61. doi: 10.25080/Majora-92bf1922-00a.
+
+[SciPy 1.0: fundamental algorithms for scientific computing in Python.](https://pubmed.ncbi.nlm.nih.gov/32015543/). Virtanen P, Gommers R, Oliphant TE, Haberland M, Reddy T, Cournapeau D, Burovski E, Peterson P, Weckesser W, Bright J, van der Walt SJ, Brett M, Wilson J, Millman KJ, Mayorov N, Nelson ARJ, Jones E, Kern R, Larson E, Carey CJ, Polat İ, Feng Y, Moore EW, VanderPlas J, Laxalde D, Perktold J, Cimrman R, Henriksen I, Quintero EA, Harris CR, Archibald AM, Ribeiro AH, Pedregosa F, van Mulbregt P; SciPy 1.0 Contributors. <b>Nat Methods.</b> 2020 Mar;17(3):261-272. doi: 10.1038/s41592-019-0686-2. Epub 2020 Feb 3. PMID: 32015543; PMCID: PMC7056644.
 
 [The genome of the basidiomycetous yeast and human pathogen <i>Cryptococcus neoformans</i>](https://pubmed.ncbi.nlm.nih.gov/15653466/). Loftus BJ, Fung E, Roncaglia P, Rowley D, Amedeo P, Bruno D, Vamathevan J, Miranda M, Anderson IJ, Fraser JA, Allen JE, Bosdet IE, Brent MR, Chiu R, Doering TL, Donlin MJ, D'Souza CA, Fox DS, Grinberg V, Fu J, Fukushima M, Haas BJ, Huang JC, Janbon G, Jones SJ, Koo HL, Krzywinski MI, Kwon-Chung JK, Lengeler KB, Maiti R, Marra MA, Marra RE, Mathewson CA, Mitchell TG, Pertea M, Riggs FR, Salzberg SL, Schein JE, Shvartsbeyn A, Shin H, Shumway M, Specht CA, Suh BB, Tenney A, Utterback TR, Wickes BL, Wortman JR, Wye NH, Kronstad JW, Lodge JK, Heitman J, Davis RW, Fraser CM, Hyman RW. <b>Science.</b> 2005 Feb 25;307(5713):1321-4. doi: 10.1126/science.1103773. Epub 2005 Jan 13. PMID: 15653466; PMCID: PMC3520129.
 
