@@ -98,7 +98,7 @@ sudo dnf install perl-PerlIO-gzip
 ```
 
 
-##### To install matplolib/seaborn:
+##### To install matplolib / seaborn / pandas / scipy:
 ```Bash
 ## On Ubuntu:
 sudo apt install python3-matplotlib
