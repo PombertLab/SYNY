@@ -2,8 +2,8 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.1b';
-my $updated = '2024-03-29';
+my $version = '0.1d';
+my $updated = '2024-03-30';
 
 use strict;
 use warnings;
@@ -54,27 +54,41 @@ my ($script,$syny_path) = fileparse($0);
 ## Installing Linux dependencies (requires sudo)
 ###################################################################################################
 
-## Linux distro check
+### Linux distro/package manager check
 my %linux_distros = (
-    'debian' => '',
-    'fedora' => '',
-    'ubuntu' => ''
+    'fedora' => 'dnf',
+    'debian' => 'apt',
+    'ubuntu' => 'apt',
+    'kali' => 'apt',
+    'suse' => 'zypper',
+    'opensuse' => 'zypper',
 );
 
 $linux = lc($linux);
 
 unless (exists $linux_distros{$linux}){
+
     print "\nUnrecognized Linux distribution: $linux\n\n";
-    print "Please use Debian/Ubuntu (apt package manager) or Fedora (dnf package manager)\n";
-    print "Exiting...\n\n";
+    print "Supported Linux distributions/package managers are:\n\n";
+
+    foreach my $distro (sort(keys %linux_distros)){
+        my $slen = 12 - length($distro);
+        my $spacer = ' ' x $slen;
+        print $distro.$spacer.$linux_distros{$distro}."\n";
+    }
+
+    print "\nExiting...\n\n";
     exit();
+
 }
 
 ### Installing deps.
 
 print "\nPlease enter sudo password to install $linux dependencies\n\n";
 
-if (($linux eq 'ubuntu') or ($linux eq 'debian')){
+my $package_manager = $linux_distros{$linux};
+
+if ($package_manager eq 'apt'){
     system ("
       sudo \\
         apt install -y \\
@@ -91,7 +105,8 @@ if (($linux eq 'ubuntu') or ($linux eq 'debian')){
     ");
 }
 
-elsif ($linux eq 'fedora'){
+elsif ($package_manager eq 'dnf'){
+
     system ('sudo dnf group install -y "C Development Tools and Libraries"');
 
     system ("
@@ -107,6 +122,26 @@ elsif ($linux eq 'fedora'){
         perl-App-cpanminus \\
         perl-GD
     ");
+
+}
+
+elsif ($package_manager eq 'zypper'){
+
+    system ("
+        sudo \\
+        zypper install -y \\
+        git \\
+        curl \\
+        patterns-devel-base-devel_basis \\
+        zlib-devel \\
+        python3-matplotlib \\
+        python3-seaborn \\
+        python3-pandas \\
+        perl-PerlIO-gzip \\
+        perl-App-cpanminus \\
+        perl-GD
+    ");
+
 }
 
 print "\nInstalling Circos perl dependencies...\n\n";
