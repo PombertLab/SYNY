@@ -2,8 +2,8 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.2b'
-updated = '2024-03-28'
+version = '0.2c'
+updated = '2024-03-30'
 
 import sys
 import os
@@ -104,7 +104,7 @@ with open (tsv_file) as f:
         fmt='.1f'
     )
 
-    cm.figure.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
+    cm.fig.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
     plt.savefig(clustered_png)
     plt.savefig(clustered_svg)
     plt.close()
