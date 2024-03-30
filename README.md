@@ -172,6 +172,7 @@ sudo dnf install perl-GD
 
 ## Dependencies (Ubuntu/Fedora)
 sudo cpanm \
+  Clone \
   Config::General \
   Font::TTF::Font \
   List::MoreUtils \
