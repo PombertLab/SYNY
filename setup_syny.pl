@@ -2,7 +2,7 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.1d';
+my $version = '0.1e';
 my $updated = '2024-03-30';
 
 use strict;
@@ -29,16 +29,19 @@ OPTIONS:
 -l (--linux)    Linux distribution [Default: fedora]
 -c (--config)   Configuration file to edit/create [Default: ~/.bash_profile]
 -i (--install)  Installation directory (for dependencies) [Default: ./TOOLS]
+--list_distro   Lists supported distribution/package managers
 USAGE
 die "\n$usage\n" unless @ARGV;
 
 my $linux = 'fedora';
 my $config = '~/.bash_profile';
 my $install_dir = './TOOLS';
+my $list_distro;
 GetOptions(
     'l|linux=s' => \$linux,
     'c|config=s' => \$config,
-    'i|install=s' => \$install_dir
+    'i|install=s' => \$install_dir,
+    'list_distro' => \$list_distro
 );
 
 ###################################################################################################
@@ -66,10 +69,9 @@ my %linux_distros = (
 
 $linux = lc($linux);
 
-unless (exists $linux_distros{$linux}){
+sub distros{
 
-    print "\nUnrecognized Linux distribution: $linux\n\n";
-    print "Supported Linux distributions/package managers are:\n\n";
+    print "\nSupported Linux distributions/package managers are:\n\n";
 
     foreach my $distro (sort(keys %linux_distros)){
         my $slen = 12 - length($distro);
@@ -77,9 +79,22 @@ unless (exists $linux_distros{$linux}){
         print $distro.$spacer.$linux_distros{$distro}."\n";
     }
 
-    print "\nExiting...\n\n";
+    print "\n";
+
+}
+
+unless (exists $linux_distros{$linux}){
+
+    print "\nUnrecognized Linux distribution: $linux\n";
+    distros();
+    print "Exiting...\n\n";
     exit();
 
+}
+
+if ($list_distro){
+    distros();
+    exit();
 }
 
 ### Installing deps.
@@ -148,6 +163,7 @@ print "\nInstalling Circos perl dependencies...\n\n";
 
 system ("
     sudo cpanm \\
+        Clone \\
         Config::General \\
         Font::TTF::Font \\
         List::MoreUtils \\
