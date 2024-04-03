@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.7d';
-my $updated = '2024-03-29';
+my $version = '0.5.7e';
+my $updated = '2024-04-03';
 
 use strict;
 use warnings;
@@ -60,6 +60,7 @@ OPTIONS (PLOTS):
 --max_ideograms		Set max number of ideograms [Default: 200]
 --max_links		Set max number of links [Default: 25000]
 --max_points_per_track	Set max number of points per track [Default: 75000]
+--clusters		Color by cluster instead of contig/chromosome [Default: off]
 
 ### Barplots
 -h (--height)	Barplot figure height in inches [Default: 10.8]
@@ -115,6 +116,7 @@ my $max_ticks = 5000;
 my $max_ideograms = 200;
 my $max_links = 25000;
 my $max_points_per_track = 75000;
+my $clusters;
 
 # Barplots
 my $bheight = 10.8;
@@ -165,6 +167,7 @@ GetOptions(
 	'max_ideograms=i' => \$max_ideograms,
 	'max_links=i' => \$max_links,
 	'max_points_per_track=i' => \$max_points_per_track,
+	'clusters' => \$clusters,
 	# Barplots
 	'h|height=s' => \$bheight,
 	'w|width=s' => \$bwidth,
@@ -334,38 +337,44 @@ system("
 
 ## Creating Circos links file
 my $paf_dir = "$minimap2_dir/PAF";
-opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
+my $paf_links = "$circos_cat_dir/paf_links.txt";
+
+# Option flags
+my $cluster_flag = '';
+if ($clusters){
+	$cluster_flag = '--clusters';
+}
+
+my $custom_cc_file = '';
+if ($custom_file){
+	$custom_cc_file = "--custom_file $custom_file";
+}
+
+my $custom_cc = '';
+if ($custom_colors){
+	$custom_cc = "--custom_preset $custom_colors";
+}
+
+system("
+	$path/paf2links.pl \\
+	  --paf $paf_dir \\
+	  --links $paf_links \\
+	  $cluster_flag \\
+	  $custom_cc \\
+	  $custom_cc_file
+") == 0 or checksig();
+
+#### Calculate/plot PAF metrics
+my $aln_length_dir = $minimap2_dir.'/METRICS';
 
 my @paf_files;
+opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
+
 while (my $file = readdir(PAFDIR)){
 	if ($file =~ /\.paf$/){
 		push (@paf_files, "$paf_dir/$file");
 	}
 }
-
-my $paf_links = "$circos_cat_dir/paf_links.txt";
-open PLINK, '>', $paf_links or die "Can't create $paf_links: $!\n";
-print PLINK '#locus1 start end locus2 start end'."\n";
-
-for my $paf_file (@paf_files){
-	open PAF, '<', $paf_file or die "Can't read $paf_file: $!\n";
-	while (my $line = <PAF>){
-		chomp $line;
-		my @data = split("\t", $line);
-		my $locus1 = $data[0];
-		my $l1_start = $data[2];
-		my $l1_end = $data[3];
-		my $locus2 = $data[5];
-		my $l2_start = $data[7];
-		my $l2_end = $data[8];
-		print PLINK "$locus1 $l1_start $l1_end $locus2 $l2_start $l2_end"."\n";
-	}
-	close PAF;
-}
-close PLINK;
-
-#### Calculate/plot PAF metrics
-my $aln_length_dir = $minimap2_dir.'/METRICS';
 
 for my $paf_file (@paf_files){
 
@@ -722,6 +731,9 @@ foreach my $cluster_subdir (@cluster_dirs){
 		--cluster $cluster_subdir/CLUSTERS/*.clusters \\
 		--list $list_dir/*.list \\
 		--outdir $outdir/CIRCOS \\
+		$cluster_flag \\
+		$custom_cc_file \\
+		$custom_cc \\
 		2>> $outdir/error.log
 	") == 0 or checksig();
 }
@@ -733,16 +745,6 @@ print ERROR "\n### nucleotide_biases.pl ###\n";
 my $ref = '';
 if ($reference){
 	$ref = "--reference $reference";
-}
-
-my $custom_cc_file = '';
-if ($custom_file){
-	$custom_cc_file = "--custom_file $custom_file";
-}
-
-my $custom_cc = '';
-if ($custom_colors){
-	$custom_cc = "--custom_preset $custom_colors";
 }
 
 my $unit_size = '';
@@ -770,6 +772,7 @@ system("
 	--max_ideograms $max_ideograms \\
 	--max_links $max_links \\
 	--max_points_per_track $max_points_per_track \\
+	$cluster_flag \\
 	2>> $outdir/error.log
 ") == 0 or checksig();
 
