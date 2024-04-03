@@ -2,7 +2,7 @@
 ## Pombert Lab, 2024
 
 my $name = 'paf2links.pl';
-my $version = '0.1';
+my $version = '0.1a';
 my $updated = '2024-04-03';
 
 use strict;
@@ -10,6 +10,7 @@ use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
+use Math::Round;
 
 my $usage = <<"USAGE";
 NAME        ${name}
@@ -56,9 +57,9 @@ while (my $file = readdir(PAFDIR)){
 }
 
 #################### Circos colors
-my @yellows = ('vlyellow','lyellow','yellow','dyellow','vdyellow','vvdyellow');
 my @reds = ('vvlred','vlred','lred','red','dred','vdred','vvdred');
 my @oranges = ('vvlorange','vlorange','lorange','orange','dorange','vdorange','vvdorange');
+my @yellows = ('vlyellow','lyellow','yellow','dyellow','vdyellow','vvdyellow');
 my @greens = ('vvlgreen','vlgreen','lgreen','green','dgreen','vdgreen','vvdgreen');
 my @blues = ('vvlblue','vlblue','lblue','blue','dblue','vdblue','vvdblue');
 my @purples = ('vvlpurple','vlpurple','lpurple','purple','dpurple','vdpurple','vvdpurple');
@@ -71,9 +72,10 @@ my @color_set = @bowgrey;
 
 # Custom color set(s)
 my %custom_colors = cc_colors();
-my @custom_set;
 
 if ($custom_file){
+
+	@color_set = ();
 
 	open CC, '<', $custom_file or die "Can't read $custom_file: $!\n";
 	my ($basename) = fileparse($custom_file);
@@ -84,6 +86,7 @@ if ($custom_file){
 		unless ($line =~ /^#/){
 			my ($color,$rgb) = split("\t", $line);
 			$custom_colors{$basename}{$color} = $rgb;
+			push (@color_set, $color);
 		}
 
 	}
@@ -91,7 +94,7 @@ if ($custom_file){
 }
 
 if ($custom_cc){
-	@custom_set = sort (keys %{$custom_colors{$custom_cc}});
+	@color_set = sort (keys %{$custom_colors{$custom_cc}});
 }
 
 ## Creating Circos links file
@@ -104,9 +107,26 @@ my $color_number = 0;
 
 for my $paf_file (@paf_files){
 
-	open PAF, '<', $paf_file or die "Can't read $paf_file: $!\n";
+	open NUM, '<', $paf_file or die "Can't read $paf_file: $!\n";
+	my $line_num = 0;
+	while (my $line = <NUM>){
+		$line_num++;
+	}
+	close NUM;
 
 	$color_number = 0;
+
+	## Creating an increment so that it will use the full range of colors
+	## not just the start
+	my $increment = (scalar(@color_set))/$line_num;
+	my $rounded_increment = round($increment);
+
+	## Making sure that the increment is >= 1
+	if ($rounded_increment < 1){
+		$rounded_increment = 1;
+	}
+
+	open PAF, '<', $paf_file or die "Can't read $paf_file: $!\n";
 
 	while (my $line = <PAF>){
 
@@ -114,7 +134,8 @@ for my $paf_file (@paf_files){
 
 		if ($clusters){
 			$link_color = $color_set[$color_number];
-			$color_number++;
+			$color_number += 1;
+			# $color_number += $rounded_increment;
 			if ($color_number >= scalar(@color_set)){
 				$color_number = 0;
 			}
