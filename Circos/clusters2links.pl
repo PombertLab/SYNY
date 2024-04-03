@@ -2,7 +2,7 @@
 ## Pombert Lab, Illinois Tech 2023
 
 my $name = 'clusters2links.pl';
-my $version = '0.2';
+my $version = '0.2a';
 my $updated = '2023-04-03';
 
 use strict;
@@ -10,6 +10,7 @@ use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
+use Math::Round;
 
 my $usage = <<"USAGE";
 NAME        ${name}
@@ -87,17 +88,12 @@ while (my $list = shift @lists){
 
 #################### Circos colors
 
-# 6 colors per set
-my @yellows = ('vlyellow','lyellow','yellow','dyellow','vdyellow','vvdyellow');
-
-# 7 colors per set
 my @reds = ('vvlred','vlred','lred','red','dred','vdred','vvdred');
 my @oranges = ('vvlorange','vlorange','lorange','orange','dorange','vdorange','vvdorange');
+my @yellows = ('vlyellow','lyellow','yellow','dyellow','vdyellow','vvdyellow');
 my @greens = ('vvlgreen','vlgreen','lgreen','green','dgreen','vdgreen','vvdgreen');
 my @blues = ('vvlblue','vlblue','lblue','blue','dblue','vdblue','vvdblue');
 my @purples = ('vvlpurple','vlpurple','lpurple','purple','dpurple','vdpurple','vvdpurple');
-
-# 8 colors per set; did not include vvvlgrey => too light can't see it on a white background
 my @greys = ('vvlgrey','vlgrey','lgrey','grey','dgrey','vdgrey','vvdgrey','vvvdgrey');
 
 my @rainbow = (@reds,@oranges,@yellows,@greens,@blues,@purples); ## 41 colors total
@@ -107,9 +103,10 @@ my @color_set = @bowgrey;
 
 # Custom color set(s)
 my %custom_colors = cc_colors();
-my @custom_set;
 
 if ($custom_file){
+
+	@color_set = ();
 
 	open CC, '<', $custom_file or die "Can't read $custom_file: $!\n";
 	my ($basename) = fileparse($custom_file);
@@ -120,6 +117,7 @@ if ($custom_file){
 		unless ($line =~ /^#/){
 			my ($color,$rgb) = split("\t", $line);
 			$custom_colors{$basename}{$color} = $rgb;
+			push(@color_set, $color);
 		}
 
 	}
@@ -127,7 +125,7 @@ if ($custom_file){
 }
 
 if ($custom_cc){
-	@custom_set = sort (keys %{$custom_colors{$custom_cc}});
+	@color_set = sort (keys %{$custom_colors{$custom_cc}});
 } 
 
 ### Iterating through cluster files
@@ -152,6 +150,26 @@ while (my $cluster = shift@clusters){
 
     my $outlinks = $subdir.'/'.$prefix.'.'.$gap.'.links';
     my $catlinks = $catdir.'/concatenated.'.$gap.'.links';
+
+    open NUM, "<", $cluster or die "Can't open $cluster: $!\n";
+    my $line_num = 0;
+    while (my $line = <NUM>){
+        if ($line =~ /^### Cluster (\d+)/){
+            $line_num++;
+        }
+    }
+    close NUM;
+
+    ## Creating an increment so that it will use the full range of colors
+    ## not just the start
+    my $increment = (scalar(@color_set))/$line_num;
+    my $rounded_increment = round($increment);
+
+    ## Making sure that the increment is >= 1
+    if ($rounded_increment < 1){
+        $rounded_increment = 1;
+    }
+
 
     open CLUSTER, "<", $cluster or die "Can't open $cluster: $!\n";
     open OUT, ">", $outlinks or die "Can't create $outlinks: $!\n";
@@ -179,7 +197,7 @@ while (my $cluster = shift@clusters){
 
             if ($clusters){
                 $color = $color_set[$color_number];
-                $color_number++;
+                $color_number += $rounded_increment;
                 if ($color_number >= scalar(@color_set)){
                     $color_number = 0;
                 }
