@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.5d';
-my $updated = '2024-03-29';
+my $version = '0.5e';
+my $updated = '2024-04-03';
 
 use strict;
 use warnings;
@@ -55,6 +55,8 @@ OPTIONS (Circos)
 -max_ideograms		Set max number of ideograms [Default: 200]
 -max_links		Set max number of links [Default: 25000]
 -max_points_per_track	Set max number of points per track [Default: 75000]
+-zdepth			Set links zdepth in ruleset [Default: 50]
+-clusters		Color by clusters [Default: off]
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
@@ -78,6 +80,8 @@ my $max_ticks = 5000;
 my $max_ideograms = 200;
 my $max_links = 25000;
 my $max_points_per_track = 75000;
+my $zdepth = 50;
+my $clusters;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
 	'o|outdir=s' => \$outdir,
@@ -98,7 +102,9 @@ GetOptions(
 	'max_ticks=i' => \$max_ticks,
 	'max_ideograms=i' => \$max_ideograms,
 	'max_links=i' => \$max_links,
-	'max_points_per_track=i' => \$max_points_per_track
+	'max_points_per_track=i' => \$max_points_per_track,
+	'zdepth=i' => \$zdepth,
+	'clusters' => \$clusters
 );
 
 ### List presets and stop
@@ -593,58 +599,63 @@ for my $genome ((keys %sequences), 'concatenated'){
 			print $cg 'color         = '.$link_color."\n";
 			print $cg 'thickness     = 1'."\n";
 
-			## Rules
-			print $cg '<rules>'."\n\n";
+			unless ($clusters){
 
-			## Counting for required colors
-			my $ref_sequence_count = scalar (keys %{$sequences{$reference}});
-			if ($orientation eq 'normal'){
-				print "\n"."Total # of sequences in reference $reference = $ref_sequence_count"."\n";
-			}
+				## Rules
+				print $cg '<rules>'."\n\n";
 
-			if ($custom_cc){
-				@color_set = @custom_set;
-			}
-			elsif ($ref_sequence_count <= scalar(@rainbow)){
-				@color_set = @rainbow;
-			}
-			else {
-				@color_set = @bowgrey;
-			}
+				## Counting for required colors
+				my $ref_sequence_count = scalar (keys %{$sequences{$reference}});
+				if ($orientation eq 'normal'){
+					print "\n"."Total # of sequences in reference $reference = $ref_sequence_count"."\n";
+				}
 
-			## Creating an increment so that it will use the full range of colors
-			## not just the start
-			my $increment = scalar(@color_set)/$ref_sequence_count;
-			my $rounded_increment = round($increment);
-			my $color_start = 0;
+				if ($custom_cc){
+					@color_set = @custom_set;
+				}
+				elsif ($ref_sequence_count <= scalar(@rainbow)){
+					@color_set = @rainbow;
+				}
+				else {
+					@color_set = @bowgrey;
+				}
 
-			## Making sure that the increment is >= 1
-			if ($rounded_increment == 0){
-				$rounded_increment = 1;
-			}
-			
-			foreach my $refseq (sort (keys %{$sequences{$reference}})){
-				foreach my $queseq (sort (keys %sequences)){
-					if (($queseq eq 'concatenated') or ($queseq eq $reference)){
-						next;
-					}
-					else{
-						foreach my $queseq_cg (sort (keys %{$sequences{$queseq}})){
-							print $cg '<rule>'."\n";
-							print $cg "condition  = between($refseq,$queseq_cg)"."\n";
-							print $cg "color      = ".$color_set[$color_start]."\n";
-							print $cg 'flow       = continue'."\n";
-							print $cg '</rule>'."\n\n";
+				## Creating an increment so that it will use the full range of colors
+				## not just the start
+				my $increment = scalar(@color_set)/$ref_sequence_count;
+				my $rounded_increment = round($increment);
+				my $color_start = 0;
+
+				## Making sure that the increment is >= 1
+				if ($rounded_increment == 0){
+					$rounded_increment = 1;
+				}
+				
+				foreach my $refseq (sort (keys %{$sequences{$reference}})){
+					foreach my $queseq (sort (keys %sequences)){
+						if (($queseq eq 'concatenated') or ($queseq eq $reference)){
+							next;
+						}
+						else{
+							foreach my $queseq_cg (sort (keys %{$sequences{$queseq}})){
+								print $cg '<rule>'."\n";
+								print $cg "condition  = between($refseq,$queseq_cg)"."\n";
+								print $cg "color      = ".$color_set[$color_start]."\n";
+								print $cg 'flow       = continue'."\n";
+								print $cg 'z          = '.$zdepth."\n";
+								print $cg '</rule>'."\n\n";
+							}
 						}
 					}
+					$color_start += $rounded_increment;
+					## Check if no more colors left, if so restart from 1st color in color set
+					if ($color_start >= scalar(@color_set)){
+						$color_start = 0;
+					}
 				}
-				$color_start += $rounded_increment;
-				## Check if no more colors left, if so restart from 1st color in color set
-				if ($color_start >= scalar(@color_set)){
-					$color_start = 0;
-				}
+				print $cg '</rules>'."\n\n";
+
 			}
-			print $cg '</rules>'."\n\n";
 
 			print $cg '</link>'."\n";
 			print $cg '</links>'."\n\n";
