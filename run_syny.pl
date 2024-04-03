@@ -799,6 +799,7 @@ unless ($nomap){
 	open P_CONF_I, '>', $circos_conf_i_paf or die "Can't create $circos_conf_i_paf: $!\n";
 
 	while (my $line = <S_CONF_I>){
+		chomp $line;
 		if ($line =~ /^file.*.links$/){
 			print P_CONF_I "file          = $paf_links"."\n";
 		}
