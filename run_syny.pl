@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.7e';
-my $updated = '2024-04-03';
+my $version = '0.5.7f';
+my $updated = '2024-04-04';
 
 use strict;
 use warnings;
@@ -298,6 +298,23 @@ system("
 ## Get PAF files with minimap2
 ###################################################################################################
 
+# Option flags
+my $cluster_flag = '';
+if ($clusters){
+	$cluster_flag = '--clusters';
+}
+
+my $custom_cc_file = '';
+if ($custom_file){
+	$custom_cc_file = "--custom_file $custom_file";
+}
+
+my $custom_cc = '';
+if ($custom_colors){
+	$custom_cc = "--custom_preset $custom_colors";
+}
+
+# Skip minimap if requested 
 if ($nomap){
 	goto HOMOLOGY;
 }
@@ -338,22 +355,6 @@ system("
 ## Creating Circos links file
 my $paf_dir = "$minimap2_dir/PAF";
 my $paf_links = "$circos_cat_dir/paf_links.txt";
-
-# Option flags
-my $cluster_flag = '';
-if ($clusters){
-	$cluster_flag = '--clusters';
-}
-
-my $custom_cc_file = '';
-if ($custom_file){
-	$custom_cc_file = "--custom_file $custom_file";
-}
-
-my $custom_cc = '';
-if ($custom_colors){
-	$custom_cc = "--custom_preset $custom_colors";
-}
 
 system("
 	$path/paf2links.pl \\
