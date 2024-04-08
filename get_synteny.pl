@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 my $name = 'get_synteny.pl';
-my $version = '0.7.2b';
-my $updated = '2022-09-26';
+my $version = '0.7.2c';
+my $updated = '2024-04-08';
 
 use strict;
 use warnings;
@@ -69,8 +69,8 @@ foreach my $dir (@dirs){
 my $query_name = (fileparse($query_list,".list"))[0];
 my $sub_name = (fileparse($subject_list,".list"))[0];
 
-my $pair_file = ${query_name}."_vs_".${sub_name}.".pairs";
-my $cluster_file = ${query_name}."_vs_".${sub_name}.".clusters";
+my $pair_file = ${query_name}."_vs_".${sub_name}.'.gap_'.$gap.'.pairs';
+my $cluster_file = ${query_name}."_vs_".${sub_name}.'.gap_'.$gap.'.clusters';
 
 ###################################################################################################
 ## Parse DIAMOND files for homologs
