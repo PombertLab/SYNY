@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1d'
-updated = '2024-03-20'
+version = '0.1e'
+updated = '2024-04-08'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -34,6 +34,7 @@ OPTIONS:
 -o (--outdir)   Output directory [Default: ./]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
+-a (--affix)    Add affix to filename
 -c (--palette)  Seaborn color palette [Default: Spectral]
                 # See https://www.practicalpythonfordatascience.com/ap_seaborn_palette
                 # for a list of color palettes
@@ -55,6 +56,7 @@ cmd.add_argument("-p", "--paf", nargs='*')
 cmd.add_argument("-o", "--outdir", default='./')
 cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
+cmd.add_argument("-a", "--affix")
 cmd.add_argument("-c", "--palette", default='Spectral')
 cmd.add_argument("-n", "--noticks", action='store_true')
 cmd.add_argument("-m", "--mono")
@@ -64,6 +66,7 @@ paf_files = args.paf
 outdir = args.outdir
 height = args.height
 width = args.width
+affix = args.affix
 color_palette = args.palette
 noticks = args.noticks
 monochrome = args.mono
@@ -159,7 +162,7 @@ for paf in paf_files:
     dlegend = {}
     for subject in reversed(sorted(subject_len_dict.keys())):
 
-        for query in dataframe.keys():
+        for query in sorted(dataframe.keys()):
 
             ccolor = palette[cnum]
             if monochrome:
@@ -201,8 +204,12 @@ for paf in paf_files:
     if monochrome:
         affix_color = monochrome
 
-    png = pngdir + '/' + output.rsplit('.', 1)[0] + '.barplot.' + f"{width}x{height}." + f"{affix_color}" + '.png'
-    svg = svgdir + '/' + output.rsplit('.', 1)[0] + '.barplot.' + f"{width}x{height}." + f"{affix_color}" + '.svg'
+    suffix = ''
+    if affix is not None:
+        suffix = '.' + affix
+
+    png = pngdir + '/' + output.rsplit('.', 1)[0] + suffix + '.barplot.' + f"{width}x{height}." + f"{affix_color}" + '.png'
+    svg = svgdir + '/' + output.rsplit('.', 1)[0] + suffix + '.barplot.' + f"{width}x{height}." + f"{affix_color}" + '.svg'
 
     print(f"Creating {png}...")
     plt.savefig(png)
