@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.7f';
-my $updated = '2024-04-04';
+my $version = '0.5.8';
+my $updated = '2024-04-08';
 
 use strict;
 use warnings;
@@ -295,7 +295,7 @@ system("
 ") == 0 or checksig();
 
 ###################################################################################################
-## Get PAF files with minimap2
+## Shared options flags
 ###################################################################################################
 
 # Option flags
@@ -313,6 +313,20 @@ my $custom_cc = '';
 if ($custom_colors){
 	$custom_cc = "--custom_preset $custom_colors";
 }
+
+my $tick_flag = '';
+if ($noticks){
+	$tick_flag = '--noticks'
+}
+
+my $monobar_flag = '';
+if ($monobar){
+	$monobar_flag = "--mono $monobar";
+}
+
+###################################################################################################
+## Get PAF files with minimap2
+###################################################################################################
 
 # Skip minimap if requested 
 if ($nomap){
@@ -404,17 +418,6 @@ for my $paf_file (@paf_files){
 my $barplot_dir = "$outdir/BARPLOTS";
 my $dotplot_dir = "$outdir/DOTPLOTS";
 
-my $tick_flag = '';
-if ($noticks){
-	$tick_flag = '--noticks'
-}
-
-# Barplots
-my $monobar_flag = '';
-if ($monobar){
-	$monobar_flag = "--mono $monobar";
-}
-
 system("
 	$path/paf_to_barplot.py \\
 	--paf $paf_dir/*.paf \\
@@ -422,6 +425,7 @@ system("
 	--height $bheight \\
 	--width $bwidth \\
 	--palette $palette \\
+	--affix mmap \\
 	$tick_flag \\
 	$monobar_flag \\
 	2>> $outdir/error.log
@@ -549,6 +553,40 @@ while (my $file = readdir(LISTS)){
 		$gene_count{$basename} = $counter;
 
 	}
+}
+
+### Create pseudo PAF files from clusters found
+foreach my $gap (@gaps){
+
+	my $clusdir = $synteny_dir.'/gap_'.$gap.'/CLUSTERS';
+	my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
+
+	system ("$path/clusters_to_paf.pl \\
+	  --fasta $outdir/GENOME/*.fasta \\
+	  --lists $list_dir/*.list \\
+	  --clusters $clusdir/*.clusters \\
+	  --outdir $ppafdir
+	") == 0 or checksig();
+}
+
+### Create barplots from PAF files
+foreach my $gap (@gaps){
+
+	my $barplot_dir = "$outdir/BARPLOTS";
+	my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
+
+	system("
+		$path/paf_to_barplot.py \\
+		--paf $ppafdir/*.paf \\
+		--outdir $barplot_dir \\
+		--height $bheight \\
+		--width $bwidth \\
+		--palette $palette \\
+		$tick_flag \\
+		$monobar_flag \\
+		2>> $outdir/error.log
+	") == 0 or checksig();
+
 }
 
 ### Create a cluster summary table
