@@ -319,7 +319,8 @@ The contents of the subdirectories are:
       - Alignment length vs. similarity scatter plots (in PNG format)
       - Alignment metrics summaries (in plain TXT format)
 - BARPLOTS:
-	- Barplots (in PNG/SVG format) generated from the minimap2 PAF alignments
+	- Barplots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+	- Barplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
 - CIRCOS:
 	- Configuration files for Circos plots
 - CONSERVED:
