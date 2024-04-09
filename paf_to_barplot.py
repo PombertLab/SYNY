@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1e'
-updated = '2024-04-08'
+version = '0.1f'
+updated = '2024-04-09'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -216,3 +216,8 @@ for paf in paf_files:
 
     print(f"Creating {svg}...")
     plt.savefig(svg)
+
+    ## Close fig
+    plt.clf()
+    plt.cla()
+    plt.close('all')
