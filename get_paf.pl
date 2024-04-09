@@ -8,8 +8,8 @@ use Cwd qw(abs_path);
 use Getopt::Long qw(GetOptions);
 
 my $name = 'get_paf.pl';
-my $version = '0.3c';
-my $updated = '2024-03-20';
+my $version = '0.3d';
+my $updated = '2024-04-09';
 
 my $usage =<<"USAGE";
 NAME        ${name}
@@ -91,6 +91,10 @@ if ($asm){
     $asm_flag = '-x asm'.$asm;
 }
 
+my $fasta_num = scalar(@fasta);
+my $to_do = $fasta_num * ($fasta_num - 1);
+my $current_iteration = 0;
+
 foreach my $query (@fasta){
 
     my $bquery = fileparse($query);
@@ -103,7 +107,9 @@ foreach my $query (@fasta){
 
         unless ($query eq $target){
 
-            print STDOUT "\n".'Minimap2: '.$bquery.' vs. '.$btarget."\n\n";
+            # $current_iteration++;
+
+            print STDOUT "\n".'Minimap2: '.++$current_iteration.'/'.$to_do.' --- '.$bquery.' vs. '.$btarget."\n\n";
             print LOG 'Minimap2: '.$bquery.' vs. '.$btarget;
 
             # Minimap2 PAF, MAF and ALN (BLAST-like) output files
