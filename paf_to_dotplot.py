@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.3'
-updated = '2024-03-25'
+version = '0.4'
+updated = '2024-04-09'
 name = 'paf_to_dotplot.py'
 
 import sys
 import os
+import matplotlib
 import matplotlib.pyplot as plt
 import argparse
 import seaborn as sns
+matplotlib.use('agg')
 
 ################################################################################
 ## README
@@ -78,11 +80,17 @@ hdis = args.hdis
 ## Working on output directory
 ################################################################################
 
-if os.path.isdir(outdir) == False:
-    try:
-        os.makedirs(outdir)
-    except:
-        sys.exit(f"Can't create directory {outdir}...")
+svgdir = outdir + '/SVG'
+pngdir = outdir + '/PNG'
+
+subdirs = [outdir,svgdir,pngdir]
+
+for dir in subdirs:
+    if os.path.isdir(dir) == False:
+        try:
+            os.makedirs(dir)
+        except:
+            sys.exit(f"Can't create directory {dir}...")
 
 ################################################################################
 ## Parsing and plotting PAF file(s) 
@@ -99,7 +107,11 @@ for paf in paf_files:
         basename = os.path.basename(paf)
         print(f"\nWorking on {basename}", end='')
 
+        matchnum = 0
+
         for line in file:
+
+            matchnum += 1
 
             # PAF data structure:
             # https://github.com/lh3/miniasm/blob/master/PAF.md
@@ -122,20 +134,27 @@ for paf in paf_files:
                 dataframe[query] = {}
             if subject not in dataframe[query]:
                 dataframe[query][subject] = {}
+            
+            dataframe[query][subject][matchnum] = {}
+            if orientation == '+':
+                dataframe[query][subject][matchnum] = [(q_start,q_end),(s_start,s_end)]
+            else:
+                dataframe[query][subject][matchnum] = [(q_start,q_end),(s_end,s_start)]
 
-            # Alignments includes gaps: no. of bases
-            # in query/subject often differs =>
-            # creating a slope so that numbers of
-            # x and y variables are the same for plotting
-            q_span = q_end - q_start + 1
-            s_span = s_end - s_start + 1
-            slope = s_span / q_span
+    ##### Output file(s)
+    output = basename
 
-            if orientation == '-':
-                slope = -abs(slope)
-                s_start = s_end
+    acolor = ccolor
+    affix = unit
 
-            dataframe[query][subject][q_start] = [q_end,s_start,slope]
+    if color_palette:
+        acolor = color_palette
+
+    if noticks:
+        affix = 'noticks'
+
+    pngfile = pngdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + f".{width}x{height}" + f".{acolor}" + '.png'
+    svgfile = svgdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + f".{width}x{height}" + f".{acolor}" + '.svg'
 
     ##### Plotting
     x_axes_total = int(len(query_len_dict))
@@ -156,9 +175,6 @@ for paf in paf_files:
     ## Convert scientific notation to number
     divider = int(float(unit))
 
-    fig = None
-    axes = None
-
     ## No subplot
     if subplots_total == 1:
 
@@ -176,22 +192,10 @@ for paf in paf_files:
         if color_palette:
             ccolor = palette[0]
 
-        xmono = []
-        ymono = []
-
-        for q_start in dataframe[xlabel][ylabel].keys():
-
-            q_end = dataframe[xlabel][ylabel][q_start][0]
-            s_start = dataframe[xlabel][ylabel][q_start][1]
-            slope = dataframe[xlabel][ylabel][q_start][2]
-
-            y = s_start
-            for x in range(q_start,q_end):
-                y += slope
-                xmono.append(x)
-                ymono.append(y)
-
-        fig = plt.scatter([x / divider for x in xmono], [y / divider for y in ymono], s=1, color=ccolor)
+        for x in dataframe[xlabel][ylabel]:
+            xmono = dataframe[xlabel][ylabel][x][0]
+            ymono = dataframe[xlabel][ylabel][x][1]
+            plt.plot([x / divider for x in xmono], [y / divider for y in ymono], color=ccolor)
 
     ## With subplots
     elif subplots_total > 1:
@@ -261,32 +265,21 @@ for paf in paf_files:
                 # subplots data
                 if subject in dataframe[query].keys():
 
-                    x1 = []
-                    y1 = []
+                    for x in dataframe[query][subject]:
 
-                    for q_start in dataframe[query][subject].keys():
+                        x1 = dataframe[query][subject][x][0]
+                        y1 = dataframe[query][subject][x][1]
 
-                        q_end = dataframe[query][subject][q_start][0]
-                        s_start = dataframe[query][subject][q_start][1]
-                        slope = dataframe[query][subject][q_start][2]
+                        # 1-dimensional array
+                        if ((x_axes_total == 1) or (y_axes_total == 1)):
+                            axes[znum].plot([x / divider for x in x1], [y / divider for y in y1], color=ccolor)
 
-                        y = s_start
-                        for x in range(q_start,q_end):
-                            y += slope
-                            x1.append(x)
-                            y1.append(y)
+                        # multidimensional array
+                        else:
+                            axes[ynum,xnum].plot([x / divider for x in x1], [y / divider for y in y1], color=ccolor)
 
-                    # 1-dimensional array
                     if ((x_axes_total == 1) or (y_axes_total == 1)):
-                        axes[znum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1, color=ccolor)
                         znum += 1
-
-                    # multidimensional array
-                    else:
-                        axes[ynum,xnum].scatter([x / divider for x in x1], [y / divider for y in y1], s=1, color=ccolor)
-
-                    ## To help reduce memory footprint
-                    del dataframe[query][subject]
 
                 ynum += 1
 
@@ -301,21 +294,13 @@ for paf in paf_files:
         )
 
     ##### Writing to output file
-    output = basename
+    print(f"Creating {pngfile}...")
+    plt.savefig(pngfile)
 
-    acolor = ccolor
-    affix = unit
-
-    if color_palette:
-        acolor = color_palette
-
-    if noticks:
-        affix = 'noticks'
-
-    filename = outdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + f".{width}x{height}" + f".{acolor}" + '.png'
-    print(f"Creating {filename}...")
-    plt.savefig(filename)
+    print(f"Creating {svgfile}...")
+    plt.savefig(svgfile)
 
     ## Close fig
     plt.clf()
-    plt.close()
+    plt.cla()
+    plt.close('all')
