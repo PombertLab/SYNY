@@ -332,7 +332,7 @@ The contents of the subdirectories are:
 		- BLASTP databases
 	- Round-robin BLASTP results (.diamond.6)
 - DOTPLOTS:
-	- Dotplots (in PNG format) generated from the minimap2 PAF alignments
+	- Dotplots (in PNG/SVG format) generated from the minimap2 PAF alignments
 - GENOME:
 	- FASTA files containing the sequences of the investigated genomes
 - HEATMAPS:
@@ -573,7 +573,7 @@ By default, the barplots are formatted for a widescreen (landscape) output (widt
 
 #### Dotplots
 
-If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), by default, dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/). If desired, this step can be skipped entirely with the `--no_dotplot` command line switch. Note that plotting large genomes can quickly eat up a lot of memory. When running out of memory, this process will be terminated automatically before a PNG image can be produced.
+If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), by default, dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/). If desired, this step can be skipped entirely with the `--no_dotplot` command line switch.
 
 ##### Example of a dotplot generated from minimap2 PAF files using defaults settings:
 
