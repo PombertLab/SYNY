@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.8';
-my $updated = '2024-04-08';
+my $version = '0.5.8a';
+my $updated = '2024-04-10';
 
 use strict;
 use warnings;
@@ -287,6 +287,8 @@ print LOG "COMMAND: $0 @commands\n";
 
 print ERROR "\n### list_maker.pl ###\n";
 
+print "\n##### Extracting data from GenBank files\n";
+
 system("
 	$path/list_maker.pl \\
 	  --input @annot_files \\
@@ -333,6 +335,8 @@ if ($nomap){
 	goto HOMOLOGY;
 }
 
+print "\n##### Infering colinearity from pairwise genome alignments\n";
+
 print ERROR "\n### get_paf.pl ###\n";
 
 my $genome_dir = "$outdir/GENOME";
@@ -367,6 +371,9 @@ system("
 ") == 0 or checksig();
 
 ## Creating Circos links file
+
+print ERROR "\n### paf2links.pl ###\n";
+
 my $paf_dir = "$minimap2_dir/PAF";
 my $paf_links = "$circos_cat_dir/paf_links.txt";
 
@@ -380,6 +387,9 @@ system("
 ") == 0 or checksig();
 
 #### Calculate/plot PAF metrics
+
+print ERROR "\n### paf_metrics.py ###\n";
+
 my $aln_length_dir = $minimap2_dir.'/METRICS';
 
 my @paf_files;
@@ -412,8 +422,10 @@ for my $paf_file (@paf_files){
 }
 
 ###################################################################################################
-## Creating barplots/dotplots from PAF files
+## Creating barplots/dotplots from minimap2 PAF files
 ###################################################################################################
+
+print ERROR "\n### paf_to_barplot.py (minimap2) ###\n";
 
 my $barplot_dir = "$outdir/BARPLOTS";
 my $dotplot_dir = "$outdir/DOTPLOTS";
@@ -421,7 +433,9 @@ my $dotplot_dir = "$outdir/DOTPLOTS";
 system("
 	$path/paf_to_barplot.py \\
 	--paf $paf_dir/*.paf \\
+	--fasta $genome_dir/*.fasta \\
 	--outdir $barplot_dir \\
+	--affix mmap \\
 	--height $bheight \\
 	--width $bwidth \\
 	--palette $palette \\
@@ -438,9 +452,16 @@ if ($dotpalette){
 }
 
 unless ($no_dotplot){
+
+	print ERROR "\n### paf_to_dotplot.py (minimap2) ###\n";
+
+	print "\nCreating Dotplots:\n";
+
 	system("
 		$path/paf_to_dotplot.py \\
 		--paf $paf_dir/*.paf \\
+		--fasta $genome_dir/*.fasta \\
+		--affix mmap \\
 		--outdir $dotplot_dir \\
 		--unit $multiplier \\
 		--height $dheight \\
@@ -459,6 +480,8 @@ unless ($no_dotplot){
 ###################################################################################################
 
 HOMOLOGY:
+
+print "\n##### Infering colinearity from protein-coding gene clusters\n";
 
 my %linked_files;
 my @prot_files;
@@ -555,7 +578,14 @@ while (my $file = readdir(LISTS)){
 	}
 }
 
+###################################################################################################
+## Creating barplots/dotplots from SYNY PAF files
+###################################################################################################
+
 ### Create pseudo PAF files from clusters found
+
+print ERROR "\n### clusters_to_paf.pl ###\n";
+
 foreach my $gap (@gaps){
 
 	my $clusdir = $synteny_dir.'/gap_'.$gap.'/CLUSTERS';
@@ -570,6 +600,8 @@ foreach my $gap (@gaps){
 }
 
 ### Create barplots from PAF files
+print ERROR "\n### paf_to_barplot.py (SYNY) ###\n";
+
 foreach my $gap (@gaps){
 
 	my $barplot_dir = "$outdir/BARPLOTS";
@@ -578,6 +610,7 @@ foreach my $gap (@gaps){
 	system("
 		$path/paf_to_barplot.py \\
 		--paf $ppafdir/*.paf \\
+		--fasta $genome_dir/*.fasta \\
 		--outdir $barplot_dir \\
 		--height $bheight \\
 		--width $bwidth \\
@@ -589,7 +622,42 @@ foreach my $gap (@gaps){
 
 }
 
+### Create dotplots from PAF files
+unless ($no_dotplot){
+
+	print ERROR "\n### paf_to_dotplot.py (SYNY) ###\n";
+
+	print "\nCreating Dotplots:\n";
+
+	foreach my $gap (@gaps){
+
+		my $dotplot_dir = "$outdir/DOTPLOTS";
+		my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
+
+		system("
+			$path/paf_to_dotplot.py \\
+			--paf $ppafdir/*.paf \\
+			--fasta $genome_dir/*.fasta \\
+			--outdir $dotplot_dir \\
+			--unit $multiplier \\
+			--height $dheight \\
+			--width $dwidth \\
+			--color $color \\
+			$tick_flag \\
+			$dotpal_flag \\
+			--wdis $wdis \\
+			--hdis $hdis \\
+			2>> $outdir/error.log
+		") == 0 or checksig();
+
+	}
+
+}
+
 ### Create a cluster summary table
+
+print ERROR "\n### Cluster summary table ###\n";
+
 my $clu_sum_table = $synteny_dir.'/'.'clusters_summary_table.tsv';
 open CLU, '<', $clu_sum_file or die "Can't read $clu_sum_file: $!\n";
 open TSV, '>', $clu_sum_table or die "Can't create $clu_sum_table: $!\n";
@@ -682,6 +750,9 @@ close CLU;
 close TSV;
 
 ### Create data matrices
+
+print ERROR "\n### Cluster data matrices ###\n";
+
 foreach my $gap (keys %matrices){
 
 	my $matrix_file = $synteny_dir."/gap_$gap"."/matrix_gap_$gap.tsv";
@@ -714,6 +785,9 @@ foreach my $gap (keys %matrices){
 }
 
 ### Create cluster summary table as heatmap with matplotlib
+
+print ERROR "\n### protein_cluster_hm.py ###\n";
+
 my $hm_dir = $outdir.'/HEATMAPS';
 foreach my $gap (@gaps){
 
@@ -851,6 +925,8 @@ unless ($nomap){
 
 # Running Circos
 if ($circos){
+
+	print "\n##### Generating Circos plots\n";
 
 	my $syny_normal_circos = "$circos_prefix.syny.normal.png";
 	my $syny_invert_circos = "$circos_prefix.syny.inverted.png";
