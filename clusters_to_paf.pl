@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'clusters_to_paf.pl';
-my $version = 0.1;
-my $updated = '2024-04-08';
+my $version = '0.1a';
+my $updated = '2024-04-10';
 
 use strict;
 use warnings;
@@ -156,16 +156,32 @@ while (my $cluster = shift @clusters){
                 $rel_strand = '-';
             }
 
+            my $real_qstart = $qm_start;
+            my $real_qend = $qm_end;
+            my $real_sstart = $sm_start;
+            my $real_ssend = $sm_end;
+
+            ## Adjusting positions if start > end
+            if ($qm_start > $qm_end){
+                $real_qstart = $qm_end;
+                $real_qend = $qm_start;
+            }
+
+            if ($sm_start > $sm_end){
+                $real_sstart = $sm_end;
+                $real_ssend = $sm_start;
+            }
+
             ## PAF
             print PAF $subject."\t";
             print PAF $slen."\t";
-            print PAF $sm_start."\t";
-            print PAF $sm_end."\t";
+            print PAF $real_sstart."\t";
+            print PAF $real_ssend."\t";
             print PAF $rel_strand."\t";
             print PAF $query."\t";
             print PAF $qlen."\t";
-            print PAF $qm_start."\t";
-            print PAF $qm_end."\t";
+            print PAF $real_qstart."\t";
+            print PAF $real_qend."\t";
             print PAF $len."\t";
             print PAF $len."\t";
             print PAF $map_quality."\n";
