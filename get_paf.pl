@@ -8,8 +8,8 @@ use Cwd qw(abs_path);
 use Getopt::Long qw(GetOptions);
 
 my $name = 'get_paf.pl';
-my $version = '0.3d';
-my $updated = '2024-04-09';
+my $version = '0.3e';
+my $updated = '2024-04-10';
 
 my $usage =<<"USAGE";
 NAME        ${name}
@@ -20,6 +20,7 @@ SYNOPSIS    Performs pairwize genome colinearity (paf,maf,aln) comparisons using
 EXAMPLE     ${name} \\
               -f *.fasta \\
               -o PAFR_5 \\
+              -threads 8 \\
               -resume \\
               -asm 5
 
@@ -29,6 +30,7 @@ OPTIONS:
 -f (--fasta)    FASTA files to compare
 -o (--outdir)   Output directory [Default: ./PAF]
 -r (--resume)   Resume computation (skip completed alignments)
+-t (--threads)  Number of threads for minimap2 [Default: 8]
 -a (--asm)      Specify minimap2 max divergence preset (asm 5, 10 or 20) [Default: off]
 USAGE
 
@@ -38,10 +40,12 @@ my @commands = @ARGV;
 my @fasta;
 my $outdir = './PAF';
 my $resume;
+my $threads = 8;
 my $asm;
 GetOptions(
     'f|fasta=s@{1,}' => \@fasta,
     'o|outdir=s' => \$outdir,
+    't|threads=i' => \$threads,
     'r|resume' => \$resume,
     'asm=i' => \$asm
 );
@@ -129,6 +133,7 @@ foreach my $query (@fasta){
             # Running minimap2 (PAF output)
             system(
                 "minimap2 \\
+                    -t $threads \\
                     $asm_flag \\
                     -c \\
                     --cs=long \\

@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.8a';
+my $version = '0.5.8b';
 my $updated = '2024-04-10';
 
 use strict;
@@ -36,6 +36,7 @@ OPTIONS (MAIN):
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
+--threads	Number of threads for minimap2 [Default: 8]
 --asm		Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
@@ -94,6 +95,7 @@ my @annot_files;
 my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
+my $threads = 8;
 my $nomap;
 my $resume;
 my $asm;
@@ -146,6 +148,7 @@ GetOptions(
 	'e|evalue=s' => \$evalue,
 	'g|gaps=i{0,}' => \@gaps,
 	'o|outdir=s' => \$outdir,
+	'threads=i' => \$threads,
 	'no_map' => \$nomap,
 	'resume' => \$resume,
 	'asm=i' => \$asm,
@@ -366,6 +369,7 @@ system("
 	$path/get_paf.pl \\
 	  --fasta $genome_dir/*.fasta \\
 	  --outdir $minimap2_dir \\
+	  --threads $threads \\
 	  $resume_flag \\
 	  $asm_flag
 ") == 0 or checksig();
