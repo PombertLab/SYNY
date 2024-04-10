@@ -574,7 +574,7 @@ By default, the barplots are formatted for a widescreen (landscape) output (widt
 
 #### Dotplots
 
-If pairwise genome alignments are performed with [minimap2](https://github.com/lh3/minimap2), by default, dotplot-like scatter plots will be generated from the minimap2-generated PAF alignment files with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/). If desired, this step can be skipped entirely with the `--no_dotplot` command line switch.
+Unless the `--no_dotplot` command line switch is invoked, dotplots will be generated with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/) from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY, (e.g. `.gap_0.`).
 
 ##### Example of a dotplot generated from minimap2 PAF files using defaults settings:
 
@@ -582,7 +582,7 @@ If pairwise genome alignments are performed with [minimap2](https://github.com/l
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.mmap.1e5.19.2x10.8.blue.png">
 </p>
 
-In these dotplots, each chromosome/contig from the query is plotted as a column (x-axis) against each chromosome/contig from the subject (y-axis). In the above example, a total of 196 subplots (14 x 14 chromosomes) are plotted using matplotlib's [subplot](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html) function. In these plots, matches identified with minimap2 are scatter-plotted using the selected color (defaut: blue), with repeated loci indicated by the presence of matches across two or more contigs/chromosomes.
+In these dotplots, each chromosome/contig from the query is plotted as a column (x-axis) against each chromosome/contig from the subject (y-axis). In the above example, a total of 196 subplots (14 x 14 chromosomes) are plotted using matplotlib's [subplot](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html) function. In these plots, matches are plotted using the selected color (defaut: blue), with repeated loci indicated by the presence of matches across two or more contigs/chromosomes.
 
 Because large numbers quickly overlap in the small subplots, to improve legibility, numbers in the x and y axes are scaled down using a desired scale with the `--multi` command line switch (default: 1e5). For example:
 ```bash
