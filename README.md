@@ -332,7 +332,8 @@ The contents of the subdirectories are:
 		- BLASTP databases
 	- Round-robin BLASTP results (.diamond.6)
 - DOTPLOTS:
-	- Dotplots (in PNG/SVG format) generated from the minimap2 PAF alignments
+	- Dotplots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+  - Dotplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
 - GENOME:
 	- FASTA files containing the sequences of the investigated genomes
 - HEATMAPS:
@@ -578,7 +579,7 @@ If pairwise genome alignments are performed with [minimap2](https://github.com/l
 ##### Example of a dotplot generated from minimap2 PAF files using defaults settings:
 
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.19.2x10.8.blue.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.mmap.1e5.19.2x10.8.blue.png">
 </p>
 
 In these dotplots, each chromosome/contig from the query is plotted as a column (x-axis) against each chromosome/contig from the subject (y-axis). In the above example, a total of 196 subplots (14 x 14 chromosomes) are plotted using matplotlib's [subplot](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html) function. In these plots, matches identified with minimap2 are scatter-plotted using the selected color (defaut: blue), with repeated loci indicated by the presence of matches across two or more contigs/chromosomes.
@@ -615,7 +616,7 @@ run_syny.pl \
 ```
 
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.1e5.19.2x10.8.husl.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.mmap.1e5.19.2x10.8.husl.png">
 </p>
 
 #### PAF metrics
