@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1f'
-updated = '2024-04-09'
+version = '0.2a'
+updated = '2024-04-10'
 name = 'paf_to_barplot.py'
 
 import sys
 import os
+import re
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -31,6 +32,7 @@ COMMAND    {name} \\
 
 OPTIONS:
 -p (--paf)      PAF file(s) to plot
+-f (--fasta)    FASTA files used to generate PAF alignments
 -o (--outdir)   Output directory [Default: ./]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
@@ -53,6 +55,7 @@ if (len(sys.argv) <= 1):
 
 cmd = argparse.ArgumentParser(add_help=False)
 cmd.add_argument("-p", "--paf", nargs='*')
+cmd.add_argument("-f", "--fasta", nargs='*')
 cmd.add_argument("-o", "--outdir", default='./')
 cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
@@ -63,6 +66,7 @@ cmd.add_argument("-m", "--mono")
 args = cmd.parse_args()
 
 paf_files = args.paf
+fasta_files = args.fasta
 outdir = args.outdir
 height = args.height
 width = args.width
@@ -88,6 +92,36 @@ for dir in subdirs:
             sys.exit(f"Can't create directory {dir}...")
 
 ################################################################################
+## Parsing FASTA file(s) 
+################################################################################
+
+len_dict = {}
+
+if fasta_files is not None:
+
+    for fasta in fasta_files:
+
+        basename = os.path.basename(fasta)
+        x = re.search(r'(\S+)\.fasta', basename)
+        if x:
+            basename = x.group(1)
+            len_dict[basename] = {}
+
+        seqname = None
+        with open(fasta) as f:
+
+            for line in f:
+
+                m = re.search(r'>(\S+)', line)
+
+                if m:
+                    seqname = m.group(1)
+                    len_dict[basename][seqname] = 0
+                else:
+                    length = len(line)
+                    len_dict[basename][seqname] += length
+
+################################################################################
 ## Parsing and plotting PAF file(s) 
 ################################################################################
 
@@ -95,9 +129,22 @@ print(f"\n" + f"Creating Barplots:\n")
 
 for paf in paf_files:
 
+    basename = os.path.basename(paf)
+    qfile = None
+    sfile = None
+
+    m = re.search(r'^(\w+)_vs_(\w+)', basename)
+    if m:
+        sfile = m.group(1)
+        qfile = m.group(2)
+
+    dataframe = {}
     query_len_dict = {}
     subject_len_dict = {}
-    dataframe = {}
+
+    if fasta_files is not None:
+        query_len_dict = len_dict[qfile]
+        subject_len_dict = len_dict[sfile]
 
     with open(paf) as file:
 
@@ -117,8 +164,9 @@ for paf in paf_files:
             s_start = int(data[7])
             s_end = int(data[8])
 
-            query_len_dict[query] = query_len
-            subject_len_dict[subject] = subject_len
+            if fasta_files is None:
+                query_len_dict[query] = query_len
+                subject_len_dict[subject] = subject_len
 
             if query not in dataframe:
                 dataframe[query] = {}
@@ -162,7 +210,7 @@ for paf in paf_files:
     dlegend = {}
     for subject in reversed(sorted(subject_len_dict.keys())):
 
-        for query in sorted(dataframe.keys()):
+        for query in sorted(query_len_dict.keys()):
 
             ccolor = palette[cnum]
             if monochrome:
@@ -175,11 +223,11 @@ for paf in paf_files:
 
             cnum += 1
 
-            if subject in dataframe[query].keys():
-
-                for start in dataframe[query][subject].keys():
-                    end = dataframe[query][subject][start]
-                    ax.add_patch(Rectangle((start, x), end, 1, color=ccolor))
+            if query in dataframe:
+                if subject in dataframe[query]:
+                    for start in dataframe[query][subject]:
+                        end = dataframe[query][subject][start]
+                        ax.add_patch(Rectangle((start, x), end, 1, color=ccolor))
 
         x += 2
         cnum = 0

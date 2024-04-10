@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.4'
-updated = '2024-04-09'
+version = '0.4a'
+updated = '2024-04-10'
 name = 'paf_to_dotplot.py'
 
 import sys
 import os
+import re
 import matplotlib
 import matplotlib.pyplot as plt
 import argparse
@@ -31,12 +32,14 @@ COMMAND    {name} \\
 
 OPTIONS:
 -p (--paf)      PAF file(s) to plot
+-f (--fasta)    FASTA files used to generate PAF alignments
 -o (--outdir)   Output directory [Default: ./]
 -u (--unit)     Units divider [Default: 1e5]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
 -c (--color)    Color [Default: blue]
 -n (--noticks)  Turn off ticks on x and y axes
+-x (--affix)    Add affix to filename
 -a (--palette)  Use a color palette (e.g. Spectral) instead
                 of a monochrome plot
 --wdis          Horizontal distance (width) between subplots [Default: 0.05]
@@ -54,11 +57,13 @@ if (len(sys.argv) <= 1):
 
 cmd = argparse.ArgumentParser(add_help=False)
 cmd.add_argument("-p", "--paf", nargs='*')
+cmd.add_argument("-f", "--fasta", nargs='*')
 cmd.add_argument("-o", "--outdir", default='./')
 cmd.add_argument("-u", "--unit", default='1e5')
 cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
 cmd.add_argument("-c", "--color", default='blue')
+cmd.add_argument("-x", "--affix")
 cmd.add_argument("-a", "--palette")
 cmd.add_argument("-n", "--noticks", action='store_true')
 cmd.add_argument("--wdis", default=0.05)
@@ -66,11 +71,13 @@ cmd.add_argument("--hdis", default=0.1)
 args = cmd.parse_args()
 
 paf_files = args.paf
+fasta_files = args.fasta
 outdir = args.outdir
 unit = args.unit
 height = args.height
 width = args.width
 ccolor = args.color
+affix = args.affix
 color_palette = args.palette
 noticks = args.noticks
 wdis = args.wdis
@@ -93,14 +100,57 @@ for dir in subdirs:
             sys.exit(f"Can't create directory {dir}...")
 
 ################################################################################
+## Parsing FASTA file(s) 
+################################################################################
+
+len_dict = {}
+
+if fasta_files is not None:
+
+    for fasta in fasta_files:
+
+        basename = os.path.basename(fasta)
+        x = re.search(r'(\S+)\.fasta', basename)
+        if x:
+            basename = x.group(1)
+            len_dict[basename] = {}
+
+        seqname = None
+        with open(fasta) as f:
+
+            for line in f:
+
+                m = re.search(r'>(\S+)', line)
+
+                if m:
+                    seqname = m.group(1)
+                    len_dict[basename][seqname] = 0
+                else:
+                    length = len(line)
+                    len_dict[basename][seqname] += length
+
+################################################################################
 ## Parsing and plotting PAF file(s) 
 ################################################################################
 
 for paf in paf_files:
 
+    basename = os.path.basename(paf)
+    qfile = None
+    sfile = None
+
+    m = re.search(r'^(\w+)_vs_(\w+)', basename)
+    if m:
+        sfile = m.group(1)
+        qfile = m.group(2)
+
+    dataframe = {}
     query_len_dict = {}
     subject_len_dict = {}
-    dataframe = {}
+
+    if fasta_files is not None:
+        query_len_dict = len_dict[qfile]
+        subject_len_dict = len_dict[sfile]
 
     with open(paf) as file:
 
@@ -127,8 +177,9 @@ for paf in paf_files:
             s_start = int(data[7])
             s_end = int(data[8])
 
-            query_len_dict[query] = query_len
-            subject_len_dict[subject] = subject_len
+            if fasta_files is None:
+                query_len_dict[query] = query_len
+                subject_len_dict[subject] = subject_len
 
             if query not in dataframe:
                 dataframe[query] = {}
@@ -145,7 +196,6 @@ for paf in paf_files:
     output = basename
 
     acolor = ccolor
-    affix = unit
 
     if color_palette:
         acolor = color_palette
@@ -153,8 +203,12 @@ for paf in paf_files:
     if noticks:
         affix = 'noticks'
 
-    pngfile = pngdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + f".{width}x{height}" + f".{acolor}" + '.png'
-    svgfile = svgdir + '/' + output.rsplit('.', 1)[0] + f".{affix}" + f".{width}x{height}" + f".{acolor}" + '.svg'
+    suffix = ''
+    if affix is not None:
+        suffix = '.' + affix
+
+    pngfile = pngdir + '/' + output.rsplit('.', 1)[0] + suffix + f".{unit}" + f".{width}x{height}" + f".{acolor}" + '.png'
+    svgfile = svgdir + '/' + output.rsplit('.', 1)[0] + suffix + f".{unit}" + f".{width}x{height}" + f".{acolor}" + '.svg'
 
     ##### Plotting
     x_axes_total = int(len(query_len_dict))
@@ -263,23 +317,25 @@ for paf in paf_files:
                         axes[ynum,xnum].get_yaxis().set_visible(False)
 
                 # subplots data
-                if subject in dataframe[query].keys():
+                if query in dataframe:
 
-                    for x in dataframe[query][subject]:
+                    if subject in dataframe[query]:
 
-                        x1 = dataframe[query][subject][x][0]
-                        y1 = dataframe[query][subject][x][1]
+                        for x in dataframe[query][subject]:
 
-                        # 1-dimensional array
+                            x1 = dataframe[query][subject][x][0]
+                            y1 = dataframe[query][subject][x][1]
+
+                            # 1-dimensional array
+                            if ((x_axes_total == 1) or (y_axes_total == 1)):
+                                axes[znum].plot([x / divider for x in x1], [y / divider for y in y1], color=ccolor)
+
+                            # multidimensional array
+                            else:
+                                axes[ynum,xnum].plot([x / divider for x in x1], [y / divider for y in y1], color=ccolor)
+
                         if ((x_axes_total == 1) or (y_axes_total == 1)):
-                            axes[znum].plot([x / divider for x in x1], [y / divider for y in y1], color=ccolor)
-
-                        # multidimensional array
-                        else:
-                            axes[ynum,xnum].plot([x / divider for x in x1], [y / divider for y in y1], color=ccolor)
-
-                    if ((x_axes_total == 1) or (y_axes_total == 1)):
-                        znum += 1
+                            znum += 1
 
                 ynum += 1
 
