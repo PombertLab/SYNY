@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.8b';
-my $updated = '2024-04-10';
+my $version = '0.5.8c';
+my $updated = '2024-04-11';
 
 use strict;
 use warnings;
@@ -379,7 +379,7 @@ system("
 print ERROR "\n### paf2links.pl ###\n";
 
 my $paf_dir = "$minimap2_dir/PAF";
-my $paf_links = "$circos_cat_dir/paf_links.txt";
+my $paf_links = "$circos_cat_dir/concatenated.mmap.links";
 
 system("
 	$path/paf2links.pl \\
@@ -871,7 +871,7 @@ if ($unit){
 
 my $gap = $gaps[0];
 
-# Running nucleotide_biases.pl
+## Running nucleotide_biases.pl
 system("
 	$circos_path/nucleotide_biases.pl \\
 	--outdir $outdir/CIRCOS \\
@@ -893,84 +893,37 @@ system("
 	2>> $outdir/error.log
 ") == 0 or checksig();
 
-unless ($nomap){
-
-	## Creating configuration files with PAF-inferred links
-	my $circos_conf_f = "$outdir/CIRCOS/concatenated/concatenated.conf";
-	my $circos_conf_f_paf = "$outdir/CIRCOS/concatenated/concatenated.paf.conf";
-	open S_CONF_F, '<', $circos_conf_f or die "Can't read $circos_conf_f: $!\n";
-	open P_CONF_F, '>', $circos_conf_f_paf or die "Can't create $circos_conf_f_paf: $!\n";
-
-	while (my $line = <S_CONF_F>){
-		if ($line =~ /^file.*.links$/){
-			print P_CONF_F "file          = $paf_links"."\n";
-		}
-		else {
-			print P_CONF_F $line."\n";
-		}
-	}
-
-	my $circos_conf_i = "$outdir/CIRCOS/concatenated/concatenated.inverted.conf";
-	my $circos_conf_i_paf = "$outdir/CIRCOS/concatenated/concatenated.inverted.paf.conf";
-	open S_CONF_I, '<', $circos_conf_i or die "Can't read $circos_conf_i: $!\n";
-	open P_CONF_I, '>', $circos_conf_i_paf or die "Can't create $circos_conf_i_paf: $!\n";
-
-	while (my $line = <S_CONF_I>){
-		chomp $line;
-		if ($line =~ /^file.*.links$/){
-			print P_CONF_I "file          = $paf_links"."\n";
-		}
-		else {
-			print P_CONF_I $line."\n";
-		}
-	}
-
+## Create circos configuration files per links file
+foreach my $num (@gaps){
+	my $gap = 'gap_'.$num;
+	circos_conf($gap);
 }
 
-# Running Circos
+unless ($nomap){
+	circos_conf('mmap');
+}
+
+## Running Circos
+my $circos_plot_dir = $outdir.'/CIRCOS_PLOTS';
+
 if ($circos){
 
 	print "\n##### Generating Circos plots\n";
 
-	my $syny_normal_circos = "$circos_prefix.syny.normal.png";
-	my $syny_invert_circos = "$circos_prefix.syny.inverted.png";
-	my $paf_normal_circos = "$circos_prefix.paf.normal.png";
-	my $paf_invert_circos = "$circos_prefix.paf.inverted.png";
+	unless (-d $circos_plot_dir){
+		mkdir ($circos_plot_dir,0755) or die "Can't create $circos_plot_dir: \n";
+	}
 
-	## Synteny inferred with SYNY
-	print "\nRunning Circos on genotype (syny; normal): $syny_normal_circos\n\n";
-
-	system ("
-	  circos \\
-	  -conf $outdir/CIRCOS/concatenated/concatenated.conf \\
-	  -outputdir $outdir \\
-	  -outputfile $syny_normal_circos");
-
-	print "\nRunning Circos on genotype (syny; inverted): $syny_invert_circos\n\n";
-
-	system ("
-	  circos \\
-	  -conf $outdir/CIRCOS/concatenated/concatenated.inverted.conf \\
-	  -outputdir $outdir \\
-	  -outputfile $syny_invert_circos");
+	## Synteny inferred from protein clusters
+	foreach my $num (@gaps){
+		my $affix = 'gap_'.$num;
+		circos_plot($affix);
+	}
 
 	## Synteny inferred from minimap2 PAF files
 	unless ($nomap){
-		print "\nRunning Circos on genotype (paf; normal): $paf_normal_circos\n\n";
-
-		system ("
-		circos \\
-		-conf $outdir/CIRCOS/concatenated/concatenated.paf.conf \\
-		-outputdir $outdir \\
-		-outputfile $paf_normal_circos");
-
-		print "\nRunning Circos on genotype (paf; inverted): $paf_invert_circos\n\n";
-
-		system ("
-		circos \\
-		-conf $outdir/CIRCOS/concatenated/concatenated.inverted.paf.conf \\
-		-outputdir $outdir \\
-		-outputfile $paf_invert_circos");
+		my $affix = 'mmap';
+		circos_plot($affix);
 	}
 
 }
@@ -1027,5 +980,60 @@ sub checksig {
 		print "\nSIGTERM detected: Ctrl+\\ => exiting...\n\n";
 		exit(131);
 	}
+
+}
+
+sub circos_conf {
+
+	my @affix = @_;
+
+	foreach my $affix (shift @affix){
+
+		## Creating Circos configuration file(s) with desired link file
+		my $paf_links  = $outdir.'/CIRCOS/concatenated/concatenated.'.$affix.'.links';
+
+		for my $orientation ('normal', 'inverted'){
+
+			my $circos_conf_f = $outdir.'/CIRCOS/concatenated/concatenated.'.$orientation.'.conf';
+			my $new_conf = $outdir.'/CIRCOS/concatenated/concatenated.'.$affix.'.'.$orientation.'.conf';
+
+				open CONF, '<', $circos_conf_f or die "Can't read $circos_conf_f: $!\n";
+				open NEWCONF, '>', $new_conf or die "Can't create $new_conf: $!\n";
+
+				while (my $line = <CONF>){
+					if ($line =~ /^file.*.links$/){
+						print NEWCONF "file          = $paf_links"."\n";
+					}
+					else {
+						print NEWCONF $line."\n";
+					}
+				}
+
+				close CONF;
+				close NEWCONF;
+
+		}
+
+	}
+
+}
+
+sub circos_plot {
+
+	my $affix = $_[0];
+
+	for my $orientation ('normal', 'inverted'){
+
+			my $circos_plot = "$circos_prefix.$affix.$orientation.png";
+			print "\nRunning Circos ($affix; $orientation): $circos_plot\n\n";
+
+			system ("
+			  circos \\
+			  -conf $outdir/CIRCOS/concatenated/concatenated.$affix.$orientation.conf \\
+			  -outputdir $circos_plot_dir \\
+			  -outputfile $circos_plot
+			");
+
+		}
 
 }
