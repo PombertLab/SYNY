@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.8c';
+my $version = '0.5.8d';
 my $updated = '2024-04-11';
 
 use strict;
@@ -905,13 +905,17 @@ unless ($nomap){
 
 ## Running Circos
 my $circos_plot_dir = $outdir.'/CIRCOS_PLOTS';
+my $circos_png_dir = $circos_plot_dir.'/PNG';
+my $circos_svg_dir = $circos_plot_dir.'/SVG';
 
 if ($circos){
 
 	print "\n##### Generating Circos plots\n";
 
-	unless (-d $circos_plot_dir){
-		mkdir ($circos_plot_dir,0755) or die "Can't create $circos_plot_dir: \n";
+	for my $dir ($circos_plot_dir, $circos_png_dir, $circos_svg_dir){
+		unless (-d $dir){
+			mkdir ($dir, 0755) or die "Can't create $dir: \n";
+		}
 	}
 
 	## Synteny inferred from protein clusters
@@ -925,6 +929,10 @@ if ($circos){
 		my $affix = 'mmap';
 		circos_plot($affix);
 	}
+
+	# Moving to PNG/SVG subdirs
+	system ("mv $circos_plot_dir/*.png $circos_png_dir/");
+	system ("mv $circos_plot_dir/*.svg $circos_svg_dir/");
 
 }
 
