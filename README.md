@@ -290,6 +290,7 @@ drwx------ 23 jpombert jpombert 4.0K Mar  8 14:45 ..
 drwxr-xr-x  5 jpombert jpombert 4.0K Mar  8 14:45 ALIGNMENTS
 drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 BARPLOTS
 drwxr-xr-x  9 jpombert jpombert 4.0K Mar  8 14:45 CIRCOS
+drwxr-xr-x  9 jpombert jpombert 4.0K Mar  8 14:45 CIRCOS_PLOTS
 drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 CONSERVED
 drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DIAMOND
 drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DOTPLOTS
@@ -301,17 +302,7 @@ drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 SHARED
 drwxr-xr-x  5 jpombert jpombert 4.0K Mar  8 14:45 SYNTENY
 -rw-r--r--  1 jpombert jpombert  182 Mar  8 14:45 error.log
 -rw-r--r--  1 jpombert jpombert  397 Mar  8 14:46 syny.log
--rw-r--r--  1 jpombert jpombert 2.5M Mar  8 14:46 circos.paf.inverted.png
--rw-r--r--  1 jpombert jpombert 3.4M Mar  8 14:46 circos.paf.inverted.svg
--rw-r--r--  1 jpombert jpombert 2.4M Mar  8 14:46 circos.paf.normal.png
--rw-r--r--  1 jpombert jpombert 3.4M Mar  8 14:46 circos.paf.normal.svg
--rw-r--r--  1 jpombert jpombert 1.2M Mar  8 14:46 circos.syny.inverted.png
--rw-r--r--  1 jpombert jpombert 3.3M Mar  8 14:46 circos.syny.inverted.svg
--rw-r--r--  1 jpombert jpombert 1.1M Mar  8 14:45 circos.syny.normal.png
--rw-r--r--  1 jpombert jpombert 3.3M Mar  8 14:45 circos.syny.normal.svg
 ```
-
-In the above, Circos colinearity plots inferred from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2) are indicated with the `.paf.` tag. Colinearity plots inferred from shared protein clusters identified with [SYNY](https://github.com/PombertLab/SYNY) are indicated with the `.syny.` tag.
 
 The contents of the subdirectories are:
 - ALIGNMENTS:
@@ -324,6 +315,9 @@ The contents of the subdirectories are:
 	- Barplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
 - CIRCOS:
 	- Configuration files for Circos plots
+- CIRCOS_PLOTS:
+	- Circos plots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+	- Circos plots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
 - CONSERVED:
 	- Lists of proteins that are conserved within the samples (.conserved)
 	- Summaries of all homology results and conservation within the samples (.conserved_summary)
@@ -482,11 +476,11 @@ Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `
 
 #### Circos plots
 
-If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots will be generated from the protein clusters identified with SYNY (`.syny.`) and from the genome alignments computed with minimap2 (`.paf.`), unless the latter alignments are skipped with the `--no_map` option. Two circos plots will be generated for each approach, `.normal` and `.inverted`. In the inverted plots, the contigs/chromosomes from the queried genomes are plotted in a reversed order, from last to first.
+If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and from the genome alignments computed with minimap2 (`.mmap.`), unless the latter alignments are skipped with the `--no_map` option. Two circos plots will be generated for each approach, `.normal` and `.inverted`. In the inverted plots, the contigs/chromosomes from the queried genomes are plotted in a reversed order, from last to first.
 
 ##### Example of an image generated with Circos and SYNY from shared proteins clusters:
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.normal.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.gap_0.normal.png">
 </p>
 
 In this figure, nucleotides biases are plotted in the concentric rings (from outer to inner rings):
@@ -517,7 +511,7 @@ run_syny.pl \
 
 ##### Example of the same Circos plot, this time labelled by contig names intead:
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.normal.names.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.gap_0.normal.names.png">
 </p>
 
 All data and configuration files for the Circos plots are located in the `CIRCOS/` subdirectory. If desired, chromosome labels can be furter adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
@@ -546,14 +540,14 @@ circos \
 
 ##### Example of an image generated with Circos and SYNY from shared proteins clusters (using the inverted karyotype):
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.syny.inverted.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.gap_0.inverted.png">
 </p>
 
 In the inverted karyotype image, the order of the karyotype(s) to be compared to the reference one is reversed. This option can be useful when comparing genomes whose chromosomes have been assigned similar numbers based on various inference methods (this does not appear to be the case in the above example). In such instances, inverting the karyotypes can help improve figure legibility.
 
 ##### Example of an image generated with Circos and SYNY from pairwise genome alignments:
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.paf.normal.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.mmap.normal.png">
 </p>
 
 In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see [Dotplots](https://github.com/PombertLab/SYNY?tab=readme-ov-file#Dotplots) section below).
