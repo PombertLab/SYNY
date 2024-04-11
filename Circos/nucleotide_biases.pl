@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.5e';
-my $updated = '2024-04-03';
+my $version = '0.5f';
+my $updated = '2024-04-11';
 
 use strict;
 use warnings;
@@ -277,7 +277,7 @@ while (my $fasta = shift@fasta){
 # genomes to the reference => sometimes the reversed order is more
 # informative than the normal one
 
-my $cat_kar = $catdir.'/concatenated.genotype';
+my $cat_kar = $catdir.'/concatenated.normal.genotype';
 my $cat_kar_inv = $catdir.'/concatenated.inverted.genotype';
 
 open CONCAT, ">", $cat_kar or die "Can't create $cat_kar: $!\n";
@@ -296,7 +296,7 @@ foreach my $fileprefix (keys (%sequences)){
 
 	## Creating a "karyotype" file for Circos
 	my $circos_dir = $outdir.'/'.$fileprefix;
-	my $circos_kar = $circos_dir.'/'.$fileprefix.'.genotype';
+	my $circos_kar = $circos_dir.'/'.$fileprefix.'.normal.genotype';
 	my $circos_kar_inv = $circos_dir.'/'.$fileprefix.'.inverted.genotype';
 
 	open KAR, ">", $circos_kar or die "Can't create $circos_kar: $!\n";
@@ -525,16 +525,12 @@ for my $genome ((keys %sequences), 'concatenated'){
 
 	my $subdir = $outdir.'/'.$genome;
 	my $subfile = $subdir.'/'.$genome;
-	my $karyotype = $subfile.'.genotype';
-	my $config = $subfile.'.conf';
 
 	## Creating conf files for Circos
 	for my $orientation ('normal', 'inverted'){
 
-		if ($orientation eq 'inverted'){
-			$karyotype = $subfile.'.inverted.genotype';
-			$config = $subfile.'.inverted.conf';
-		}
+		my $karyotype = $subfile.'.'.$orientation.'.genotype';
+		my $config = $subfile.'.'.$orientation.'.conf';
 
 		open my $cg, '>', $config or die "Can't create $config: $!\n";
 
