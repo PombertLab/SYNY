@@ -29,7 +29,7 @@ OPTIONS
 -e (--evalue)	Evalue [Default = 1e-10]
 -o (--outdir)	Diamond searches output directory [Default = DIAMOND]
 -s (--shared)	Shared proteins output directory [Default = SHARED]
--t (--threads)	Number of thread to use [Default = 8]
+-t (--threads)	Number of threads to use [Default = 8]
 EXIT
 
 die("\n$usage\n") unless (@ARGV);
