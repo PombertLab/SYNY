@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.8d';
-my $updated = '2024-04-11';
+my $version = '0.5.9';
+my $updated = '2024-04-12';
 
 use strict;
 use warnings;
@@ -329,6 +329,11 @@ if ($monobar){
 	$monobar_flag = "--mono $monobar";
 }
 
+my $dotpal_flag = '';
+if ($dotpalette){
+	$dotpal_flag = "--palette $dotpalette";
+}
+
 ###################################################################################################
 ## Get PAF files with minimap2
 ###################################################################################################
@@ -426,13 +431,14 @@ for my $paf_file (@paf_files){
 }
 
 ###################################################################################################
-## Creating barplots/dotplots from minimap2 PAF files
+## Creating barplots/dotplots/heatmaps from minimap2 PAF files
 ###################################################################################################
 
 print ERROR "\n### paf_to_barplot.py (minimap2) ###\n";
 
 my $barplot_dir = "$outdir/BARPLOTS";
 my $dotplot_dir = "$outdir/DOTPLOTS";
+my $paf_hm_dir = "$outdir/HEATMAPS";
 
 system("
 	$path/paf_to_barplot.py \\
@@ -450,15 +456,9 @@ system("
 ") == 0 or checksig();
 
 # Doplots
-my $dotpal_flag = '';
-if ($dotpalette){
-	$dotpal_flag = "--palette $dotpalette";
-}
-
 unless ($no_dotplot){
 
 	print ERROR "\n### paf_to_dotplot.py (minimap2) ###\n";
-
 	print "\nCreating Dotplots:\n";
 
 	system("
@@ -478,6 +478,22 @@ unless ($no_dotplot){
 		2>> $outdir/error.log
 	") == 0 or checksig();
 }
+
+print ERROR "\n### paf_to_hm.py (minimap2) ###\n";
+print "\nCreating heatmaps (minimap2):\n";
+
+system("
+	$path/paf_to_heatmap.py \\
+	--paf $paf_dir/*.paf \\
+	--fasta $genome_dir/*.fasta \\
+	--outdir $paf_hm_dir \\
+	--height $hheight \\
+	--width $hwidth \\
+	--palette $hmpalette \\
+	--matrix $minimap2_dir/paf_matrix.tsv \\
+	2>> $outdir/error.log
+") == 0 or checksig();
+
 
 ###################################################################################################
 ## Run get_homology.pl
@@ -791,6 +807,7 @@ foreach my $gap (keys %matrices){
 ### Create cluster summary table as heatmap with matplotlib
 
 print ERROR "\n### protein_cluster_hm.py ###\n";
+print "\nCreating heatmaps (SYNY):\n";
 
 my $hm_dir = $outdir.'/HEATMAPS';
 foreach my $gap (@gaps){
