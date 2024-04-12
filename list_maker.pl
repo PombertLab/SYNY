@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.3b';
-my $updated = '2024-03-27';
+my $version = '0.5.4';
+my $updated = '2024-04-12';
 
 use strict;
 use warnings;
@@ -106,25 +106,21 @@ foreach my $input_file (@input_files){
 		my %location_data;
 		my %features;
 		my %genome;
+		my %isoform; ## Keeping track of isoforms with identical locus tags
 
 		my $seq_flag;
 		my $contig;
-
 		my $gene;
 		my $CDS;
 		my $translate;
 		my $section;
-		
 		my $start;
 		my $sections;
 		my $end;
 		my $strand;
 		my $locus;
-
 		my $gene_num = 1;
-
 		my $sequence;
-
 		my $incomplete_product_name;
 
 		while (my $line = <GBK>){
@@ -202,26 +198,31 @@ foreach my $input_file (@input_files){
 
 						my ($start,$end,$strand) = @{$location_data{$locus}};
 
-						print OUT $locus."\t";
-						print OUT $contig."\t";
-						print OUT $start."\t";
-						print OUT $end."\t";
-						print OUT $strand."\t";
-						print OUT $gene_num."\t";
+						unless (exists $isoform{$locus}){
 
-						if (!defined $features{$locus}{'product'}){
-							$features{$locus}{'product'} = 'undefined product in accession';
+							$isoform{$locus} = '';
+							print OUT $locus."\t";
+							print OUT $contig."\t";
+							print OUT $start."\t";
+							print OUT $end."\t";
+							print OUT $strand."\t";
+							print OUT $gene_num."\t";
+
+							if (!defined $features{$locus}{'product'}){
+								$features{$locus}{'product'} = 'undefined product in accession';
+							}
+							print OUT $features{$locus}{'product'}."\n";
+
+							print PROT ">$locus \[$features{$locus}{'product'}\]\n"; #\t$contig\t$start\t$end\t$strand\n";
+							foreach my $line (unpack("(A60)*",$sequence)){
+								print PROT "$line\n";
+							}
+
+							undef $translate;
+							undef $sequence;
+							$gene_num ++;
 						}
-						print OUT $features{$locus}{'product'}."\n";
 
-						print PROT ">$locus \[$features{$locus}{'product'}\]\n"; #\t$contig\t$start\t$end\t$strand\n";
-						foreach my $line (unpack("(A60)*",$sequence)){
-							print PROT "$line\n";
-						}
-
-						undef $translate;
-						undef $sequence;
-						$gene_num ++;
 					}
 				}
 			}
