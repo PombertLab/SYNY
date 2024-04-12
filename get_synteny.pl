@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 my $name = 'get_synteny.pl';
-my $version = '0.7.2c';
-my $updated = '2024-04-08';
+my $version = '0.7.3';
+my $updated = '2024-04-12';
 
 use strict;
 use warnings;
@@ -77,7 +77,12 @@ my $cluster_file = ${query_name}."_vs_".${sub_name}.'.gap_'.$gap.'.clusters';
 ###################################################################################################
 
 open QB, "<", $query_blast or die "Unable to read from $query_blast: $!\n";
+
 my %q_blast_hits;
+my @blast_order = (); ## Must keep track of the input order
+                      ## Sorting keys alphanumerically can break
+                      ## depending on the structure of the locus tags!
+
 while (my $line = <QB>){
 	chomp($line);
 	my @data = split("\t",$line);
@@ -86,6 +91,7 @@ while (my $line = <QB>){
 	my $e_value = $data[10];
 	unless($q_blast_hits{$s_locus}){
 		@{$q_blast_hits{$s_locus}} = ($q_locus,$e_value);
+		push(@blast_order, $q_locus);
 	}
 	elsif($e_value < @{$q_blast_hits{$s_locus}}[1]){
 		@{$q_blast_hits{$s_locus}} = ($q_locus,$e_value);
@@ -179,8 +185,8 @@ my $p_sn;
 
 open OUT, ">", $pair_dir."/".$pair_file or die "Unable to read from $pair_dir/$pair_file: $!\n";
 
-foreach my $q_locus (sort(keys(%q_bd_hits))){
-	
+foreach my $q_locus (@blast_order){
+
 	## Current query locus
 	my $c_ql = $q_locus;
 	## Current query chromosome
