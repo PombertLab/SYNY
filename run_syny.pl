@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.9';
+my $version = '0.5.9a';
 my $updated = '2024-04-12';
 
 use strict;
@@ -36,7 +36,7 @@ OPTIONS (MAIN):
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
---threads	Number of threads for minimap2 [Default: 8]
+--threads	Number of threads for minimap2/diamond [Default: 8]
 --asm		Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
@@ -338,19 +338,19 @@ if ($dotpalette){
 ## Get PAF files with minimap2
 ###################################################################################################
 
+my $genome_dir = "$outdir/GENOME";
+my $minimap2_dir = "$outdir/ALIGNMENTS";
+my $circos_dir = "$outdir/CIRCOS";
+my $circos_cat_dir = "$outdir/CIRCOS/concatenated";
+
 # Skip minimap if requested 
 if ($nomap){
 	goto HOMOLOGY;
 }
 
+## Running minimap2 with get_paf.pl
 print "\n##### Infering colinearity from pairwise genome alignments\n";
-
 print ERROR "\n### get_paf.pl ###\n";
-
-my $genome_dir = "$outdir/GENOME";
-my $minimap2_dir = "$outdir/ALIGNMENTS";
-my $circos_dir = "$outdir/CIRCOS";
-my $circos_cat_dir = "$outdir/CIRCOS/concatenated";
 
 unless (-d $circos_dir){
 	mkdir ($circos_dir, 0755) or die "Can't create $circos_dir: $!\n";
@@ -359,7 +359,6 @@ unless (-d $circos_cat_dir){
 	mkdir ($circos_cat_dir, 0755) or die "Can't create $circos_cat_dir: $!\n";
 }
 
-## Running minimap2 with get_paf.pl
 my $asm_flag = '';
 if ($asm){
 	$asm_flag = "--asm $asm";
@@ -522,6 +521,7 @@ system("
 	$path/get_homology.pl \\
 	--input @prot_files \\
 	--evalue $evalue \\
+	--threads $threads \\
 	--outdir $diamond_dir \\
 	--shared $shared_dir \\
 	--list $list_dir \\
