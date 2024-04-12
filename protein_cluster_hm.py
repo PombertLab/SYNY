@@ -2,12 +2,11 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.2c'
-updated = '2024-03-30'
+version = '0.2d'
+updated = '2024-04-12'
 
 import sys
 import os
-import matplotlib
 import matplotlib.pyplot as plt
 import argparse
 import re
@@ -33,7 +32,7 @@ COMMAND    {name} \\
 OPTIONS:
 -t (--tsv)      Matrix in TSV format, e.g. matrix_gap_0.tsv
 -o (--outdir)   Output directory [Default: ./HEATMAPS]
--p (--palette)  Color palette [Default: crest]
+-p (--palette)  Color palette [Default: winter_r]
 -h (--height)   Figure height in inches [Default: 10]
 -w (--width)    Figure width in inches [Default: 10]
 """
@@ -52,7 +51,7 @@ cmd.add_argument("-t", "--tsv")
 cmd.add_argument("-o", "--outdir", default='./HEATMAPS')
 cmd.add_argument("-h", "--height", default=10)
 cmd.add_argument("-w", "--width", default=10)
-cmd.add_argument("-p", "--palette", default='crest')
+cmd.add_argument("-p", "--palette", default='winter_r')
 args = cmd.parse_args()
 
 tsv_file = args.tsv
@@ -76,7 +75,7 @@ for dir in [outdir,pngdir,svgdir]:
             sys.exit(f"Can't create directory {dir}...")
 
 ################################################################################
-## ### 
+## Plotting heatmaps 
 ################################################################################
 
 plt.rcParams["figure.figsize"] = (width,height)
@@ -105,9 +104,13 @@ with open (tsv_file) as f:
     )
 
     cm.fig.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
+    print(f"Creating {clustered_png}")
+    print(f"Creating {clustered_svg}")
     plt.savefig(clustered_png)
     plt.savefig(clustered_svg)
-    plt.close()
+    plt.close('all')
+
+
 
     ## Normal heatmaps
     hm = sns.heatmap(
@@ -118,6 +121,8 @@ with open (tsv_file) as f:
     )
 
     hm.figure.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
+    print(f"Creating {heatmap_png}")
+    print(f"Creating {heatmap_svg}")
     plt.savefig(heatmap_png)
     plt.savefig(heatmap_svg)
-    plt.close()
+    plt.close('all')
