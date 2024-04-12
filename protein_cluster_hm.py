@@ -2,7 +2,7 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.2d'
+version = '0.2e'
 updated = '2024-04-12'
 
 import sys
@@ -103,7 +103,7 @@ with open (tsv_file) as f:
         fmt='.1f'
     )
 
-    cm.fig.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
+    cm.fig.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
     print(f"Creating {clustered_png}")
     print(f"Creating {clustered_svg}")
     plt.savefig(clustered_png)
@@ -120,7 +120,7 @@ with open (tsv_file) as f:
         fmt='.1f'
     )
 
-    hm.figure.suptitle(f"% of proteins found in clusters (gap = 0)", x=0.5, y=0.95)
+    hm.figure.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
     print(f"Creating {heatmap_png}")
     print(f"Creating {heatmap_svg}")
     plt.savefig(heatmap_png)
