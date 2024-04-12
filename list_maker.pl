@@ -198,7 +198,7 @@ foreach my $input_file (@input_files){
 
 						my ($start,$end,$strand) = @{$location_data{$locus}};
 
-						unless (exists $isoform{$locus}){
+						unless (exists $isoform{$locus}){ ## Keeping only the first isoform
 
 							$isoform{$locus} = '';
 							print OUT $locus."\t";
