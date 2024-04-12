@@ -2,8 +2,8 @@
 ## Pombert Lab, 2022
 
 my $name = "get_homology.pl";
-my $version = "0.1.6e";
-my $updated = "2024-03-07";
+my $version = "0.1.7";
+my $updated = "2024-04-12";
 
 use warnings;
 use strict;
@@ -29,6 +29,7 @@ OPTIONS
 -e (--evalue)	Evalue [Default = 1e-10]
 -o (--outdir)	Diamond searches output directory [Default = DIAMOND]
 -s (--shared)	Shared proteins output directory [Default = SHARED]
+-t (--threads)	Number of thread to use [Default = 8]
 EXIT
 
 die("\n$usage\n") unless (@ARGV);
@@ -42,13 +43,15 @@ my $e_value = "1e-10";
 my $outdir = "DIAMOND";
 my $shared_dir = "SHARED";
 my $list_dir = "LISTS";
+my $threads = 8;
 
 GetOptions(
 	'i|input=s@{2,}' => \@input_files,
 	'e|evalue=s' => \$e_value,
 	'o|outdir=s' => \$outdir,
 	's|shared=s' => \$shared_dir,
-	'l|list=s' => \$list_dir
+	'l|list=s' => \$list_dir,
+	't|threads=i' => \$threads
 );
 
 my $diamond_version = `which diamond`;
@@ -88,6 +91,7 @@ foreach my $file (@input_files){
 		print "\t$file_name\n";
 		system ("
 			diamond makedb \\
+			  --threads $threads \\
 			  --in $file \\
 			  --db $db_dir/$file_prefix \\
 			  --quiet
@@ -122,6 +126,7 @@ foreach my $file (sort(@input_files)){
 
 			unless(-f $blast_file){
 				system ("diamond blastp \\
+						--threads $threads \\
 						-d $db_files{$db_prefix} \\
 						-q $file \\
 						-o $blast_file \\
