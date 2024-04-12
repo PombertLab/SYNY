@@ -8,8 +8,8 @@ use Cwd qw(abs_path);
 use Getopt::Long qw(GetOptions);
 
 my $name = 'get_paf.pl';
-my $version = '0.3e';
-my $updated = '2024-04-10';
+my $version = '0.3f';
+my $updated = '2024-04-12';
 
 my $usage =<<"USAGE";
 NAME        ${name}
@@ -118,9 +118,9 @@ foreach my $query (@fasta){
 
             # Minimap2 PAF, MAF and ALN (BLAST-like) output files
             my $tmp_paf_outfile = $paf_dir.'/'.$bquery.'_vs_'.$btarget.'.tmp.paf';
-            my $paf_outfile = $paf_dir.'/'.$bquery.'_vs_'.$btarget.'.paf';
-            my $maf_outfile = $maf_dir.'/'.$bquery.'_vs_'.$btarget.'.maf';
-            my $blast_outfile = $blast_dir.'/'.$bquery.'_vs_'.$btarget.'.aln';
+            my $paf_outfile = $paf_dir.'/'.$bquery.'_vs_'.$btarget.'.mmap.paf';
+            my $maf_outfile = $maf_dir.'/'.$bquery.'_vs_'.$btarget.'.mmap.maf';
+            my $blast_outfile = $blast_dir.'/'.$bquery.'_vs_'.$btarget.'.mmap.aln';
 
             my $map_time_start = time;
 
