@@ -25,19 +25,17 @@ USAGE		$name \\
 		  -sb CCMP_vs_RCC.diamond.blastp.6
 		  -gap 10 \\
 		  -o RCCvsCCMP \\
-		  -list_dir LISTS
 
-OPTIONS:
-*query and subject files must correspond to qseqid and sseqid respectively*
--ql (--query_list)		List (.list) file from query organism generated with list_maker.pl
--qb (--query_blast)		BLAST/DIAMOND homology searches in output format 6 for query_vs_subject
--sl (--subject_list)		List (.list) file from subject organism generated with list_maker.pl
--sb (--subject_blast)		BLAST/DIAMOND homology searches in output format 6 for subject_vs_query
+OPTIONS: ### query and subject files must correspond to qseqid and sseqid respectively
+-ql (--query_list)	List (.list) file from query organism generated with list_maker.pl
+-qb (--query_blast)	BLAST/DIAMOND homology searches in output format 6 for query_vs_subject
+-sl (--subject_list)	List (.list) file from subject organism generated with list_maker.pl
+-sb (--subject_blast)	BLAST/DIAMOND homology searches in output format 6 for subject_vs_query
 -g (--gap)		Space allowed between adjacent genes [Default: 0]
 -o (--outdir)		Output directory ## Writes detected gene pairs
 -sd (--sumdir)		Summary output directory
---list_dir		Directory cotnaining .list files
 EXIT
+die "\n$usage\n" unless @ARGV;
 
 my $query_list;
 my $query_blast;
@@ -46,7 +44,6 @@ my $subject_blast;
 my $gap = 0;
 my $outdir = 'SYNTENY';
 my $sumdir = $outdir;
-my $list_dir;
 
 GetOptions(
 	'ql|query_list=s' => \$query_list,
@@ -55,8 +52,7 @@ GetOptions(
 	'sb|subject_blast=s' => \$subject_blast,
 	'g|gap=s' => \$gap,
 	'o|outdir=s' => \$outdir,
-	'sd|sumdir=s' => \$sumdir,
-	'list_dir=s' => \$list_dir
+	'sd|sumdir=s' => \$sumdir
 );
 
 my $pair_dir = $outdir."/PAIRS";
@@ -79,20 +75,6 @@ my $cluster_file = ${query_name}."_vs_".${sub_name}.'.gap_'.$gap.'.clusters';
 ###################################################################################################
 ## Parse DIAMOND files for homologs
 ###################################################################################################
-
-### Loading locus_tag information from the query from its list file
-my @loci = ();  ## Must keep track of the input order
-                ## Sorting keys alphanumerically can break
-                ## depending on the structure of the locus tags!
-
-my $list_file = $list_dir.'/'.$query_name.'.list';
-open LIST, '<', $list_file or die "Unable to read from $list_file: $!\n";
-while (my $line = <LIST>){
-	my @data = split("\t", $line);
-	my $locus = $data[0];
-	push(@loci, $locus);
-}
-close LIST;
 
 ### Loading diamond blast result for query
 open QB, "<", $query_blast or die "Unable to read from $query_blast: $!\n";
@@ -149,6 +131,11 @@ foreach my $q_s_locus (keys(%q_blast_hits)){
 ## Store query and subject info locally
 ###################################################################################################
 
+### Loading locus_tag information from the query from its list file
+my @loci = ();  ## Must keep track of the input order
+                ## Sorting keys alphanumerically can break
+                ## depending on the structure of the locus tags!
+
 open QL, "<", $query_list or die "Unable to read from $query_list: $!\n";
 
 my %query_info;
@@ -157,6 +144,7 @@ while (my $line = <QL>){
 	chomp($line);
 	my ($locus,$accession,$start,$end,$strand,$number) = split("\t",$line);
 	@{$query_info{$locus}} = ($accession,$strand,$counter);
+	push(@loci, $locus);
 	$counter += 1;
 }
 

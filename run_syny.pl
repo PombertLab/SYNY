@@ -562,7 +562,6 @@ foreach my $annot_file_1 (sort(@annot_files)){
 					--gap $gap \\
 					--outdir $synteny_dir/gap_$gap \\
 					--sumdir $synteny_dir \\
-					--list_dir $list_dir \\
 					2>> $outdir/error.log
 				") == 0 or checksig();
 			}
