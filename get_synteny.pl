@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 my $name = 'get_synteny.pl';
-my $version = '0.7.3';
-my $updated = '2024-04-12';
+my $version = '0.7.3a';
+my $updated = '2024-04-13';
 
 use strict;
 use warnings;
@@ -24,7 +24,8 @@ USAGE		$name \\
 		  -sl CCMP1205.list \\
 		  -sb CCMP_vs_RCC.diamond.blastp.6
 		  -gap 10 \\
-		  -o RCCvsCCMP
+		  -o RCCvsCCMP \\
+		  -list_dir LISTS
 
 OPTIONS:
 *query and subject files must correspond to qseqid and sseqid respectively*
@@ -35,6 +36,7 @@ OPTIONS:
 -g (--gap)		Space allowed between adjacent genes [Default: 0]
 -o (--outdir)		Output directory ## Writes detected gene pairs
 -sd (--sumdir)		Summary output directory
+--list_dir		Directory cotnaining .list files
 EXIT
 
 my $query_list;
@@ -44,6 +46,7 @@ my $subject_blast;
 my $gap = 0;
 my $outdir = 'SYNTENY';
 my $sumdir = $outdir;
+my $list_dir;
 
 GetOptions(
 	'ql|query_list=s' => \$query_list,
@@ -52,7 +55,8 @@ GetOptions(
 	'sb|subject_blast=s' => \$subject_blast,
 	'g|gap=s' => \$gap,
 	'o|outdir=s' => \$outdir,
-	'sd|sumdir=s' => \$sumdir
+	'sd|sumdir=s' => \$sumdir,
+	'list_dir=s' => \$list_dir
 );
 
 my $pair_dir = $outdir."/PAIRS";
@@ -76,13 +80,23 @@ my $cluster_file = ${query_name}."_vs_".${sub_name}.'.gap_'.$gap.'.clusters';
 ## Parse DIAMOND files for homologs
 ###################################################################################################
 
+### Loading locus_tag information from the query from its list file
+my @loci = ();  ## Must keep track of the input order
+                ## Sorting keys alphanumerically can break
+                ## depending on the structure of the locus tags!
+
+my $list_file = $list_dir.'/'.$query_name.'.list';
+open LIST, '<', $list_file or die "Unable to read from $list_file: $!\n";
+while (my $line = <LIST>){
+	my @data = split("\t", $line);
+	my $locus = $data[0];
+	push(@loci, $locus);
+}
+close LIST;
+
+### Loading diamond blast result for query
 open QB, "<", $query_blast or die "Unable to read from $query_blast: $!\n";
-
 my %q_blast_hits;
-my @blast_order = (); ## Must keep track of the input order
-                      ## Sorting keys alphanumerically can break
-                      ## depending on the structure of the locus tags!
-
 while (my $line = <QB>){
 	chomp($line);
 	my @data = split("\t",$line);
@@ -91,7 +105,6 @@ while (my $line = <QB>){
 	my $e_value = $data[10];
 	unless($q_blast_hits{$s_locus}){
 		@{$q_blast_hits{$s_locus}} = ($q_locus,$e_value);
-		push(@blast_order, $q_locus);
 	}
 	elsif($e_value < @{$q_blast_hits{$s_locus}}[1]){
 		@{$q_blast_hits{$s_locus}} = ($q_locus,$e_value);
@@ -99,6 +112,7 @@ while (my $line = <QB>){
 }
 close QB;
 
+### Loading diamond blast result for subject
 open SB, "<", $subject_blast or die "Unable to read from $subject_blast: $!\n";
 my %s_blast_hits;
 while (my $line = <SB>){
@@ -185,7 +199,7 @@ my $p_sn;
 
 open OUT, ">", $pair_dir."/".$pair_file or die "Unable to read from $pair_dir/$pair_file: $!\n";
 
-foreach my $q_locus (@blast_order){
+foreach my $q_locus (@loci){
 
 	## Current query locus
 	my $c_ql = $q_locus;

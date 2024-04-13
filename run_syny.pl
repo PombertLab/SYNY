@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.9a';
-my $updated = '2024-04-12';
+my $version = '0.5.9b';
+my $updated = '2024-04-13';
 
 use strict;
 use warnings;
@@ -562,6 +562,7 @@ foreach my $annot_file_1 (sort(@annot_files)){
 					--gap $gap \\
 					--outdir $synteny_dir/gap_$gap \\
 					--sumdir $synteny_dir \\
+					--list_dir $list_dir \\
 					2>> $outdir/error.log
 				") == 0 or checksig();
 			}
