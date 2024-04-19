@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.6';
+my $version = '0.6a';
 my $updated = '2024-04-18';
 
 use strict;
@@ -366,25 +366,19 @@ close CONCAT;
 close CONCATINV;
 
 ### Pairwise
-foreach my $fileprefix (keys (%sequences)){
+foreach my $query (keys (%sequences)){
 
 	foreach my $subject (keys (%sequences)){
 
-		my $pairwise_ref;
-		if (($reference eq $fileprefix) or ($reference eq $subject)){
-			$pairwise_ref = $reference;
-		}
-		else {
-			$pairwise_ref = $fileprefix;
-		}
+		my $pairwise_ref = $query; ## Setting the query as the reference in pairwise mode
 
-		if ($fileprefix eq $subject){
+		if ($query eq $subject){
 			next;
 		}
 		else {
 
 			## Creating a "karyotype" file for Circos
-			my $prefix = $fileprefix.'_vs_'.$subject;
+			my $prefix = $query.'_vs_'.$subject;
 			my $subdir = $pairwisedir.'/'.$prefix;
 			unless (-d $subdir){
 				mkdir($subdir,0755) or die "Can't create $subdir: $!\n";
@@ -398,7 +392,7 @@ foreach my $fileprefix (keys (%sequences)){
 			print PAIR '#chr - ID LABEL START END COLOR'."\n";
 			print PAIRINV '#chr - ID LABEL START END COLOR'."\n";
 
-			for my $key ($fileprefix, $subject){
+			for my $key ($query, $subject){
 
 				my @seqs = sort (keys %{$sequences{$key}});
 				my $num_of_seq = scalar (@seqs);
@@ -653,14 +647,7 @@ for my $genome (keys %sequences){
 		## Creating conf files for Circos
 		my $subdir = $pairwisedir.'/'.$genome.'_vs_'.$subject;
 		my $subfile = $subdir.'/'.$genome.'_vs_'.$subject;
-
-		my $pairwise_ref;
-		if (($reference eq $genome) or ($reference eq $subject)){
-			$pairwise_ref = $reference;
-		}
-		else {
-			$pairwise_ref = $genome;
-		}
+		my $pairwise_ref = $genome; ## Setting the query as the reference in pairwise mode
 
 		for my $orientation ('normal', 'inverted'){
 			print_circos_conf($subfile,$orientation,$pairwise_ref,'cat','links');
@@ -760,9 +747,6 @@ sub print_circos_conf {
 
 				## Counting for required colors
 				my $ref_sequence_count = scalar (keys %{$sequences{$pairwise_ref}});
-				if ($orientation eq 'normal'){
-					print "\n"."Total # of sequences in reference $pairwise_ref = $ref_sequence_count"."\n";
-				}
 
 				if ($custom_cc){
 					@color_set = @custom_set;

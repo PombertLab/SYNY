@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.9c';
+my $version = '0.5.9d';
 my $updated = '2024-04-18';
 
 use strict;
@@ -29,7 +29,8 @@ USAGE		${name} \\
 		  -e 1e-10 \\
 		  -g 0 1 5 \\
 		  -o SYNY \\
-		  -r CCMP1205
+		  -r CCMP1205 \\
+		  --circos cat
 
 OPTIONS (MAIN):
 -a (--annot)	GenBank GBF/GBFF Annotation files (GZIP files are supported)
@@ -42,10 +43,10 @@ OPTIONS (MAIN):
 --no_map	Skip minimap2 pairwise genome alignments
 
 OPTIONS (PLOTS):
-### Circos
--c (--circos)	Generate Circos plots automatically - http://circos.ca/
---circos_prefix	Desired Circos plot prefix [Default: circos]
--r (--ref)	Genome to use as reference (defaults to first one alphabetically if none provided)
+### Circos - http://circos.ca/
+-c (--circos)	Generate Circos plots automatically: cat (concatenate), pair (pairwize), all (cat + pair)
+--circos_prefix	Desired Circos plot prefix for concatenated plots [Default: circos]
+-r (--ref)	Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
 -u (--unit)	Size unit (Kb or Mb) [Default: Mb]
 --winsize	Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize	Sliding windows step (nucleotide biases) [Default: 5000]
@@ -153,7 +154,7 @@ GetOptions(
 	'resume' => \$resume,
 	'asm=i' => \$asm,
 	# Circos
-	'c|circos' => \$circos,
+	'c|circos=s' => \$circos,
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
 	'labels=s' => \$labels,
@@ -924,34 +925,49 @@ unless ($nomap){
 
 ## Running Circos
 my $circos_plot_dir = $outdir.'/CIRCOS_PLOTS';
-my $circos_png_dir = $circos_plot_dir.'/PNG';
-my $circos_svg_dir = $circos_plot_dir.'/SVG';
 
 if ($circos){
 
 	print "\n##### Generating Circos plots\n";
 
-	for my $dir ($circos_plot_dir, $circos_png_dir, $circos_svg_dir){
-		unless (-d $dir){
-			mkdir ($dir, 0755) or die "Can't create $dir: \n";
-		}
+	unless (-d $circos_plot_dir){
+			mkdir ($circos_plot_dir, 0755) or die "Can't create $circos_plot_dir: \n";
 	}
 
 	## Synteny inferred from protein clusters
 	foreach my $num (@gaps){
 		my $affix = 'gap_'.$num;
-		circos_plot($affix);
+		if (($circos eq 'cat') or ($circos eq 'all')){
+			circos_plot($affix, 'cat');
+		}
+		if (($circos eq 'pair') or ($circos eq 'all')){
+			circos_plot($affix, 'pair');
+		}
 	}
 
 	## Synteny inferred from minimap2 PAF files
 	unless ($nomap){
 		my $affix = 'mmap';
-		circos_plot($affix);
+		if (($circos eq 'cat') or ($circos eq 'all')){
+			circos_plot($affix, 'cat');
+		}
+		if (($circos eq 'pair') or ($circos eq 'all')){
+			circos_plot($affix, 'pair');
+		}
 	}
 
 	# Moving to PNG/SVG subdirs
-	system ("mv $circos_plot_dir/*.png $circos_png_dir/");
-	system ("mv $circos_plot_dir/*.svg $circos_svg_dir/");
+	if (($circos eq 'cat') or ($circos eq 'all')){
+		my $tmpdir = $circos_plot_dir.'/Concatenated';
+		system ("mv $tmpdir/*.png $tmpdir/PNG/");
+		system ("mv $tmpdir/*.svg $tmpdir/SVG/");
+	}
+
+	if (($circos eq 'pair') or ($circos eq 'all')){
+		my $tmpdir = $circos_plot_dir.'/Pairwise';
+		system ("mv $tmpdir/*.png $tmpdir/PNG/");
+		system ("mv $tmpdir/*.svg $tmpdir/SVG/");
+	}
 
 }
 
@@ -1104,19 +1120,76 @@ sub pairwise_conf {
 sub circos_plot {
 
 	my $affix = $_[0];
+	my $mode = $_[1];
 
-	for my $orientation ('normal', 'inverted'){
+	if ($mode eq 'cat'){
+
+		my $plot_dir = $circos_plot_dir.'/Concatenated';
+		my $plot_dir_png = $plot_dir.'/PNG';
+		my $plot_dir_svg = $plot_dir.'/SVG';
+
+		for my $dir ($plot_dir,$plot_dir_png,$plot_dir_svg){
+			unless (-d $dir){
+				mkdir($dir,0755) or die "Can't create $dir: !$\n";
+			}
+		}
+
+		for my $orientation ('normal', 'inverted'){
 
 			my $circos_plot = "$circos_prefix.$affix.$orientation.png";
 			print "\nRunning Circos ($affix; $orientation): $circos_plot\n\n";
 
 			system ("
 			  circos \\
-			  -conf $outdir/CIRCOS/concatenated/concatenated.$affix.$orientation.conf \\
-			  -outputdir $circos_plot_dir \\
-			  -outputfile $circos_plot
+				-conf $outdir/CIRCOS/concatenated/concatenated.$affix.$orientation.conf \\
+				-outputdir $plot_dir \\
+				-outputfile $circos_plot
 			");
 
 		}
+
+	}
+
+	elsif ($mode eq 'pair'){
+
+		my $plot_dir = $circos_plot_dir.'/Pairwise';
+		my $plot_dir_png = $plot_dir.'/PNG';
+		my $plot_dir_svg = $plot_dir.'/SVG';
+
+		for my $dir ($plot_dir,$plot_dir_png,$plot_dir_svg){
+			unless (-d $dir){
+				mkdir($dir,0755) or die "Can't create $dir: !$\n";
+			}
+		}
+
+		my $pairwisedir = $outdir.'/CIRCOS/pairwise';
+		opendir(PAIRS, $pairwisedir) or die "Can't open $pairwisedir: $!\n";
+		my @pairs;
+		while (my $entry = readdir(PAIRS)){
+			if ($entry =~ /_vs_/){
+				push(@pairs, $entry);
+			}
+		}
+
+		for my $pair (@pairs){
+
+			for my $orientation ('normal', 'inverted'){
+
+				my $conf = $pairwisedir.'/'.$pair.'/'.$pair.'.'.$affix.'.'.$orientation.'.conf';
+				my $circos_plot = "$pair.$affix.$orientation.png";
+				print "\nRunning Circos ($affix; $orientation): $circos_plot\n\n";
+
+				system ("
+				  circos \\
+					-conf $conf \\
+					-outputdir $plot_dir \\
+					-outputfile $circos_plot
+				");
+
+			}
+
+		}
+
+	}
 
 }

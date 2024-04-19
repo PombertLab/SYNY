@@ -238,10 +238,11 @@ OPTIONS (MAIN):
 --no_map        Skip minimap2 pairwise genome alignments
 
 OPTIONS (PLOTS):
-### Circos
--c (--circos)   Generate Circos plots automatically - http://circos.ca/
+### Circos - http://circos.ca/
+-c (--circos)	Generate Circos plots automatically: cat (concatenate), pair (pairwize), all (cat + pair)
+--circos_prefix	Desired Circos plot prefix for concatenated plots [Default: circos]
 --circos_prefix Desired Circos plot prefix [Default: circos]
--r (--ref)      Genome to use as reference (defaults to first one alphabetically if none provided)
+-r (--ref)      Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
 --winsize       Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize      Sliding windows step (nucleotide biases) [Default: 5000]
@@ -381,7 +382,7 @@ run_syny.pl \
   -e 1e-10 \
   -r JEC21 \
   -o $SYNY \
-  --circos \
+  --circos cat \
   --circos_prefix WM276_vs_JEC21
 ```
 
@@ -479,7 +480,7 @@ Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `
 
 #### Circos plots
 
-If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and from the genome alignments computed with minimap2 (`.mmap.`), unless these alignments are skipped with the `--no_map` option. Two circos plots will be generated for each approach, `.normal` and `.inverted`. In the inverted plots, the contigs/chromosomes from the queried genomes are plotted in a reversed order, from last to first.
+If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots (concatenated and/or pairwise) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and from the genome alignments computed with minimap2 (`.mmap.`), unless these alignments are skipped with the `--no_map` option. Two circos plots will be generated for each approach, `.normal` and `.inverted`. In the inverted plots, the contigs/chromosomes from the queried genomes are plotted in a reversed order, from last to first.
 
 ##### Example of an image generated with Circos and SYNY from shared proteins clusters:
 <p align="left">
@@ -505,7 +506,7 @@ run_syny.pl \
   -e 1e-10 \
   -r JEC21 \
   -o $SYNY \
-  --circos \
+  --circos cat \
   --circos_prefix WM276_vs_JEC21 \
   --labels names \
   --label_size 20 \
@@ -669,7 +670,7 @@ run_syny.pl \
   -e 1e-10 \
   -r intestinalis_50506 \
   -o $SYNY \
-  --circos \
+  --circos all \
   --circos_prefix encephalitozoon
 ```
 
@@ -753,6 +754,8 @@ In the above image, links between the reference and the queried genomes are colo
 
 Note that while SYNY can handle multiple genomes, adding too much data can quickly clutter the Circos plots generated. In the above [Circos](https://circos.ca/) plots, each chromosome/contig is plotted as a distinct [ideogram](https://circos.ca/documentation/tutorials/ideograms/ideograms/). Drawing too many ideograms can make the figure illegible and, when comparing genomes featuring many chromosomes/contigs, cluttering can also occur even when comparing a small number of genomes.
 
+If too dense, drawing pairwise (`--circos pair`) circos plots rather concatenated (`--circos cat`) ones should help with readability.
+
 #### Custom Circos colors
 Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files containing color names and their associated RGB values (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Circos/custom_color_1.txt) for an example). A few custom presets are also available to use in SYNY.
 
@@ -768,7 +771,7 @@ run_syny.pl \
   -r intestinalis_50506 \
   -o $SYNY \
   --custom_file $COLORS \
-  --circos \
+  --circos all \
   --circos_prefix encephalitozoon_cc
 ```
 
@@ -797,7 +800,7 @@ run_syny.pl \
   -e 1e-10 \
   -r intestinalis_50506 \
   -o $SYNY \
-  --circos \
+  --circos all \
   --circos_prefix encephalitozoon_blues \
   --custom_preset blues
 ```
