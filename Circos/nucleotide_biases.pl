@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.5f';
-my $updated = '2024-04-11';
+my $version = '0.6';
+my $updated = '2024-04-18';
 
 use strict;
 use warnings;
@@ -25,7 +25,6 @@ COMMAND		$name \\
 		  -winsize 1000 \\
 		  -step 500 \\
 		  -reference CCMP1205 \\
-		  -circos \\
 		  -gap 0 \\
 		  -custom_preset chloropicon
 
@@ -37,8 +36,7 @@ OPTIONS (Main)
 -n (--ncheck)		Check for ambiguous/masked (Nn) nucleotides
 -t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
 
-OPTIONS (Circos)
--c (--circos)		Run Circos to plot images
+OPTIONS (Circos data files options)
 -r (--reference)	Genome reference for Circos plotting
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
 -u (--unit)		Size unit (Kb or Mb) [Default: Mb]
@@ -125,12 +123,14 @@ if ($list_preset){
 
 ### Check if output directory / subdirs can be created
 $outdir =~ s/\/$//;
-unless (-d $outdir) {
-	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
-}
 my $catdir = $outdir.'/concatenated';
-unless (-d $catdir) {
-	make_path($catdir,{mode => 0755}) or die "Can't create $catdir: $!\n";
+my $pairwisedir = $outdir.'/pairwise';
+my $singledir = $outdir.'/single';
+
+for my $dir ($outdir,$catdir,$pairwisedir,$singledir){
+	unless (-d $dir) {
+		make_path($dir,{mode => 0755}) or die "Can't create $dir: $!\n";
+	}
 }
 
 no warnings 'once';
@@ -166,7 +166,7 @@ while (my $fasta = shift@fasta){
 		}
 	}
 
-	my $fasta_dir = "$outdir/$fileprefix";
+	my $fasta_dir = $singledir.'/'.$fileprefix;
 	unless (-d $fasta_dir){
 		mkdir ($fasta_dir,0755) or die "Can't create $fasta_dir: $!\n";
 	}
@@ -186,16 +186,12 @@ while (my $fasta = shift@fasta){
 	my $circos_GA;
 	my $circos_CT;
 	my $circos_NN;
-	
-	my $circos_dir = $outdir.'/'.$fileprefix;
-	unless (-d $circos_dir) {
-			make_path($circos_dir,{mode => 0755}) or die "Can't create $circos_dir: $!\n";
-	}
 
 	## Nucleotide biases
 	for my $fh (@filehandles){
 		my ($lfh) = $fh =~ /(\w+)$/; ## grabbing test from filehandle
-		my $filename = $circos_dir.'/'.$fileprefix.'.'.$lfh;
+		my $subdir = $singledir.'/'.$fileprefix;
+		my $filename = $subdir.'/'.$fileprefix.'.'.$lfh;
 		open $fh, ">", $filename or die "Can't create $filename: $!\n";
 		print $fh '#chr START END GC_PERCENTAGE'."\n";
 	}
@@ -295,7 +291,7 @@ print CONCATINV '#chr - ID LABEL START END COLOR'."\n";
 foreach my $fileprefix (keys (%sequences)){
 
 	## Creating a "karyotype" file for Circos
-	my $circos_dir = $outdir.'/'.$fileprefix;
+	my $circos_dir = $singledir.'/'.$fileprefix;
 	my $circos_kar = $circos_dir.'/'.$fileprefix.'.normal.genotype';
 	my $circos_kar_inv = $circos_dir.'/'.$fileprefix.'.inverted.genotype';
 
@@ -335,7 +331,6 @@ foreach my $fileprefix (keys (%sequences)){
 
 	}
 
-	
 	my @rev_seqs = reverse(@seqs);
 	my $id_rev = $num_of_seq;
 
@@ -369,6 +364,105 @@ foreach my $fileprefix (keys (%sequences)){
 
 close CONCAT;
 close CONCATINV;
+
+### Pairwise
+foreach my $fileprefix (keys (%sequences)){
+
+	foreach my $subject (keys (%sequences)){
+
+		my $pairwise_ref;
+		if (($reference eq $fileprefix) or ($reference eq $subject)){
+			$pairwise_ref = $reference;
+		}
+		else {
+			$pairwise_ref = $fileprefix;
+		}
+
+		if ($fileprefix eq $subject){
+			next;
+		}
+		else {
+
+			## Creating a "karyotype" file for Circos
+			my $prefix = $fileprefix.'_vs_'.$subject;
+			my $subdir = $pairwisedir.'/'.$prefix;
+			unless (-d $subdir){
+				mkdir($subdir,0755) or die "Can't create $subdir: $!\n";
+			}
+			my $circos_kar = $subdir.'/'.$prefix.'.normal.genotype';
+			my $circos_kar_inv = $subdir.'/'.$prefix.'.inverted.genotype';
+
+			open PAIR, ">", $circos_kar or die "Can't create $circos_kar: $!\n";
+			open PAIRINV, ">", $circos_kar_inv or die "Can't create $circos_kar_inv: $!\n";
+
+			print PAIR '#chr - ID LABEL START END COLOR'."\n";
+			print PAIRINV '#chr - ID LABEL START END COLOR'."\n";
+
+			for my $key ($fileprefix, $subject){
+
+				my @seqs = sort (keys %{$sequences{$key}});
+				my $num_of_seq = scalar (@seqs);
+				my $id = 0;
+				my $label;
+
+				foreach my $sequence (@seqs){
+
+					my $seq = $sequences{$key}{$sequence};
+					my $csize = length $seq;
+
+					my $terminus = $csize - 1;
+					$id++;
+
+					if ($labels eq 'numbers'){
+						$label = $id;
+					}
+					elsif ($labels eq 'names'){
+						$label = $sequence;
+					}
+					print PAIR "chr - $sequence $label 0 $terminus black\n";
+
+					if ($key eq $pairwise_ref){
+						print PAIRINV "chr - $sequence $label 0 $terminus black\n";
+					}
+
+				}
+
+				my @rev_seqs = reverse(@seqs);
+				my $id_rev = $num_of_seq;
+
+				foreach my $sequence (@rev_seqs){
+
+					my $seq = $sequences{$key}{$sequence};
+					my $csize = length $seq;
+
+					my $terminus = $csize - 1;
+
+					if ($labels eq 'numbers'){
+						$label = $id_rev;
+					}
+					elsif ($labels eq 'names'){
+						$label = $sequence;
+					}
+
+					if ($key ne $pairwise_ref){
+						print PAIRINV "chr - $sequence $label 0 $terminus black\n";
+					}
+					
+					$id_rev--;
+
+				}
+
+			}
+
+			close PAIR;
+			close PAIRINV;
+
+		}
+
+	}
+
+}
+
 
 ############## Creating a default ideogram configuration for Circos
 my $ideogram = $outdir.'/'.'ideogram.conf';
@@ -520,19 +614,83 @@ my %colors = (
 	'NN' => 'black'
 );
 
-### Creating files for both normal and inverted genotypes
+### Creating files for both normal and inverted genotypes (single and concatenated)
 for my $genome ((keys %sequences), 'concatenated'){
 
-	my $subdir = $outdir.'/'.$genome;
-	my $subfile = $subdir.'/'.$genome;
+	my $subfile;
+	my $subdir = $singledir.'/'.$genome;
+
+	if ($genome eq 'concatenated'){
+		$subfile = $outdir.'/concatenated/'.$genome;
+	}
+	else{
+		$subfile = $subdir.'/'.$genome;
+	}
+
+	my $pairwise_ref = $reference;
 
 	## Creating conf files for Circos
 	for my $orientation ('normal', 'inverted'){
+		if ($genome eq 'concatenated'){
+			print_circos_conf($subfile,$orientation,$pairwise_ref,'cat','links');
+		}
+		else{
+			print_circos_conf($subfile,$orientation,$pairwise_ref,'nocat','nolink');
+		}
+	}
 
-		my $karyotype = $subfile.'.'.$orientation.'.genotype';
-		my $config = $subfile.'.'.$orientation.'.conf';
+}
 
-		open my $cg, '>', $config or die "Can't create $config: $!\n";
+### Creating pairwise files for both normal and inverted genotypes
+for my $genome (keys %sequences){
+
+	for my $subject (keys %sequences){
+
+		if ($genome eq $subject){
+			next;
+		}
+
+		## Creating conf files for Circos
+		my $subdir = $pairwisedir.'/'.$genome.'_vs_'.$subject;
+		my $subfile = $subdir.'/'.$genome.'_vs_'.$subject;
+
+		my $pairwise_ref;
+		if (($reference eq $genome) or ($reference eq $subject)){
+			$pairwise_ref = $reference;
+		}
+		else {
+			$pairwise_ref = $genome;
+		}
+
+		for my $orientation ('normal', 'inverted'){
+			print_circos_conf($subfile,$orientation,$pairwise_ref,'cat','links');
+		}
+
+	}
+
+}
+
+####################################################################
+### Subroutine(s)
+####################################################################
+
+sub print_circos_conf {
+
+	my $subfile = $_[0];
+	my $orientation = $_[1];
+	my $pairwise_ref = $_[2];
+	my $cat_status = $_[3];
+	my $link_status = $_[3];
+
+	my $config = $subfile.'.'.$orientation.'.conf';
+	my $karyotype = $subfile.'.'.$orientation.'.genotype';
+
+	my $bias_file = $subfile;
+	if ($cat_status){
+		$bias_file = $catdir.'/concatenated';
+	}
+
+	open my $cg, '>', $config or die "Can't create $config: $!\n";
 
 		print $cg "<<include $ideogram>>"."\n";
 		print $cg "<<include $ticks>>"."\n\n";
@@ -558,7 +716,7 @@ for my $genome ((keys %sequences), 'concatenated'){
 
 			print $cg '## '.$bias."\n";
 			print $cg '<plot>'."\n";
-			print $cg "file    = $subfile.$bias"."\n";
+			print $cg "file    = $bias_file.$bias"."\n";
 			print $cg 'type      = line'."\n";
 			print $cg 'thickness = 2'."\n";
 			print $cg 'max_gap = 1u'."\n";
@@ -579,8 +737,8 @@ for my $genome ((keys %sequences), 'concatenated'){
 
 		print $cg '</plots>'."\n\n";
 
-		## Links; only for concatenated genomes
-		if ($genome eq 'concatenated'){
+		unless ($link_status eq 'nolink'){
+
 			my $link_start = $r_end + 0.04;
 			my $link_color = 'grey_a5';
 
@@ -601,9 +759,9 @@ for my $genome ((keys %sequences), 'concatenated'){
 				print $cg '<rules>'."\n\n";
 
 				## Counting for required colors
-				my $ref_sequence_count = scalar (keys %{$sequences{$reference}});
+				my $ref_sequence_count = scalar (keys %{$sequences{$pairwise_ref}});
 				if ($orientation eq 'normal'){
-					print "\n"."Total # of sequences in reference $reference = $ref_sequence_count"."\n";
+					print "\n"."Total # of sequences in reference $pairwise_ref = $ref_sequence_count"."\n";
 				}
 
 				if ($custom_cc){
@@ -627,9 +785,9 @@ for my $genome ((keys %sequences), 'concatenated'){
 					$rounded_increment = 1;
 				}
 				
-				foreach my $refseq (sort (keys %{$sequences{$reference}})){
+				foreach my $refseq (sort (keys %{$sequences{$pairwise_ref}})){
 					foreach my $queseq (sort (keys %sequences)){
-						if (($queseq eq 'concatenated') or ($queseq eq $reference)){
+						if (($queseq eq 'concatenated') or ($queseq eq $pairwise_ref)){
 							next;
 						}
 						else{
@@ -655,6 +813,7 @@ for my $genome ((keys %sequences), 'concatenated'){
 
 			print $cg '</link>'."\n";
 			print $cg '</links>'."\n\n";
+
 		}
 
 		## image.conf
@@ -680,60 +839,8 @@ for my $genome ((keys %sequences), 'concatenated'){
 		}
 
 		close $cg;
-	
-	}
 
 }
-
-####################################################################
-### Running Circos
-####################################################################
-
-## Running circos; sometimes breaks because it doesn't
-## find the links file (even if present); runs fine if done manually
-## sleep() timer doesn't seem to fix it...
-## Not sure what causes Circos to misbehave
-
-if ($circos_plot){
-
-	sleep(10);
-
-	for my $genome ((keys %sequences), 'concatenated'){
-
-		my $subdir = $outdir.'/'.$genome;
-		my $subfile = $subdir.'/'.$genome;
-		my $config = $subfile.'.conf';
-		my $image = $genome.'.png';
-
-		my $pngdir = $subdir.'/images/';
-		unless (-d $pngdir){
-			make_path($pngdir,{mode => 0755}) or die "Can't create $pngdir: $!\n";
-		}
-
-		for my $orientation ('normal', 'inverted'){
-
-			if ($orientation eq 'inverted'){
-				$config = $subfile.'.inverted.conf';
-				$image = $genome.'.inverted.png';
-			}
-
-			print "\n\nRunning Circos for $genome: $orientation\n\n";
-
-			system ("circos \\
-			  -conf $config \\
-			  -outputfile $image \\
-			  -outputdir $pngdir"
-			);
-		
-		}
-
-	}
-
-}
-
-####################################################################
-### Subroutine(s)
-####################################################################
 
 sub biases {
 
