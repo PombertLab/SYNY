@@ -2,8 +2,8 @@
 ## Pombert Lab, Illinois Tech 2023
 
 my $name = 'clusters2links.pl';
-my $version = '0.2a';
-my $updated = '2023-04-03';
+my $version = '0.2b';
+my $updated = '2023-04-19';
 
 use strict;
 use warnings;
@@ -142,7 +142,7 @@ while (my $cluster = shift@clusters){
     my ($gap) = $path =~ /(gap_\d+)/;
     my ($prefix) = $filename =~ /^(\w+)/;
     my ($query) = $prefix =~ /^([^_]+)/;
-    my $subdir = $outdir.'/'.$query;
+    my $subdir = $outdir.'/pairwise/'.$prefix;
 
     unless (-d $subdir) {
         make_path($subdir,{mode => 0755})  or die "Can't create $subdir: $!\n";
