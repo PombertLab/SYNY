@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.9b';
-my $updated = '2024-04-13';
+my $version = '0.5.9c';
+my $updated = '2024-04-18';
 
 use strict;
 use warnings;
@@ -914,10 +914,12 @@ system("
 foreach my $num (@gaps){
 	my $gap = 'gap_'.$num;
 	circos_conf($gap);
+	pairwise_conf($gap)
 }
 
 unless ($nomap){
 	circos_conf('mmap');
+	pairwise_conf('mmap')
 }
 
 ## Running Circos
@@ -1026,6 +1028,7 @@ sub circos_conf {
 				open NEWCONF, '>', $new_conf or die "Can't create $new_conf: $!\n";
 
 				while (my $line = <CONF>){
+					chomp $line;
 					if ($line =~ /^file.*.links$/){
 						print NEWCONF "file          = $paf_links"."\n";
 					}
@@ -1036,6 +1039,61 @@ sub circos_conf {
 
 				close CONF;
 				close NEWCONF;
+
+		}
+
+	}
+
+}
+
+sub pairwise_conf {
+
+	my @affix = @_;
+
+	foreach my $affix (shift @affix){
+
+		## Creating Circos configuration file(s) with desired link file
+		my $paf_links = $outdir.'/CIRCOS/concatenated/concatenated.'.$affix.'.links';
+
+		my $pairwisedir = $outdir.'/CIRCOS/pairwise';
+		opendir(PAIRS, $pairwisedir) or die "Can't open $pairwisedir: $!\n";
+
+		my @pairs;
+		while (my $entry = readdir(PAIRS)){
+			if ($entry =~ /_vs_/){
+				push(@pairs, $entry);
+			}
+		}
+
+		for my $pair (@pairs){
+
+			for my $orientation ('normal', 'inverted'){
+
+				my $subloc = $pairwisedir.'/'.$pair.'/'.$pair;
+				my $circos_conf_f = $subloc.'.'.$orientation.'.conf';
+				my $pair_genotype = $subloc.'.'.$orientation.'.genotype';
+				my $new_conf = $subloc.'.'.$affix.'.'.$orientation.'.conf';
+
+					open CONF, '<', $circos_conf_f or die "Can't read $circos_conf_f: $!\n";
+					open NEWCONF, '>', $new_conf or die "Can't create $new_conf: $!\n";
+
+					while (my $line = <CONF>){
+						chomp $line;
+						if ($line =~ /^karyotype/){
+							print NEWCONF "karyotype = $pair_genotype"."\n";
+						}
+						elsif ($line =~ /^file.*.links$/){
+							print NEWCONF "file          = $paf_links"."\n";
+						}
+						else {
+							print NEWCONF $line."\n";
+						}
+					}
+
+					close CONF;
+					close NEWCONF;
+
+			}
 
 		}
 
