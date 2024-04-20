@@ -400,6 +400,7 @@ system("
 #### Calculate/plot PAF metrics
 
 print ERROR "\n### paf_metrics.py ###\n";
+print "\nCalculating minimap2 alignment metrics:\n";
 
 my $aln_length_dir = $minimap2_dir.'/METRICS';
 
