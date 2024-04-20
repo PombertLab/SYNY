@@ -413,25 +413,16 @@ while (my $file = readdir(PAFDIR)){
 	}
 }
 
-for my $paf_file (@paf_files){
+system ("
+	$path/paf_metrics.py \\
+	--paf @paf_files \\
+	--outdir $aln_length_dir \\
+	--height 10.8 \\
+	--width 19.2 \\
+	--color steelblue \\
+	2>> $outdir/error.log
+") == 0 or checksig();
 
-	my $basename = fileparse($paf_file);
-	$basename =~ s/\.\w+$//;
-	my $aln_png = $basename.'.metrics.png';
-	my $aln_metrics = $basename.'.metrics.txt';
-
-	system ("
-		$path/paf_metrics.py \\
-		--paf $paf_file \\
-		--outdir $aln_length_dir \\
-		--output $aln_png \\
-		--metrics $aln_metrics \\
-		--height 10.8 \\
-		--width 19.2 \\
-		--color steelblue \\
-		2>> $outdir/error.log
-	") == 0 or checksig();
-}
 
 ###################################################################################################
 ## Creating barplots/dotplots/heatmaps from minimap2 PAF files
