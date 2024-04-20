@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.0a';
+my $version = '0.6.0b';
 my $updated = '2024-04-20';
 
 use strict;
@@ -417,6 +417,7 @@ system ("
 	$path/paf_metrics.py \\
 	--paf @paf_files \\
 	--outdir $aln_length_dir \\
+	--threads $threads \\
 	--height 10.8 \\
 	--width 19.2 \\
 	--color steelblue \\
@@ -440,6 +441,7 @@ system("
 	--paf $paf_dir/*.paf \\
 	--fasta $genome_dir/*.fasta \\
 	--outdir $barplot_dir \\
+	--threads $threads \\
 	--affix mmap \\
 	--height $bheight \\
 	--width $bwidth \\
@@ -460,6 +462,7 @@ unless ($no_dotplot){
 		$path/paf_to_dotplot.py \\
 		--paf $paf_dir/*.paf \\
 		--fasta $genome_dir/*.fasta \\
+		--threads $threads \\
 		--affix mmap \\
 		--outdir $dotplot_dir \\
 		--unit $multiplier \\
@@ -628,6 +631,7 @@ foreach my $gap (@gaps){
 		$path/paf_to_barplot.py \\
 		--paf $ppafdir/*.paf \\
 		--fasta $genome_dir/*.fasta \\
+		--threads $threads \\
 		--outdir $barplot_dir \\
 		--height $bheight \\
 		--width $bwidth \\
@@ -665,6 +669,7 @@ unless ($no_dotplot){
 		$path/paf_to_dotplot.py \\
 		--paf @dotplot_files \\
 		--fasta $genome_dir/*.fasta \\
+		--threads $threads \\
 		--outdir $dotplot_dir \\
 		--unit $multiplier \\
 		--height $dheight \\
@@ -826,6 +831,7 @@ system("
 	$path/protein_cluster_hm.py \\
 	--tsv @hm_files \\
 	--outdir $hm_dir \\
+	--threads $threads \\
 	--height $hheight \\
 	--width $hwidth \\
 	--palette $hmpalette
