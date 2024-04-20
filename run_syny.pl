@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.0';
+my $version = '0.6.0a';
 my $updated = '2024-04-20';
 
 use strict;
@@ -39,7 +39,7 @@ OPTIONS (MAIN):
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
---threads	Number of threads for minimap2/diamond/circos [Default: 16]
+--threads	Number of threads to use [Default: 16]
 --asm		Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
@@ -437,6 +437,7 @@ for my $paf_file (@paf_files){
 ###################################################################################################
 
 print ERROR "\n### paf_to_barplot.py (minimap2) ###\n";
+print "\nCreating Barplots (minimap2):\n";
 
 my $barplot_dir = "$outdir/BARPLOTS";
 my $dotplot_dir = "$outdir/DOTPLOTS";
@@ -461,7 +462,7 @@ system("
 unless ($no_dotplot){
 
 	print ERROR "\n### paf_to_dotplot.py (minimap2) ###\n";
-	print "\nCreating Dotplots:\n";
+	print "\nCreating Dotplots (minimap2):\n";
 
 	system("
 		$path/paf_to_dotplot.py \\
@@ -624,6 +625,7 @@ foreach my $gap (@gaps){
 
 ### Create barplots from PAF files
 print ERROR "\n### paf_to_barplot.py (SYNY) ###\n";
+print "\nCreating Barplots (SYNY):\n";
 
 foreach my $gap (@gaps){
 
@@ -649,31 +651,39 @@ foreach my $gap (@gaps){
 unless ($no_dotplot){
 
 	print ERROR "\n### paf_to_dotplot.py (SYNY) ###\n";
+	print "\nCreating Dotplots (SYNY):\n";
 
-	print "\nCreating Dotplots:\n";
+	my @dotplot_files;
+	my $dotplot_dir = "$outdir/DOTPLOTS";
 
 	foreach my $gap (@gaps){
 
-		my $dotplot_dir = "$outdir/DOTPLOTS";
 		my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
+		opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
 
-		system("
-			$path/paf_to_dotplot.py \\
-			--paf $ppafdir/*.paf \\
-			--fasta $genome_dir/*.fasta \\
-			--outdir $dotplot_dir \\
-			--unit $multiplier \\
-			--height $dheight \\
-			--width $dwidth \\
-			--color $color \\
-			$tick_flag \\
-			$dotpal_flag \\
-			--wdis $wdis \\
-			--hdis $hdis \\
-			2>> $outdir/error.log
-		") == 0 or checksig();
+		while (my $file = readdir(PAFDIR)){
+			if ($file =~ /\.paf$/){
+				push (@dotplot_files, "$ppafdir/$file");
+			}
+		}
 
 	}
+
+	system("
+		$path/paf_to_dotplot.py \\
+		--paf @dotplot_files \\
+		--fasta $genome_dir/*.fasta \\
+		--outdir $dotplot_dir \\
+		--unit $multiplier \\
+		--height $dheight \\
+		--width $dwidth \\
+		--color $color \\
+		$tick_flag \\
+		$dotpal_flag \\
+		--wdis $wdis \\
+		--hdis $hdis \\
+		2>> $outdir/error.log
+	") == 0 or checksig();
 
 }
 

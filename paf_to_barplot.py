@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2a'
-updated = '2024-04-10'
+version = '0.3'
+updated = '2024-04-20'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.patches as mpatches
 from matplotlib.patches import Rectangle
+from multiprocessing import Pool
 import seaborn as sns
 
 ################################################################################
@@ -63,6 +64,7 @@ cmd.add_argument("-a", "--affix")
 cmd.add_argument("-c", "--palette", default='Spectral')
 cmd.add_argument("-n", "--noticks", action='store_true')
 cmd.add_argument("-m", "--mono")
+cmd.add_argument("--threads", default=16)
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -74,6 +76,7 @@ affix = args.affix
 color_palette = args.palette
 noticks = args.noticks
 monochrome = args.mono
+threads = int(args.threads)
 
 ################################################################################
 ## Working on output directory
@@ -125,9 +128,7 @@ if fasta_files is not None:
 ## Parsing and plotting PAF file(s) 
 ################################################################################
 
-print(f"\n" + f"Creating Barplots:\n")
-
-for paf in paf_files:
+def barplot(paf):
 
     basename = os.path.basename(paf)
     qfile = None
@@ -269,3 +270,7 @@ for paf in paf_files:
     plt.clf()
     plt.cla()
     plt.close('all')
+
+## Run
+pool = Pool(threads)
+pool.map(barplot, paf_files)

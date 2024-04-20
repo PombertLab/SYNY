@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.4a'
-updated = '2024-04-10'
+version = '0.5'
+updated = '2024-04-20'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -12,6 +12,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import argparse
 import seaborn as sns
+from multiprocessing import Pool
 matplotlib.use('agg')
 
 ################################################################################
@@ -68,6 +69,7 @@ cmd.add_argument("-a", "--palette")
 cmd.add_argument("-n", "--noticks", action='store_true')
 cmd.add_argument("--wdis", default=0.05)
 cmd.add_argument("--hdis", default=0.1)
+cmd.add_argument("--threads", default=16)
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -82,6 +84,7 @@ color_palette = args.palette
 noticks = args.noticks
 wdis = args.wdis
 hdis = args.hdis
+threads = int(args.threads)
 
 ################################################################################
 ## Working on output directory
@@ -133,7 +136,7 @@ if fasta_files is not None:
 ## Parsing and plotting PAF file(s) 
 ################################################################################
 
-for paf in paf_files:
+def dotplot(paf):
 
     basename = os.path.basename(paf)
     qfile = None
@@ -154,8 +157,7 @@ for paf in paf_files:
 
     with open(paf) as file:
 
-        basename = os.path.basename(paf)
-        print(f"\nWorking on {basename}", end='')
+        print(f"Working on {basename}", end='')
 
         matchnum = 0
 
@@ -195,11 +197,13 @@ for paf in paf_files:
     ##### Output file(s)
     output = basename
 
+    global ccolor
     acolor = ccolor
 
     if color_palette:
         acolor = color_palette
 
+    global affix
     if noticks:
         affix = 'noticks'
 
@@ -350,13 +354,14 @@ for paf in paf_files:
         )
 
     ##### Writing to output file
-    print(f"Creating {pngfile}...")
     plt.savefig(pngfile)
-
-    print(f"Creating {svgfile}...")
     plt.savefig(svgfile)
 
     ## Close fig
     plt.clf()
     plt.cla()
     plt.close('all')
+
+## Run
+pool = Pool(threads)
+pool.map(dotplot, paf_files)
