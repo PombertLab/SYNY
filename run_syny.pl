@@ -824,20 +824,23 @@ print ERROR "\n### protein_cluster_hm.py ###\n";
 print "\nCreating heatmaps (SYNY):\n";
 
 my $hm_dir = $outdir.'/HEATMAPS';
+my @hm_files;
+
 foreach my $gap (@gaps){
-
 	my $matrix_file = $synteny_dir."/gap_$gap"."/matrix_gap_$gap.tsv";
-
-	system("
-		$path/protein_cluster_hm.py \\
-		--tsv $matrix_file \\
-		--outdir $hm_dir \\
-		--height $hheight \\
-		--width $hwidth \\
-		--palette $hmpalette
-	") == 0 or checksig();
-
+	push (@hm_files, $matrix_file);
 }
+
+system("
+	$path/protein_cluster_hm.py \\
+	--tsv @hm_files \\
+	--outdir $hm_dir \\
+	--height $hheight \\
+	--width $hwidth \\
+	--palette $hmpalette
+") == 0 or checksig();
+
+
 
 ###################################################################################################
 ## Run id_conserved_regions.pl

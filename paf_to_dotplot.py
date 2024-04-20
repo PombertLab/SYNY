@@ -45,6 +45,7 @@ OPTIONS:
                 of a monochrome plot
 --wdis          Horizontal distance (width) between subplots [Default: 0.05]
 --hdis          Vertical distance (height) between subplots [Default: 0.1]
+--threads       Number of threads to use [Default: 16]
 """
 
 # Print custom message if argv is empty

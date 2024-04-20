@@ -43,6 +43,7 @@ OPTIONS:
                 # for a list of color palettes
 -m (--mono)     Use a single specified mochochrome color for all chromosomes instead
                 of a color palette
+--threads       Number of threads to use [Default: 16]
 """
 
 # Print custom message if argv is empty

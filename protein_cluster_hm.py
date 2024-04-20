@@ -2,7 +2,7 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.2e'
+version = '0.3'
 updated = '2024-04-12'
 
 import sys
@@ -12,6 +12,7 @@ import argparse
 import re
 import seaborn as sns
 import pandas as pd
+from multiprocessing import Pool
 
 ################################################################################
 ## README
@@ -35,6 +36,7 @@ OPTIONS:
 -p (--palette)  Color palette [Default: winter_r]
 -h (--height)   Figure height in inches [Default: 10]
 -w (--width)    Figure width in inches [Default: 10]
+--threads       Number of threads to use [Default: 16]
 """
 
 # Print custom message if argv is empty
@@ -47,18 +49,20 @@ if (len(sys.argv) <= 1):
 ################################################################################
 
 cmd = argparse.ArgumentParser(add_help=False)
-cmd.add_argument("-t", "--tsv")
+cmd.add_argument("-t", "--tsv", nargs='*')
 cmd.add_argument("-o", "--outdir", default='./HEATMAPS')
 cmd.add_argument("-h", "--height", default=10)
 cmd.add_argument("-w", "--width", default=10)
 cmd.add_argument("-p", "--palette", default='winter_r')
+cmd.add_argument("--threads", default=16)
 args = cmd.parse_args()
 
-tsv_file = args.tsv
+tsv_files = args.tsv
 outdir = args.outdir
 height = args.height
 width = args.width
 color_palette = args.palette
+threads = int(args.threads)
 
 ################################################################################
 ## Working on output directory
@@ -78,51 +82,58 @@ for dir in [outdir,pngdir,svgdir]:
 ## Plotting heatmaps 
 ################################################################################
 
-plt.rcParams["figure.figsize"] = (width,height)
 
-with open (tsv_file) as f:
+def heatmap(tsv_file):
 
-    data = pd.read_csv(tsv_file, sep="\t", header=0, index_col=0)
+    plt.rcParams["figure.figsize"] = (width,height)
 
-    gap = None
-    m = re.search(r'gap_(\d+).tsv', tsv_file)
-    if m:
-        gap = m.group(1)
+    with open (tsv_file) as f:
 
-    clustered_png = pngdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered.png'
-    clustered_svg = svgdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered.svg'
+        data = pd.read_csv(tsv_file, sep="\t", header=0, index_col=0)
 
-    heatmap_png = pngdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap.png'
-    heatmap_svg = svgdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap.svg'
+        gap = None
+        m = re.search(r'gap_(\d+).tsv', tsv_file)
+        if m:
+            gap = m.group(1)
 
-    ## Clustered heatmaps
-    cm = sns.clustermap(
-        data[0:],
-        cmap=color_palette,
-        annot=True,
-        fmt='.1f'
-    )
+        clustered_png = pngdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered.png'
+        clustered_svg = svgdir + '/' + 'proteins_in_clusters.gap_' + gap + '.clustered.svg'
 
-    cm.fig.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
-    print(f"Creating {clustered_png}")
-    print(f"Creating {clustered_svg}")
-    plt.savefig(clustered_png)
-    plt.savefig(clustered_svg)
-    plt.close('all')
+        heatmap_png = pngdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap.png'
+        heatmap_svg = svgdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap.svg'
+
+        ## Clustered heatmaps
+        cm = sns.clustermap(
+            data[0:],
+            cmap=color_palette,
+            annot=True,
+            fmt='.1f'
+        )
+
+        cm.fig.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
+        print(f"Creating {clustered_png}")
+        print(f"Creating {clustered_svg}")
+        plt.savefig(clustered_png)
+        plt.savefig(clustered_svg)
+        plt.close('all')
 
 
 
-    ## Normal heatmaps
-    hm = sns.heatmap(
-        data[0:],
-        cmap=color_palette,
-        annot=True,
-        fmt='.1f'
-    )
+        ## Normal heatmaps
+        hm = sns.heatmap(
+            data[0:],
+            cmap=color_palette,
+            annot=True,
+            fmt='.1f'
+        )
 
-    hm.figure.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
-    print(f"Creating {heatmap_png}")
-    print(f"Creating {heatmap_svg}")
-    plt.savefig(heatmap_png)
-    plt.savefig(heatmap_svg)
-    plt.close('all')
+        hm.figure.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
+        print(f"Creating {heatmap_png}")
+        print(f"Creating {heatmap_svg}")
+        plt.savefig(heatmap_png)
+        plt.savefig(heatmap_svg)
+        plt.close('all')
+
+## Run
+pool = Pool(threads)
+pool.map(heatmap, tsv_files)
