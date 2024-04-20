@@ -2,8 +2,8 @@
 ## Pombert Lab, Illinois Tech 2023
 
 my $name = 'clusters2links.pl';
-my $version = '0.2b';
-my $updated = '2023-04-19';
+my $version = '0.2c';
+my $updated = '2023-04-20';
 
 use strict;
 use warnings;
@@ -213,16 +213,25 @@ while (my $cluster = shift@clusters){
             my ($sstart,$send) = $subject =~ /^(\w+) to (\w+)/;
 
             for my $fh (\*OUT,\*CAT){
+
                 # query
+                my $query_start = $loci_db{$qstart}{'start'} - 1;
+                my $query_end = $loci_db{$qend}{'end'} - 1;
+
                 print $fh $loci_db{$qstart}{'contig'}.' ';
-                print $fh $loci_db{$qstart}{'start'}.' ';
-                print $fh $loci_db{$qend}{'end'}.' ';
+                print $fh $query_start.' ';
+                print $fh $query_end.' ';
+
                 # subject
+                my $subject_start = $loci_db{$sstart}{'start'} - 1;
+                my $subject_end = $loci_db{$send}{'end'} - 1;
+
                 print $fh $loci_db{$sstart}{'contig'}.' ';
-                print $fh $loci_db{$sstart}{'start'}.' ';
-                print $fh $loci_db{$send}{'end'}.' ';
+                print $fh $subject_start.' ';
+                print $fh $subject_end.' ';
                 print $fh 'color='.$color;
                 print $fh ',z='.$zdepth."\n";
+
             }
 
         }

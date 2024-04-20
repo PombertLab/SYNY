@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'paf2links.pl';
-my $version = '0.1a';
-my $updated = '2024-04-03';
+my $version = '0.1b';
+my $updated = '2024-04-20';
 
 use strict;
 use warnings;
@@ -143,11 +143,11 @@ for my $paf_file (@paf_files){
 
 		my @data = split("\t", $line);
 		my $locus1 = $data[0];
-		my $l1_start = $data[2];
-		my $l1_end = $data[3];
+		my $l1_start = $data[2] - 1;
+		my $l1_end = $data[3] - 1;
 		my $locus2 = $data[5];
-		my $l2_start = $data[7];
-		my $l2_end = $data[8];
+		my $l2_start = $data[7] - 1;
+		my $l2_end = $data[8] - 1;
 
 		print PLINK "$locus1 $l1_start $l1_end $locus2 $l2_start $l2_end ";
 		print PLINK 'color='.$link_color;
