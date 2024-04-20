@@ -232,7 +232,7 @@ OPTIONS (MAIN):
 -e (--evalue)   BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)     Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)   Output directory [Default = SYNY]
---threads       Number of threads for minimap2/diamond [Default: 8]
+--threads       Number of threads for minimap2/diamond/circos [Default: 8]
 --asm           Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume        Resume minimap2 computations (skip completed alignments)
 --no_map        Skip minimap2 pairwise genome alignments
@@ -480,7 +480,11 @@ Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `
 
 #### Circos plots
 
-If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots (concatenated and/or pairwise) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and from the genome alignments computed with minimap2 (`.mmap.`), unless these alignments are skipped with the `--no_map` option. Two circos plots will be generated for each approach, `.normal` and `.inverted`. In the inverted plots, the contigs/chromosomes from the queried genomes are plotted in a reversed order, from last to first.
+If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots (concatenated and/or pairwise) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and from the genome alignments computed with minimap2 (`.mmap.`), unless these alignments are skipped with the `--no_map` option.
+
+In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. In the pairwise plots (`--circos pair`), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. Both contenated and pairwise plots can be generated with the `--circos all` command line switch.
+
+Two circos plots, `.normal` and `.inverted`, will be generated for each approach. In the inverted plots, the contigs/chromosomes from the genome(s) being compared to the reference are plotted in reverse, from last to first.
 
 ##### Example of an image generated with Circos and SYNY from shared proteins clusters:
 <p align="left">
@@ -492,7 +496,7 @@ In this figure, nucleotides biases are plotted in the concentric rings (from out
 - GT and AC nucleotide biases (blue and green lines)
 - GA and CT nucleotide biases (purple and yellow lines)
 
-Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. The reference genome can be specified with the `--ref` commmand line switch. If omitted, the first genome encountered alphabetically will be used as the default reference.
+Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used.
 
 By default, contigs will be labelled by numbers in the Circos plots. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) and fonts can be futher adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
 `normal`, `default`, `semibold`, `bold`, `italic`, `bolditalic`, `italicbold` (see this Circos [tutorial](https://circos.ca/documentation/tutorials/ideograms/labels/) for details).
@@ -750,11 +754,9 @@ GPK93_01g00270  -       J0A71_11g23150  -
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.syny.normal.png">
 </p>
 
-In the above image, links between the reference and the queried genomes are color-coded based on the reference genotype; links between the queried genomes are shown in light gray.
+In the above [Circos](https://circos.ca/) plot, links between the reference and the queried genomes are color-coded based on the reference genotype; links between the queried genomes are shown in light gray. In these plots, each chromosome/contig is plotted as a distinct [ideogram](https://circos.ca/documentation/tutorials/ideograms/ideograms/).
 
-Note that while SYNY can handle multiple genomes, adding too much data can quickly clutter the Circos plots generated. In the above [Circos](https://circos.ca/) plots, each chromosome/contig is plotted as a distinct [ideogram](https://circos.ca/documentation/tutorials/ideograms/ideograms/). Drawing too many ideograms can make the figure illegible and, when comparing genomes featuring many chromosomes/contigs, cluttering can also occur even when comparing a small number of genomes.
-
-If too dense, drawing pairwise (`--circos pair`) circos plots rather concatenated (`--circos cat`) ones should help with readability.
+Note that while SYNY can plot multiple genomes together in a single figure with `--circos cat` / `--circos all`, adding too much data can quickly clutter the Circos plots generated (drawing too many ideograms can make the figure illegible). If too dense, drawing pairwise (`--circos pair`) plots rather concatenated ones should help with readability. However, when comparing genomes featuring many chromosomes/contigs, cluttering can also occur even when performing pairwise genome comparisons.
 
 #### Custom Circos colors
 Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files containing color names and their associated RGB values (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Circos/custom_color_1.txt) for an example). A few custom presets are also available to use in SYNY.
