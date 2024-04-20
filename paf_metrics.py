@@ -90,9 +90,7 @@ x_aln_sizes = []
 similarity = []
 matches = []
 
-
 FH = open(paf,'r')
-print(f"\nCalculating alignment metrics for: {paf} ...")
 
 ## Parse alignments
 for line in FH:
