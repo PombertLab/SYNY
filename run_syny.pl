@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.5.9d';
-my $updated = '2024-04-18';
+my $version = '0.6.0';
+my $updated = '2024-04-20';
 
 use strict;
 use warnings;
@@ -11,6 +11,8 @@ use Getopt::Long qw(GetOptions);
 use File::Basename;
 use Cwd qw(abs_path);
 use File::Path qw(make_path);
+use threads;
+use threads::shared;
 
 my $usage = <<"EXIT";
 NAME		${name}
@@ -37,7 +39,7 @@ OPTIONS (MAIN):
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
---threads	Number of threads for minimap2/diamond [Default: 8]
+--threads	Number of threads for minimap2/diamond/circos [Default: 8]
 --asm		Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
@@ -923,9 +925,11 @@ unless ($nomap){
 	pairwise_conf('mmap')
 }
 
-## Running Circos
+##### Running Circos
+my %circos_todo_list;
 my $circos_plot_dir = $outdir.'/CIRCOS_PLOTS';
 
+## Populating list of plots to generate
 if ($circos){
 
 	print "\n##### Generating Circos plots\n";
@@ -954,6 +958,21 @@ if ($circos){
 		if (($circos eq 'pair') or ($circos eq 'all')){
 			circos_plot($affix, 'pair');
 		}
+	}
+}
+
+## Running one circos instance per thread
+my @circos_files :shared = sort(keys %circos_todo_list);
+
+if ($circos){
+
+	my @threads = initThreads();
+
+	for my $thread (@threads){
+		$thread = threads->create(\&run_circos);
+	}
+	for my $thread (@threads){
+		$thread ->join();
 	}
 
 	# Moving to PNG/SVG subdirs
@@ -1136,15 +1155,11 @@ sub circos_plot {
 
 		for my $orientation ('normal', 'inverted'){
 
+			my $conf = "$outdir/CIRCOS/concatenated/concatenated.$affix.$orientation.conf";
 			my $circos_plot = "$circos_prefix.$affix.$orientation.png";
-			print "\nRunning Circos ($affix; $orientation): $circos_plot\n\n";
 
-			system ("
-			  circos \\
-				-conf $outdir/CIRCOS/concatenated/concatenated.$affix.$orientation.conf \\
-				-outputdir $plot_dir \\
-				-outputfile $circos_plot
-			");
+			$circos_todo_list{$conf}{'dir'} = $plot_dir;
+			$circos_todo_list{$conf}{'png'} = $circos_plot;
 
 		}
 
@@ -1177,14 +1192,9 @@ sub circos_plot {
 
 				my $conf = $pairwisedir.'/'.$pair.'/'.$pair.'.'.$affix.'.'.$orientation.'.conf';
 				my $circos_plot = "$pair.$affix.$orientation.png";
-				print "\nRunning Circos ($affix; $orientation): $circos_plot\n\n";
 
-				system ("
-				  circos \\
-					-conf $conf \\
-					-outputdir $plot_dir \\
-					-outputfile $circos_plot
-				");
+				$circos_todo_list{$conf}{'dir'} = $plot_dir;
+				$circos_todo_list{$conf}{'png'} = $circos_plot;
 
 			}
 
@@ -1192,4 +1202,37 @@ sub circos_plot {
 
 	}
 
+}
+
+sub initThreads {
+	my @initThreads;
+	for (my $i = 1; $i <= $threads; $i++){
+		push(@initThreads,$i);
+	}
+	return @initThreads;
+}
+
+sub run_circos {
+
+	my $id = threads->tid();
+	my $length = length($threads);
+
+	while (my $conf = shift@circos_files){
+
+		my $plot_dir = $circos_todo_list{$conf}{'dir'};
+		my $circos_plot = $circos_todo_list{$conf}{'png'};
+
+		$id = sprintf("%0${length}d", $id);
+		print "Thread $id: Plotting $circos_plot\n";
+
+		system ("
+			circos \\
+				-conf $conf \\
+				-outputdir $plot_dir \\
+				-outputfile $circos_plot \\
+				-silent
+		");
+
+	}
+	threads->exit();
 }
