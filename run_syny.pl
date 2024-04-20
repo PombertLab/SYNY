@@ -39,7 +39,7 @@ OPTIONS (MAIN):
 -e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
 -g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
---threads	Number of threads for minimap2/diamond/circos [Default: 8]
+--threads	Number of threads for minimap2/diamond/circos [Default: 16]
 --asm		Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
@@ -98,7 +98,7 @@ my @annot_files;
 my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
-my $threads = 8;
+my $threads = 16;
 my $nomap;
 my $resume;
 my $asm;
