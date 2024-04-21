@@ -293,16 +293,20 @@ print LOG "COMMAND: $0 @commands\n";
 ## Run list_maker.pl
 ###################################################################################################
 
-print ERROR "\n### list_maker.pl ###\n";
+my @threads = initThreads();
 
+print ERROR "\n### list_maker.pl ###\n";
 print "\n##### Extracting data from GenBank files\n";
 
-system("
-	$path/list_maker.pl \\
-	  --input @annot_files \\
-	  --outdir $outdir \\
-	  2>> $outdir/error.log
-") == 0 or checksig();
+my @annotations :shared = @annot_files;
+my $annot_num = scalar(@annot_files);
+
+for my $thread (@threads){
+	$thread = threads->create(\&list_maker);
+}
+for my $thread (@threads){
+	$thread ->join();
+}
 
 ###################################################################################################
 ## Shared options flags
@@ -981,11 +985,8 @@ if ($circos){
 ## Running one circos instance per thread
 my @circos_files :shared = sort(keys %circos_todo_list);
 my $circos_num = scalar(@circos_files);
-my $circos_counter = 0;
 
 if ($circos){
-
-	my @threads = initThreads();
 
 	for my $thread (@threads){
 		$thread = threads->create(\&run_circos);
@@ -1023,6 +1024,50 @@ print LOG "Runtime: ".$run_time." seconds\n";
 ## Subroutines
 ###################################################################################################
 
+sub initThreads {
+	my @initThreads;
+	for (my $i = 1; $i <= $threads; $i++){
+		push(@initThreads,$i);
+	}
+	return @initThreads;
+}
+
+sub checksig {
+
+	my $exit_code = $?;
+	my $modulo = $exit_code % 255;
+
+	if ($modulo == 2) {
+		print "\nSIGINT detected: Ctrl+C => exiting...\n\n";
+		exit(2);
+	}
+	elsif ($modulo == 131) {
+		print "\nSIGTERM detected: Ctrl+\\ => exiting...\n\n";
+		exit(131);
+	}
+
+}
+
+sub list_maker {
+
+	while (my $annotation = shift@annotations){
+
+		my $x = $annot_num - scalar(@annotations);
+		print "$x / $annot_num - Extracting data from $annotation\n";
+
+		system("
+			$path/list_maker.pl \\
+			--input @annotations \\
+			--outdir $outdir \\
+			2>> $outdir/error.log
+		") == 0 or checksig();
+
+	}
+
+	threads->exit();
+
+}
+
 sub link_files {
 
 	if(scalar(@annot_files) != scalar(@prot_files)){
@@ -1048,22 +1093,7 @@ sub link_files {
 
 }
 
-sub checksig {
-
-	my $exit_code = $?;
-	my $modulo = $exit_code % 255;
-
-	if ($modulo == 2) {
-		print "\nSIGINT detected: Ctrl+C => exiting...\n\n";
-		exit(2);
-	}
-	elsif ($modulo == 131) {
-		print "\nSIGTERM detected: Ctrl+\\ => exiting...\n\n";
-		exit(131);
-	}
-
-}
-
+## Circos subs
 sub circos_conf {
 
 	my @affix = @_;
@@ -1221,14 +1251,6 @@ sub circos_plot {
 
 	}
 
-}
-
-sub initThreads {
-	my @initThreads;
-	for (my $i = 1; $i <= $threads; $i++){
-		push(@initThreads,$i);
-	}
-	return @initThreads;
 }
 
 sub run_circos {
