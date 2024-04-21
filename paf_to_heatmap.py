@@ -226,8 +226,8 @@ with open (matrix_file) as f:
     )
 
     hm.figure.suptitle(f"% of colinear bases in pairwise alignments", x=0.5, y=0.95)
-    print(f"Creating {heatmap_png}")
-    print(f"Creating {heatmap_svg}")
+    print(f"Plotting {heatmap_png}")
+    print(f"Plotting {heatmap_svg}")
     plt.savefig(heatmap_png)
     plt.savefig(heatmap_svg)
     plt.close('all')
