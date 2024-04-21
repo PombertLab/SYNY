@@ -2,8 +2,8 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.3'
-updated = '2024-04-12'
+version = '0.3a'
+updated = '2024-04-20'
 
 import sys
 import os
@@ -12,7 +12,7 @@ import argparse
 import re
 import seaborn as sns
 import pandas as pd
-from multiprocessing import Pool
+from multiprocessing import Pool, Value
 
 ################################################################################
 ## README
@@ -82,10 +82,13 @@ for dir in [outdir,pngdir,svgdir]:
 ## Plotting heatmaps 
 ################################################################################
 
+lsize = len(tsv_files) * 4
+counter = Value('i', 0)
 
 def heatmap(tsv_file):
 
     plt.rcParams["figure.figsize"] = (width,height)
+    global counter
 
     with open (tsv_file) as f:
 
@@ -111,13 +114,16 @@ def heatmap(tsv_file):
         )
 
         cm.fig.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
-        print(f"Creating {clustered_png}")
-        print(f"Creating {clustered_svg}")
+        with counter.get_lock():
+            counter.value += 1
+        print(f"{counter.value} / {lsize} - plotting {clustered_png}")
         plt.savefig(clustered_png)
+
+        with counter.get_lock():
+            counter.value += 1
+        print(f"{counter.value} / {lsize} - plotting {clustered_svg}")
         plt.savefig(clustered_svg)
         plt.close('all')
-
-
 
         ## Normal heatmaps
         hm = sns.heatmap(
@@ -128,10 +134,16 @@ def heatmap(tsv_file):
         )
 
         hm.figure.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
-        print(f"Creating {heatmap_png}")
-        print(f"Creating {heatmap_svg}")
+        with counter.get_lock():
+            counter.value += 1
+        print(f"{counter.value} / {lsize} - plotting {heatmap_png}")
         plt.savefig(heatmap_png)
+
+        with counter.get_lock():
+            counter.value += 1
+        print(f"{counter.value} / {lsize} - plotting {heatmap_svg}")
         plt.savefig(heatmap_svg)
+
         plt.close('all')
 
 ## Run

@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.0b';
+my $version = '0.6.0c';
 my $updated = '2024-04-20';
 
 use strict;
@@ -265,6 +265,8 @@ my $db_dir = "$diamond_dir/DB";
 my $shared_dir = "$outdir/SHARED";
 my $synteny_dir = "$outdir/SYNTENY";
 my $conserved_dir = "$outdir/CONSERVED";
+my $barplot_dir = "$outdir/BARPLOTS";
+my $dotplot_dir = "$outdir/DOTPLOTS";
 
 my @outdirs = ($list_dir,$prot_dir,$diamond_dir,$db_dir,$synteny_dir);
 
@@ -400,7 +402,7 @@ system("
 #### Calculate/plot PAF metrics
 
 print ERROR "\n### paf_metrics.py ###\n";
-print "\nCalculating minimap2 alignment metrics:\n";
+print "\n# Calculating alignment metrics (minimap2):\n";
 
 my $aln_length_dir = $minimap2_dir.'/METRICS';
 
@@ -430,10 +432,8 @@ system ("
 ###################################################################################################
 
 print ERROR "\n### paf_to_barplot.py (minimap2) ###\n";
-print "\nCreating Barplots (minimap2):\n";
+print "\n# Barplots (minimap2):\n";
 
-my $barplot_dir = "$outdir/BARPLOTS";
-my $dotplot_dir = "$outdir/DOTPLOTS";
 my $paf_hm_dir = "$outdir/HEATMAPS";
 
 system("
@@ -456,7 +456,7 @@ system("
 unless ($no_dotplot){
 
 	print ERROR "\n### paf_to_dotplot.py (minimap2) ###\n";
-	print "\nCreating Dotplots (minimap2):\n";
+	print "\n# Dotplots (minimap2):\n";
 
 	system("
 		$path/paf_to_dotplot.py \\
@@ -478,7 +478,7 @@ unless ($no_dotplot){
 }
 
 print ERROR "\n### paf_to_hm.py (minimap2) ###\n";
-print "\nCreating heatmaps (minimap2):\n";
+print "\n# Heatmaps (minimap2):\n";
 
 system("
 	$path/paf_to_heatmap.py \\
@@ -620,38 +620,44 @@ foreach my $gap (@gaps){
 
 ### Create barplots from PAF files
 print ERROR "\n### paf_to_barplot.py (SYNY) ###\n";
-print "\nCreating Barplots (SYNY):\n";
+print "\n# Barplots (SYNY):\n";
+
+my @barplot_files;
 
 foreach my $gap (@gaps){
 
-	my $barplot_dir = "$outdir/BARPLOTS";
 	my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
+	opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
 
-	system("
-		$path/paf_to_barplot.py \\
-		--paf $ppafdir/*.paf \\
-		--fasta $genome_dir/*.fasta \\
-		--threads $threads \\
-		--outdir $barplot_dir \\
-		--height $bheight \\
-		--width $bwidth \\
-		--palette $palette \\
-		$tick_flag \\
-		$monobar_flag \\
-		2>> $outdir/error.log
-	") == 0 or checksig();
+	while (my $file = readdir(PAFDIR)){
+		if ($file =~ /\.paf$/){
+			push (@barplot_files, "$ppafdir/$file");
+		}
+	}
 
 }
+
+system("
+	$path/paf_to_barplot.py \\
+	--paf @barplot_files \\
+	--fasta $genome_dir/*.fasta \\
+	--threads $threads \\
+	--outdir $barplot_dir \\
+	--height $bheight \\
+	--width $bwidth \\
+	--palette $palette \\
+	$tick_flag \\
+	$monobar_flag \\
+	2>> $outdir/error.log
+") == 0 or checksig();
 
 ### Create dotplots from PAF files
 unless ($no_dotplot){
 
 	print ERROR "\n### paf_to_dotplot.py (SYNY) ###\n";
-	print "\nCreating Dotplots (SYNY):\n";
+	print "\n# Dotplots (SYNY):\n";
 
 	my @dotplot_files;
-	my $dotplot_dir = "$outdir/DOTPLOTS";
-
 	foreach my $gap (@gaps){
 
 		my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
@@ -817,7 +823,7 @@ foreach my $gap (keys %matrices){
 ### Create cluster summary table as heatmap with matplotlib
 
 print ERROR "\n### protein_cluster_hm.py ###\n";
-print "\nCreating heatmaps (SYNY):\n";
+print "\n# Heatmaps (SYNY):\n";
 
 my $hm_dir = $outdir.'/HEATMAPS';
 my @hm_files;
@@ -943,7 +949,7 @@ my $circos_plot_dir = $outdir.'/CIRCOS_PLOTS';
 ## Populating list of plots to generate
 if ($circos){
 
-	print "\n##### Generating Circos plots\n";
+	print "\n# Circos plots:\n";
 
 	unless (-d $circos_plot_dir){
 			mkdir ($circos_plot_dir, 0755) or die "Can't create $circos_plot_dir: \n";
@@ -974,6 +980,8 @@ if ($circos){
 
 ## Running one circos instance per thread
 my @circos_files :shared = sort(keys %circos_todo_list);
+my $circos_num = scalar(@circos_files);
+my $circos_counter = 0;
 
 if ($circos){
 
@@ -1225,16 +1233,13 @@ sub initThreads {
 
 sub run_circos {
 
-	my $id = threads->tid();
-	my $length = length($threads);
-
 	while (my $conf = shift@circos_files){
 
 		my $plot_dir = $circos_todo_list{$conf}{'dir'};
 		my $circos_plot = $circos_todo_list{$conf}{'png'};
 
-		$id = sprintf("%0${length}d", $id);
-		print "Thread $id: Plotting $circos_plot\n";
+		my $x = $circos_num - scalar(@circos_files);
+		print "$x / $circos_num - plotting $plot_dir/$circos_plot\n";
 
 		system ("
 			circos \\

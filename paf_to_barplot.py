@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 version = '0.3'
-updated = '2024-04-20'
+updated = '2024-04-20a'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.patches as mpatches
 from matplotlib.patches import Rectangle
-from multiprocessing import Pool
+from multiprocessing import Pool, Value
 import seaborn as sns
 
 ################################################################################
@@ -129,11 +129,15 @@ if fasta_files is not None:
 ## Parsing and plotting PAF file(s) 
 ################################################################################
 
+lsize = len(paf_files) * 2
+counter = Value('i', 0)
+
 def barplot(paf):
 
     basename = os.path.basename(paf)
     qfile = None
     sfile = None
+    global counter
 
     m = re.search(r'^(\w+)_vs_(\w+)', basename)
     if m:
@@ -261,10 +265,14 @@ def barplot(paf):
     png = pngdir + '/' + output.rsplit('.', 1)[0] + suffix + '.barplot.' + f"{width}x{height}." + f"{affix_color}" + '.png'
     svg = svgdir + '/' + output.rsplit('.', 1)[0] + suffix + '.barplot.' + f"{width}x{height}." + f"{affix_color}" + '.svg'
 
-    print(f"Creating {png}...")
+    with counter.get_lock():
+        counter.value += 1
+    print(f"{counter.value} / {lsize} - plotting {png}...")
     plt.savefig(png)
 
-    print(f"Creating {svg}...")
+    with counter.get_lock():
+        counter.value += 1
+    print(f"{counter.value} / {lsize} - plotting {svg}...")
     plt.savefig(svg)
 
     ## Close fig

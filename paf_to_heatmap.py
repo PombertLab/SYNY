@@ -211,8 +211,8 @@ with open (matrix_file) as f:
     )
 
     cm.fig.suptitle(f"% of colinear bases in pairwise alignments", x=0.5, y=0.95)
-    print(f"Creating {clustered_png}")
-    print(f"Creating {clustered_svg}")
+    print(f"Plotting {clustered_png}")
+    print(f"Plotting {clustered_svg}")
     plt.savefig(clustered_png)
     plt.savefig(clustered_svg)
     plt.close('all')

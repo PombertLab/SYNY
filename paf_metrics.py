@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2'
+version = '0.2a'
 updated = '2024-04-20'
 name = 'paf_metrics.py'
 
@@ -9,7 +9,7 @@ import sys
 import re
 import argparse
 import matplotlib.pyplot as plt
-from multiprocessing import Pool
+from multiprocessing import Pool, Value
 
 ################################################################################
 ## README
@@ -98,8 +98,12 @@ for dir in [outdir,txtdir,pngdir]:
 ## Working on PAF file
 ################################################################################
 
+lsize = len(paf_files)
+counter = Value('i', 0)
+
 def scatterplot(paf):
 
+    global counter
     basename = os.path.basename(paf)
     metrics_file = basename
 
@@ -253,9 +257,16 @@ def scatterplot(paf):
     )
 
     # Creating outfile
+    with counter.get_lock():
+        counter.value += 1
     filename = pngdir + '/' + metrics_file + '.png' 
-    print(f"Plotting {filename}...")
+    print(f"{counter.value} / {lsize} - plotting {filename}...")
     plt.savefig(filename)
+
+    ## Close fig
+    plt.clf()
+    plt.cla()
+    plt.close('all')
 
 ## Run
 pool = Pool(threads)

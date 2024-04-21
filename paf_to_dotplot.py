@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.5'
+version = '0.5a'
 updated = '2024-04-20'
 name = 'paf_to_dotplot.py'
 
@@ -12,7 +12,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import argparse
 import seaborn as sns
-from multiprocessing import Pool
+from multiprocessing import Pool, Value
 matplotlib.use('agg')
 
 ################################################################################
@@ -137,8 +137,12 @@ if fasta_files is not None:
 ## Parsing and plotting PAF file(s) 
 ################################################################################
 
+lsize = len(paf_files) * 2
+counter = Value('i', 0)
+
 def dotplot(paf):
 
+    global counter
     basename = os.path.basename(paf)
     qfile = None
     sfile = None
@@ -157,8 +161,6 @@ def dotplot(paf):
         subject_len_dict = len_dict[sfile]
 
     with open(paf) as file:
-
-        print(f"Working on {basename}", end='')
 
         matchnum = 0
 
@@ -219,7 +221,6 @@ def dotplot(paf):
     x_axes_total = int(len(query_len_dict))
     y_axes_total = int(len(subject_len_dict))
     subplots_total = x_axes_total * y_axes_total
-    print( '  => ', 'total subplots:', subplots_total)
 
     # Setting default image to widescreen by default
     plt.rcParams["figure.figsize"] = (width,height)
@@ -355,7 +356,14 @@ def dotplot(paf):
         )
 
     ##### Writing to output file
+    with counter.get_lock():
+        counter.value += 1
+    print(f"{counter.value} / {lsize} - plotting {pngfile}...")
     plt.savefig(pngfile)
+
+    with counter.get_lock():
+        counter.value += 1
+    print(f"{counter.value} / {lsize} - plotting {svgfile}...")
     plt.savefig(svgfile)
 
     ## Close fig
