@@ -215,16 +215,16 @@ while (my $cluster = shift@clusters){
             for my $fh (\*OUT,\*CAT){
 
                 # query
-                my $query_start = $loci_db{$qstart}{'start'} - 1;
-                my $query_end = $loci_db{$qend}{'end'} - 1;
+                my $query_start = $loci_db{$qstart}{'start'};
+                my $query_end = $loci_db{$qend}{'end'};
 
                 print $fh $loci_db{$qstart}{'contig'}.' ';
                 print $fh $query_start.' ';
                 print $fh $query_end.' ';
 
                 # subject
-                my $subject_start = $loci_db{$sstart}{'start'} - 1;
-                my $subject_end = $loci_db{$send}{'end'} - 1;
+                my $subject_start = $loci_db{$sstart}{'start'};
+                my $subject_end = $loci_db{$send}{'end'};
 
                 print $fh $loci_db{$sstart}{'contig'}.' ';
                 print $fh $subject_start.' ';
