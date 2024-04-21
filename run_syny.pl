@@ -1057,7 +1057,7 @@ sub list_maker {
 
 		system("
 			$path/list_maker.pl \\
-			--input @annotations \\
+			--input $annotation \\
 			--outdir $outdir \\
 			2>> $outdir/error.log
 		") == 0 or checksig();
