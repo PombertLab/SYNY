@@ -2,7 +2,7 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.4';
+my $version = '0.5.4a';
 my $updated = '2024-04-12';
 
 use strict;
@@ -21,15 +21,16 @@ SYNOPSIS	Creates a list containing all protein-coding genes with their genomic p
 
 USAGE		${name}
 		  -i *.gbff \\
-		  -o LISTS
+		  -o LISTS \\
+		  -verbose
 OPTIONS
 
 $usage .= <<'REGEX';
 OPTIONS:
 -i (--input)	Input file(s) (GZIP supported; File type determined by file extension)
 -o (--outdir)	Output directory [Default: LIST_MAKER]
+-v (--verbose)	Add verbosity
 REGEX
-
 die "$usage\n" unless @ARGV;
 
 my %filetypes = (
@@ -41,10 +42,11 @@ my %filetypes = (
 
 my @input_files;
 my $outdir = 'LIST_MAKER';
-
+my $verbose;
 GetOptions(
 	'i|input=s@{1,}' => \@input_files,
-	'o|outdir=s' => \$outdir
+	'o|outdir=s' => \$outdir,
+	'v|verbose' => \$verbose
 );
 
 
@@ -72,8 +74,6 @@ for my $dir (@outdirs){
 ## Parsing input files
 ###################################################################################################
 
-print "\n";
-
 foreach my $input_file (@input_files){
 
 	my $file_name = basename($input_file);
@@ -87,8 +87,9 @@ foreach my $input_file (@input_files){
 		$ext = $file_data[-2];
 	}
 
-	print "Creating .list file for $file_name\n";
-
+	if ($verbose){
+		print "Creating .list file for $file_name\n";
+	}
 
 	my $annotation_list = "$list_dir/$file_prefix.list";
 	my $fasta_proteins = "$prot_dir/$file_prefix.faa";
@@ -300,9 +301,9 @@ foreach my $input_file (@input_files){
 
 	### Other formats
 	else {
-		print "Unrecognized file type: $filetypes{$ext}\n";
+		if ($verbose){
+			print "Unrecognized file type: $filetypes{$ext}\n";
+		}
 		exit;
 	}
 }
-
-print "\n";
