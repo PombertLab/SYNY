@@ -211,10 +211,12 @@ with open (matrix_file) as f:
     )
 
     cm.fig.suptitle(f"% of colinear bases in pairwise alignments", x=0.5, y=0.95)
-    print(f"Plotting {clustered_png}")
-    print(f"Plotting {clustered_svg}")
+    print(f"1 / 4 - Plotting {clustered_png}")
     plt.savefig(clustered_png)
+
+    print(f"2 / 4 - Plotting {clustered_svg}")
     plt.savefig(clustered_svg)
+
     plt.close('all')
 
     ## Normal heatmaps
@@ -226,8 +228,10 @@ with open (matrix_file) as f:
     )
 
     hm.figure.suptitle(f"% of colinear bases in pairwise alignments", x=0.5, y=0.95)
-    print(f"Plotting {heatmap_png}")
-    print(f"Plotting {heatmap_svg}")
+    print(f"3 / 4 - Plotting {heatmap_png}")
     plt.savefig(heatmap_png)
+
+    print(f"4 / 4 - Plotting {heatmap_svg}")
     plt.savefig(heatmap_svg)
+
     plt.close('all')
