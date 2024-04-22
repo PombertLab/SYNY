@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'clusters_to_paf.pl';
-my $version = '0.1a';
-my $updated = '2024-04-10';
+my $version = '0.2';
+my $updated = '2024-04-22';
 
 use strict;
 use warnings;
@@ -151,25 +151,23 @@ while (my $cluster = shift @clusters){
             my $slen = $lengths{$subject};
             my $sstrand = $annotations{$sstart}{'strand'};
 
-            my $rel_strand = '+';
-            if ($qstrand ne $sstrand){
-                $rel_strand = '-';
-            }
-
             my $real_qstart = $qm_start;
             my $real_qend = $qm_end;
             my $real_sstart = $sm_start;
             my $real_ssend = $sm_end;
 
-            ## Adjusting positions if start > end
+            ## Adjusting positions and relative strandedness if start > end
+            my $rel_strand = '+';
             if ($qm_start > $qm_end){
                 $real_qstart = $qm_end;
                 $real_qend = $qm_start;
+                $rel_strand = '-';
             }
 
             if ($sm_start > $sm_end){
                 $real_sstart = $sm_end;
                 $real_ssend = $sm_start;
+                $rel_strand = '-';
             }
 
             ## PAF
