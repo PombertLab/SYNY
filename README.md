@@ -222,7 +222,6 @@ SYNY can be run from the master script as follows:<br>
 ```Bash
 run_SYNY.pl \
   -a *.gbff \
-  -g 5 \
   -o SYNY
 ```
 Options for run_SYNY.pl are:
