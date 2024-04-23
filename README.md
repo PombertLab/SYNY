@@ -235,7 +235,7 @@ OPTIONS (MAIN):
 --asm           Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume        Resume minimap2 computations (skip completed alignments)
 --no_map        Skip minimap2 pairwise genome alignments
---no_clus       Skip protein gene cluster reconstructions
+--no_clus       Skip gene cluster reconstructions
 
 OPTIONS (PLOTS):
 ### Circos - http://circos.ca/
