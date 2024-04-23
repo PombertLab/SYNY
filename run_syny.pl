@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.0d';
+my $version = '0.6.1';
 my $updated = '2024-04-23';
 
 use strict;
@@ -33,7 +33,7 @@ USAGE		${name} \\
 		  -r CCMP1205 \\
 		  --circos cat
 
-OPTIONS (MAIN):
+OPTIONS:
 -t (--threads)	Number of threads to use [Default: 16]
 -a (--annot)	GenBank GBF/GBFF Annotation files (GZIP files are supported)
 -o (--outdir)	Output directory [Default = SYNY]
@@ -43,11 +43,12 @@ OPTIONS (MAIN):
 --resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
 --no_clus	Skip gene cluster reconstructions
+--help		Display all command line options
+EXIT
 
-OPTIONS (PLOTS):
-### Circos - http://circos.ca/
+my $plot_options = <<"PLOT_OPTIONS";
+### Circos plots - http://circos.ca/
 -c (--circos)	Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: pair]
---no_circos		Turn off Circos plots
 --circos_prefix	Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)	Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
 -u (--unit)	Size unit (Kb or Mb) [Default: Mb]
@@ -66,12 +67,14 @@ OPTIONS (PLOTS):
 --max_links		Set max number of links [Default: 25000]
 --max_points_per_track	Set max number of points per track [Default: 75000]
 --clusters		Color by cluster instead of contig/chromosome [Default: off]
+--no_circos		Turn off Circos plots
 
 ### Barplots
 -h (--height)	Barplot figure height in inches [Default: 10.8]
 -w (--width)	Barplot figure width in inches [Default: 19.2]
 --palette	Barplot color palette [Default: Spectral]
 --monobar	Use a monochrome barplot color instead: e.g. --monobar blue
+--no_barplot	Turn off barplots
 
 ### Dotplots
 -dh (--dheight)	Dotplot figure height in inches [Default: 10.8]
@@ -82,13 +85,14 @@ OPTIONS (PLOTS):
 --noticks	Turn off ticks on x and y axes
 --wdis		Horizontal distance (width) between subplots [Default: 0.05]
 --hdis		Vertical distance (height) between subplots [Default: 0.1]
---no_dotplot	Skip dotplot creation
+--no_dotplot	Turn of dotplots
 
 ### Heatmaps
 -hh (--hheight)	Heatmap figure height in inches [Default: 10]
 -hw (--hwidth)	Heatmap figure width in inches [Default: 10]
 --hmpalette	Heatmap color palette [Default: winter_r]
-EXIT
+--no_heatmap	Turn off heatmaps
+PLOT_OPTIONS
 
 die ("\n$usage\n") unless (@ARGV);
 
@@ -104,6 +108,7 @@ my $nomap;
 my $noclus;
 my $resume;
 my $asm;
+my $help;
 
 # Circos
 my $reference;
@@ -112,7 +117,6 @@ my $labels = 'numbers';
 my $label_size = 36;
 my $label_font = 'bold';
 my $circos = 'pair';
-my $nocircos;
 my $circos_prefix = 'circos';
 my $winsize = 10000;
 my $stepsize = 5000;
@@ -125,12 +129,14 @@ my $max_ideograms = 200;
 my $max_links = 25000;
 my $max_points_per_track = 75000;
 my $clusters;
+my $no_circos;
 
 # Barplots
 my $bheight = 10.8;
 my $bwidth = 19.2;
 my $palette = 'Spectral';
 my $monobar;
+my $no_barplot;
 
 # Dotplots
 my $dheight = 10.8;
@@ -147,6 +153,7 @@ my $no_dotplot;
 my $hheight = 10;
 my $hwidth = 10;
 my $hmpalette = 'winter_r';
+my $no_heatmap;
 
 GetOptions(
 	# Main
@@ -159,9 +166,9 @@ GetOptions(
 	'no_clus' => \$noclus,
 	'resume' => \$resume,
 	'asm=i' => \$asm,
+	'help' => \$help,
 	# Circos
 	'c|circos=s' => \$circos,
-	'no_circos' => \$nocircos,
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
 	'labels=s' => \$labels,
@@ -179,11 +186,13 @@ GetOptions(
 	'max_links=i' => \$max_links,
 	'max_points_per_track=i' => \$max_points_per_track,
 	'clusters' => \$clusters,
+	'no_circos' => \$no_circos,
 	# Barplots
 	'h|height=s' => \$bheight,
 	'w|width=s' => \$bwidth,
 	'palette=s' => \$palette,
 	'monobar=s' => \$monobar,
+	'no_barplot' => \$no_barplot,
 	# Dotplots
 	'dh|dheight=s' => \$dheight,
 	'dw|dwidth=s' => \$dwidth,
@@ -197,9 +206,18 @@ GetOptions(
 	# Heatmaps
 	'hh|hheight=s' => \$hheight,
 	'hw|hwidth=s' => \$hwidth,
-	'hmpalette=s' => \$hmpalette
+	'hmpalette=s' => \$hmpalette,
+	'no_heatmap' => \$no_heatmap,
 );
 
+# Displaying the full list of options
+if ($help){
+	print $usage."\n";
+	print $plot_options."\n";
+	exit;
+}
+
+# Setting default gap value
 unless(@gaps){
 	@gaps = (0);
 }
@@ -225,7 +243,7 @@ if ($minimap2_check eq ''){
 }
 
 # Circos
-unless ($nocircos){
+unless ($no_circos){
 	my $circos_check = `echo \$(command -v circos)`;
 	chomp $circos_check;
 	if ($diamond_check eq ''){
@@ -267,9 +285,14 @@ my $list_dir = "$outdir/LISTS";
 my $prot_dir = "$outdir/PROT_SEQ";
 my $diamond_dir = "$outdir/DIAMOND";
 my $db_dir = "$diamond_dir/DB";
+
+# gene clusters subdirs
 my $conserved_dir = "$outdir/CONSERVED";
 my $shared_dir = "$outdir/SHARED";
 my $synteny_dir = "$outdir/SYNTENY";
+
+# plots subdirs
+my $paf_hm_dir = "$outdir/HEATMAPS";
 my $barplot_dir = "$outdir/BARPLOTS";
 my $dotplot_dir = "$outdir/DOTPLOTS";
 
@@ -444,26 +467,29 @@ system ("
 ## Creating barplots/dotplots/heatmaps from minimap2 PAF files
 ###################################################################################################
 
-print ERROR "\n### paf_to_barplot.py (minimap2) ###\n";
-print "\n# Barplots (minimap2):\n";
+# Barplots
+unless ($no_barplot){
 
-my $paf_hm_dir = "$outdir/HEATMAPS";
+	print ERROR "\n### paf_to_barplot.py (minimap2) ###\n";
+	print "\n# Barplots (minimap2):\n";
 
-system("
-	$path/paf_to_barplot.py \\
-	--paf $paf_dir/*.paf \\
-	--fasta $genome_dir/*.fasta \\
-	--outdir $barplot_dir \\
-	--threads $threads \\
-	--affix mmap \\
-	--height $bheight \\
-	--width $bwidth \\
-	--palette $palette \\
-	--affix mmap \\
-	$tick_flag \\
-	$monobar_flag \\
-	2>> $outdir/error.log
-") == 0 or checksig();
+	system("
+		$path/paf_to_barplot.py \\
+		--paf $paf_dir/*.paf \\
+		--fasta $genome_dir/*.fasta \\
+		--outdir $barplot_dir \\
+		--threads $threads \\
+		--affix mmap \\
+		--height $bheight \\
+		--width $bwidth \\
+		--palette $palette \\
+		--affix mmap \\
+		$tick_flag \\
+		$monobar_flag \\
+		2>> $outdir/error.log
+	") == 0 or checksig();
+
+}
 
 # Doplots
 unless ($no_dotplot){
@@ -490,20 +516,24 @@ unless ($no_dotplot){
 	") == 0 or checksig();
 }
 
-print ERROR "\n### paf_to_hm.py (minimap2) ###\n";
-print "\n# Heatmaps (minimap2):\n";
+unless ($no_heatmap){
 
-system("
-	$path/paf_to_heatmap.py \\
-	--paf $paf_dir/*.paf \\
-	--fasta $genome_dir/*.fasta \\
-	--outdir $paf_hm_dir \\
-	--height $hheight \\
-	--width $hwidth \\
-	--palette $hmpalette \\
-	--matrix $minimap2_dir/paf_matrix.tsv \\
-	2>> $outdir/error.log
-") == 0 or checksig();
+	print ERROR "\n### paf_to_hm.py (minimap2) ###\n";
+	print "\n# Heatmaps (minimap2):\n";
+
+	system("
+		$path/paf_to_heatmap.py \\
+		--paf $paf_dir/*.paf \\
+		--fasta $genome_dir/*.fasta \\
+		--outdir $paf_hm_dir \\
+		--height $hheight \\
+		--width $hwidth \\
+		--palette $hmpalette \\
+		--matrix $minimap2_dir/paf_matrix.tsv \\
+		2>> $outdir/error.log
+	") == 0 or checksig();
+
+}
 
 ###################################################################################################
 ## Run get_homology.pl
@@ -637,37 +667,41 @@ foreach my $gap (@gaps){
 }
 
 ### Create barplots from PAF files
-print ERROR "\n### paf_to_barplot.py (SYNY) ###\n";
-print "\n# Barplots (SYNY):\n";
+unless ($no_barplot){
 
-my @barplot_files;
+	print ERROR "\n### paf_to_barplot.py (SYNY) ###\n";
+	print "\n# Barplots (SYNY):\n";
 
-foreach my $gap (@gaps){
+	my @barplot_files;
 
-	my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
-	opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
+	foreach my $gap (@gaps){
 
-	while (my $file = readdir(PAFDIR)){
-		if ($file =~ /\.paf$/){
-			push (@barplot_files, "$ppafdir/$file");
+		my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
+		opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
+
+		while (my $file = readdir(PAFDIR)){
+			if ($file =~ /\.paf$/){
+				push (@barplot_files, "$ppafdir/$file");
+			}
 		}
+
 	}
 
-}
+	system("
+		$path/paf_to_barplot.py \\
+		--paf @barplot_files \\
+		--fasta $genome_dir/*.fasta \\
+		--threads $threads \\
+		--outdir $barplot_dir \\
+		--height $bheight \\
+		--width $bwidth \\
+		--palette $palette \\
+		$tick_flag \\
+		$monobar_flag \\
+		2>> $outdir/error.log
+	") == 0 or checksig();
 
-system("
-	$path/paf_to_barplot.py \\
-	--paf @barplot_files \\
-	--fasta $genome_dir/*.fasta \\
-	--threads $threads \\
-	--outdir $barplot_dir \\
-	--height $bheight \\
-	--width $bwidth \\
-	--palette $palette \\
-	$tick_flag \\
-	$monobar_flag \\
-	2>> $outdir/error.log
-") == 0 or checksig();
+}
 
 ### Create dotplots from PAF files
 unless ($no_dotplot){
@@ -840,28 +874,30 @@ foreach my $gap (keys %matrices){
 
 ### Create cluster summary table as heatmap with matplotlib
 
-print ERROR "\n### protein_cluster_hm.py ###\n";
-print "\n# Heatmaps (SYNY):\n";
+unless ($no_heatmap){
 
-my $hm_dir = $outdir.'/HEATMAPS';
-my @hm_files;
+	print ERROR "\n### protein_cluster_hm.py ###\n";
+	print "\n# Heatmaps (SYNY):\n";
 
-foreach my $gap (@gaps){
-	my $matrix_file = $synteny_dir."/gap_$gap"."/matrix_gap_$gap.tsv";
-	push (@hm_files, $matrix_file);
+	my $hm_dir = $outdir.'/HEATMAPS';
+	my @hm_files;
+
+	foreach my $gap (@gaps){
+		my $matrix_file = $synteny_dir."/gap_$gap"."/matrix_gap_$gap.tsv";
+		push (@hm_files, $matrix_file);
+	}
+
+	system("
+		$path/protein_cluster_hm.py \\
+		--tsv @hm_files \\
+		--outdir $hm_dir \\
+		--threads $threads \\
+		--height $hheight \\
+		--width $hwidth \\
+		--palette $hmpalette
+	") == 0 or checksig();
+
 }
-
-system("
-	$path/protein_cluster_hm.py \\
-	--tsv @hm_files \\
-	--outdir $hm_dir \\
-	--threads $threads \\
-	--height $hheight \\
-	--width $hwidth \\
-	--palette $hmpalette
-") == 0 or checksig();
-
-
 
 ###################################################################################################
 ## Run id_conserved_regions.pl
@@ -970,7 +1006,7 @@ my %circos_todo_list;
 my $circos_plot_dir = $outdir.'/CIRCOS_PLOTS';
 
 ## Populating list of plots to generate
-unless ($nocircos){
+unless ($no_circos){
 
 	print "\n# Circos plots:\n";
 
@@ -1007,7 +1043,7 @@ unless ($nocircos){
 my @circos_files :shared = sort(keys %circos_todo_list);
 my $circos_num = scalar(@circos_files);
 
-unless ($nocircos){
+unless ($no_circos){
 
 	for my $thread (@threads){
 		$thread = threads->create(\&run_circos);
