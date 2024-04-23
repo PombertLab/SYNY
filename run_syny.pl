@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.0c';
-my $updated = '2024-04-20';
+my $version = '0.6.0d';
+my $updated = '2024-04-23';
 
 use strict;
 use warnings;
@@ -18,8 +18,7 @@ my $usage = <<"EXIT";
 NAME		${name}
 VERSION		${version}
 UPDATED		${updated}
-SYNOPSIS	Runs all the components of the SYNY pipeline and
-		creates configuration files for Circos plots
+SYNOPSIS	Runs the SYNY pipeline
 
 REQS		Perl / PerlIO::gzip - https://metacpan.org/pod/PerlIO::gzip
 		Python3 / matplotlib / seaborn / pandas - https://www.python.org/
@@ -35,14 +34,15 @@ USAGE		${name} \\
 		  --circos cat
 
 OPTIONS (MAIN):
+-t (--threads)	Number of threads to use [Default: 16]
 -a (--annot)	GenBank GBF/GBFF Annotation files (GZIP files are supported)
--e (--evalue)	BLAST evalue cutoff [Default = 1e-10]
--g (--gaps)	Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)	Output directory [Default = SYNY]
---threads	Number of threads to use [Default: 16]
+-e (--evalue)	DIAMOND BLASTP evalue cutoff [Default = 1e-10]
+-g (--gaps)	Allowable number of gaps between gene pairs [Default = 0]
 --asm		Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
+--no_clus	Skip protein gene cluster reconstructions
 
 OPTIONS (PLOTS):
 ### Circos - http://circos.ca/
@@ -100,6 +100,7 @@ my @gaps;
 my $outdir = 'SYNY';
 my $threads = 16;
 my $nomap;
+my $noclus;
 my $resume;
 my $asm;
 
@@ -147,12 +148,13 @@ my $hmpalette = 'winter_r';
 
 GetOptions(
 	# Main
+	't|threads=i' => \$threads,
 	'a|annot=s@{1,}' => \@annot_files,
+	'o|outdir=s' => \$outdir,
 	'e|evalue=s' => \$evalue,
 	'g|gaps=i{0,}' => \@gaps,
-	'o|outdir=s' => \$outdir,
-	'threads=i' => \$threads,
 	'no_map' => \$nomap,
+	'no_clus' => \$noclus,
 	'resume' => \$resume,
 	'asm=i' => \$asm,
 	# Circos
@@ -262,13 +264,17 @@ my $list_dir = "$outdir/LISTS";
 my $prot_dir = "$outdir/PROT_SEQ";
 my $diamond_dir = "$outdir/DIAMOND";
 my $db_dir = "$diamond_dir/DB";
+my $conserved_dir = "$outdir/CONSERVED";
 my $shared_dir = "$outdir/SHARED";
 my $synteny_dir = "$outdir/SYNTENY";
-my $conserved_dir = "$outdir/CONSERVED";
 my $barplot_dir = "$outdir/BARPLOTS";
 my $dotplot_dir = "$outdir/DOTPLOTS";
 
-my @outdirs = ($list_dir,$prot_dir,$diamond_dir,$db_dir,$synteny_dir);
+my @outdirs = ($list_dir,$prot_dir,$diamond_dir,$db_dir);
+
+unless ($noclus){
+	push (@outdirs, $synteny_dir);
+}
 
 foreach my $dir (@outdirs){
 	unless (-d $dir){
@@ -496,11 +502,16 @@ system("
 	2>> $outdir/error.log
 ") == 0 or checksig();
 
-
 ###################################################################################################
 ## Run get_homology.pl
 ###################################################################################################
 
+# Skip gene cluster if requested
+if ($noclus){
+	goto CIRCOS;
+}
+
+# Else, search for gene clusters
 HOMOLOGY:
 
 print "\n##### Infering colinearity from protein-coding gene clusters\n";
@@ -896,6 +907,9 @@ foreach my $cluster_subdir (@cluster_dirs){
 	") == 0 or checksig();
 }
 
+###### Circos section
+CIRCOS:
+
 ## Karyotypes and nucleotide biases
 print ERROR "\n### nucleotide_biases.pl ###\n";
 
@@ -935,10 +949,12 @@ system("
 ") == 0 or checksig();
 
 ## Create circos configuration files per links file
-foreach my $num (@gaps){
-	my $gap = 'gap_'.$num;
-	circos_conf($gap);
-	pairwise_conf($gap)
+unless ($noclus){
+	foreach my $num (@gaps){
+		my $gap = 'gap_'.$num;
+		circos_conf($gap);
+		pairwise_conf($gap)
+	}
 }
 
 unless ($nomap){
@@ -960,13 +976,15 @@ if ($circos){
 	}
 
 	## Synteny inferred from protein clusters
-	foreach my $num (@gaps){
-		my $affix = 'gap_'.$num;
-		if (($circos eq 'cat') or ($circos eq 'all')){
-			circos_plot($affix, 'cat');
-		}
-		if (($circos eq 'pair') or ($circos eq 'all')){
-			circos_plot($affix, 'pair');
+	unless ($noclus){
+		foreach my $num (@gaps){
+			my $affix = 'gap_'.$num;
+			if (($circos eq 'cat') or ($circos eq 'all')){
+				circos_plot($affix, 'cat');
+			}
+			if (($circos eq 'pair') or ($circos eq 'all')){
+				circos_plot($affix, 'pair');
+			}
 		}
 	}
 

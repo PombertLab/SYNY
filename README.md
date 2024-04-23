@@ -228,27 +228,27 @@ run_SYNY.pl \
 Options for run_SYNY.pl are:
 ```
 OPTIONS (MAIN):
+-t (--threads)  Number of threads to use [Default: 16]
 -a (--annot)    GenBank GBF/GBFF Annotation files (GZIP files are supported)
--e (--evalue)   BLAST evalue cutoff [Default = 1e-10]
--g (--gaps)     Allowable number of gaps between pairs [Default = 0]
 -o (--outdir)   Output directory [Default = SYNY]
---threads       Number of threads to use [Default: 16]
+-e (--evalue)   DIAMOND BLASTP evalue cutoff [Default = 1e-10]
+-g (--gaps)     Allowable number of gaps between gene pairs [Default = 0]
 --asm           Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume        Resume minimap2 computations (skip completed alignments)
 --no_map        Skip minimap2 pairwise genome alignments
+--no_clus       Skip protein gene cluster reconstructions
 
 OPTIONS (PLOTS):
 ### Circos - http://circos.ca/
--c (--circos)	Generate Circos plots automatically: cat (concatenate), pair (pairwize), all (cat + pair)
---circos_prefix	Desired Circos plot prefix for concatenated plots [Default: circos]
---circos_prefix Desired Circos plot prefix [Default: circos]
+-c (--circos)   Generate Circos plots automatically: cat (concatenate), pair (pairwize), all (cat + pair)
+--circos_prefix Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)      Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
 --winsize       Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize      Sliding windows step (nucleotide biases) [Default: 5000]
 --labels        Contig label type: numbers or names [Defaut: numbers]
 --label_size    Contig label size [Default: 36]
---label_font    Contig label font [Default: bold]
+--label_font    Contig label font [Default: bold] - https://circos.ca/documentation/tutorials/ideograms/labels/
 --custom_file   Load custom colors from file
 --list_preset   List available custom color presets
 --custom_preset Use a custom color preset; e.g.
@@ -271,7 +271,7 @@ OPTIONS (PLOTS):
 -dw (--dwidth)  Dotplot figure width in inches [Default: 19.2]
 -m (--multi)    Axes units multiplier (for dotplots) [Default: 1e5]
 --color         Dotplot color [Default: blue]
---dotpalette    Use a color palette instead: e.g. --dotpalette husl
+--dotpalette    Use a color palette instead: e.g. --dotpalette inferno
 --noticks       Turn off ticks on x and y axes
 --wdis          Horizontal distance (width) between subplots [Default: 0.05]
 --hdis          Vertical distance (height) between subplots [Default: 0.1]
