@@ -42,8 +42,6 @@ Synteny inferences can be used to:
 - [seaborn](https://seaborn.pydata.org/)
 - [pandas](https://pandas.pydata.org/)
 - [scipy](https://scipy.org/)
-
-##### <b>Optional</b>
 - [Circos](https://circos.ca/)
 
 #### <b>Downloading SYNY from GitHub</b>
@@ -239,7 +237,8 @@ OPTIONS (MAIN):
 
 OPTIONS (PLOTS):
 ### Circos - http://circos.ca/
--c (--circos)   Generate Circos plots automatically: cat (concatenate), pair (pairwize), all (cat + pair)
+-c (--circos)	Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: pair]
+--no_circos		Turn off Circos plots
 --circos_prefix Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)      Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
@@ -381,7 +380,7 @@ run_syny.pl \
   -e 1e-10 \
   -r JEC21 \
   -o $SYNY \
-  --circos cat \
+  --circos all \
   --circos_prefix WM276_vs_JEC21
 ```
 
@@ -479,9 +478,9 @@ Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `
 
 #### Circos plots
 
-If [Circos](https://circos.ca/) is invoked from the command line (with `--circos`), the corresponding plots (concatenated and/or pairwise) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and from the genome alignments computed with minimap2 (`.mmap.`), unless these alignments are skipped with the `--no_map` option.
+Unless the `--no_circos` command line switch is invoked, [Circos](https://circos.ca/) (concatenated and/or pairwise) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and/or from the genome alignments computed with minimap2 (`.mmap.`).
 
-In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. In the pairwise plots (`--circos pair`), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. Both contenated and pairwise plots can be generated with the `--circos all` command line switch.
+In the pairwise plots (`--circos pair`, set as default), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. Both contenated and pairwise plots can be generated with the `--circos all` command line switch.
 
 Two circos plots, `.normal` and `.inverted`, will be generated for each approach. In the inverted plots, the contigs/chromosomes from the genome(s) being compared to the reference are plotted in reverse, from last to first.
 
@@ -509,7 +508,7 @@ run_syny.pl \
   -e 1e-10 \
   -r JEC21 \
   -o $SYNY \
-  --circos cat \
+  --circos all \
   --circos_prefix WM276_vs_JEC21 \
   --labels names \
   --label_size 20 \
@@ -755,7 +754,7 @@ GPK93_01g00270  -       J0A71_11g23150  -
 
 In the above [Circos](https://circos.ca/) plot, links between the reference and the queried genomes are color-coded based on the reference genotype; links between the queried genomes are shown in light gray. In these plots, each chromosome/contig is plotted as a distinct [ideogram](https://circos.ca/documentation/tutorials/ideograms/ideograms/).
 
-Note that while SYNY can plot multiple genomes together in a single figure with `--circos cat` / `--circos all`, adding too much data can quickly clutter the Circos plots generated (drawing too many ideograms can make the figure illegible). If too dense, drawing pairwise (`--circos pair`) plots rather concatenated ones should help with readability. However, when comparing genomes featuring many chromosomes/contigs, cluttering can also occur even when performing pairwise genome comparisons.
+Note that while SYNY can plot multiple genomes together in a single figure with `--circos cat` / `--circos all`, adding too much data can quickly clutter the Circos plots generated (drawing too many ideograms can make the figure illegible). If too dense, drawing pairwise plots with `--circos pair`( set as default) rather than concatenated ones should help with readability. However, when comparing genomes featuring many chromosomes/contigs, cluttering can also occur even when performing pairwise genome comparisons.
 
 #### Custom Circos colors
 Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files containing color names and their associated RGB values (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Circos/custom_color_1.txt) for an example). A few custom presets are also available to use in SYNY.

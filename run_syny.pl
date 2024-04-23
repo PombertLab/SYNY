@@ -46,7 +46,8 @@ OPTIONS (MAIN):
 
 OPTIONS (PLOTS):
 ### Circos - http://circos.ca/
--c (--circos)	Generate Circos plots automatically: cat (concatenate), pair (pairwize), all (cat + pair)
+-c (--circos)	Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: pair]
+--no_circos		Turn off Circos plots
 --circos_prefix	Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)	Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
 -u (--unit)	Size unit (Kb or Mb) [Default: Mb]
@@ -110,7 +111,8 @@ my $unit = 'Mb';
 my $labels = 'numbers';
 my $label_size = 36;
 my $label_font = 'bold';
-my $circos;
+my $circos = 'pair';
+my $nocircos;
 my $circos_prefix = 'circos';
 my $winsize = 10000;
 my $stepsize = 5000;
@@ -159,6 +161,7 @@ GetOptions(
 	'asm=i' => \$asm,
 	# Circos
 	'c|circos=s' => \$circos,
+	'no_circos' => \$nocircos,
 	'r|ref|reference=s' => \$reference,
 	'u|unit=s' => \$unit,
 	'labels=s' => \$labels,
@@ -222,7 +225,7 @@ if ($minimap2_check eq ''){
 }
 
 # Circos
-if ($circos){
+unless ($nocircos){
 	my $circos_check = `echo \$(command -v circos)`;
 	chomp $circos_check;
 	if ($diamond_check eq ''){
@@ -967,7 +970,7 @@ my %circos_todo_list;
 my $circos_plot_dir = $outdir.'/CIRCOS_PLOTS';
 
 ## Populating list of plots to generate
-if ($circos){
+unless ($nocircos){
 
 	print "\n# Circos plots:\n";
 
@@ -1004,7 +1007,7 @@ if ($circos){
 my @circos_files :shared = sort(keys %circos_todo_list);
 my $circos_num = scalar(@circos_files);
 
-if ($circos){
+unless ($nocircos){
 
 	for my $thread (@threads){
 		$thread = threads->create(\&run_circos);
