@@ -31,8 +31,7 @@ USAGE		${name} \\
 		  -e 1e-10 \\
 		  -g 0 1 5 \\
 		  -o SYNY \\
-		  -r CCMP1205 \\
-		  --circos cat
+		  --circos pair
 
 OPTIONS:
 -t (--threads)	Number of threads to use [Default: 16]
