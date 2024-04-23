@@ -273,7 +273,7 @@ Options for run_SYNY.pl are:
 --noticks       Turn off ticks on x and y axes
 --wdis          Horizontal distance (width) between subplots [Default: 0.05]
 --hdis          Vertical distance (height) between subplots [Default: 0.1]
---no_dotplot    Turn of dotplots
+--no_dotplot    Turn off dotplots
 
 ### Heatmaps
 -hh (--hheight) Heatmap figure height in inches [Default: 10]
