@@ -224,7 +224,6 @@ run_SYNY.pl \
 ```
 Options for run_SYNY.pl are:
 ```
-OPTIONS (MAIN):
 -t (--threads)  Number of threads to use [Default: 16]
 -a (--annot)    GenBank GBF/GBFF Annotation files (GZIP files are supported)
 -o (--outdir)   Output directory [Default = SYNY]
@@ -234,11 +233,10 @@ OPTIONS (MAIN):
 --resume        Resume minimap2 computations (skip completed alignments)
 --no_map        Skip minimap2 pairwise genome alignments
 --no_clus       Skip gene cluster reconstructions
+--help          Display all command line options
 
-OPTIONS (PLOTS):
-### Circos - http://circos.ca/
--c (--circos)	Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: pair]
---no_circos		Turn off Circos plots
+### Circos plots - http://circos.ca/
+-c (--circos)   Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: pair]
 --circos_prefix Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)      Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
@@ -257,12 +255,14 @@ OPTIONS (PLOTS):
 --max_links             Set max number of links [Default: 25000]
 --max_points_per_track  Set max number of points per track [Default: 75000]
 --clusters              Color by cluster instead of contig/chromosome [Default: off]
+--no_circos             Turn off Circos plots
 
 ### Barplots
 -h (--height)   Barplot figure height in inches [Default: 10.8]
 -w (--width)    Barplot figure width in inches [Default: 19.2]
 --palette       Barplot color palette [Default: Spectral]
 --monobar       Use a monochrome barplot color instead: e.g. --monobar blue
+--no_barplot    Turn off barplots
 
 ### Dotplots
 -dh (--dheight) Dotplot figure height in inches [Default: 10.8]
@@ -273,12 +273,13 @@ OPTIONS (PLOTS):
 --noticks       Turn off ticks on x and y axes
 --wdis          Horizontal distance (width) between subplots [Default: 0.05]
 --hdis          Vertical distance (height) between subplots [Default: 0.1]
---no_dotplot    Skip dotplot creation
+--no_dotplot    Turn of dotplots
 
 ### Heatmaps
 -hh (--hheight) Heatmap figure height in inches [Default: 10]
 -hw (--hwidth)  Heatmap figure width in inches [Default: 10]
 --hmpalette     Heatmap color palette [Default: winter_r]
+--no_heatmap    Turn off heatmaps
 ```
 The output directory will be structured as follows: 
 ```Bash
