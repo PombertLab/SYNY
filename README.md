@@ -235,7 +235,7 @@ Options for run_SYNY.pl are:
 --no_clus       Skip gene cluster reconstructions
 --help          Display all command line options
 
-### Circos plots - http://circos.ca/
+### Circos plots
 -c (--circos)   Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: pair]
 --circos_prefix Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)      Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
