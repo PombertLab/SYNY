@@ -24,6 +24,7 @@ REQS		Perl / PerlIO::gzip - https://metacpan.org/pod/PerlIO::gzip
 		Python3 / matplotlib / seaborn / pandas - https://www.python.org/
 		Diamond - https://github.com/bbuchfink/diamond
 		Minimap2 - https://github.com/lh3/minimap2
+		Circos - http://circos.ca/
 
 USAGE		${name} \\
 		  -a *.gbff \\
@@ -47,7 +48,7 @@ OPTIONS:
 EXIT
 
 my $plot_options = <<"PLOT_OPTIONS";
-### Circos plots - http://circos.ca/
+### Circos plots
 -c (--circos)	Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: all]
 --circos_prefix	Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)	Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
