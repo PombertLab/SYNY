@@ -296,11 +296,11 @@ drwxr-xr-x  4 jpombert jpombert 4096 Apr 24 09:54 SEQUENCES
 -rw-r--r--  1 jpombert jpombert 1574 Apr 24 09:57 syny.log
 ```
 
-Genome/protein sequences and gene lists extracted from GenBank GBFF files are located in the `SEQUENCES/` and `LISTS` directories, respectively. Data files from minimap2 pairwise genome alignments and from gene cluster inferences are located in the `ALIGNMENTS` and `CLUSTERS` directories, respectively. Plots are located in `PLOTS`.
+Genome/protein sequences and gene lists extracted from GenBank GBFF files are located in the `SEQUENCES/` and `LISTS/` directories, respectively. Data files from minimap2 pairwise genome alignments and from gene cluster inferences are located in the `ALIGNMENTS/` and `CLUSTERS/` directories, respectively. Plots are located in `PLOTS/`.
 
 The contents of the subdirectories are:
 - ALIGNMENTS:
-	- MAF, PAF and ALN: pairwise minimap2 genome alignments in the corresponding formats
+	- MAF, PAF and ALN: pairwise genome alignments in the corresponding formats
 	- METRICS:
       - Alignment length vs. similarity scatter plots (in PNG format)
       - Alignment metrics summaries (in plain TXT format)
