@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.4a';
-my $updated = '2024-04-12';
+my $version = '0.5.4b';
+my $updated = '2024-04-24';
 
 use strict;
 use warnings;
@@ -54,11 +54,12 @@ GetOptions(
 ## Output dir/subdir creation and setup
 ###################################################################################################
 
-my $list_dir = $outdir."/LISTS";
-my $prot_dir = $outdir."/PROT_SEQ";
-my $genome_dir = $outdir."/GENOME";
+my $list_dir = $outdir.'/LISTS';
+my $seq_dir = $outdir.'/SEQUENCES';
+my $prot_dir = $seq_dir.'/PROTEINS';
+my $genome_dir = $seq_dir.'/GENOMES';
 
-my @outdirs = ($list_dir,$prot_dir,$genome_dir);
+my @outdirs = ($list_dir,$seq_dir,$prot_dir,$genome_dir);
 
 unless (-d $outdir){
 	make_path($outdir,{mode=>0755}) or die("Can't create output directory $outdir: $!\n");
