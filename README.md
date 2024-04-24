@@ -285,24 +285,18 @@ The output directory will be structured as follows:
 ```Bash
 ls -lah SYNY/
 
-drwxr-xr-x 11 jpombert jpombert 4.0K Mar  8 14:46 .
-drwx------ 23 jpombert jpombert 4.0K Mar  8 14:45 ..
-drwxr-xr-x  5 jpombert jpombert 4.0K Mar  8 14:45 ALIGNMENTS
-drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 BARPLOTS
-drwxr-xr-x  9 jpombert jpombert 4.0K Mar  8 14:45 CIRCOS
-drwxr-xr-x  9 jpombert jpombert 4.0K Mar  8 14:45 CIRCOS_PLOTS
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 CONSERVED
-drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DIAMOND
-drwxr-xr-x  3 jpombert jpombert 4.0K Mar  8 14:45 DOTPLOTS
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 GENOME
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 HEATMAPS
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 LISTS
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 PROT_SEQ
-drwxr-xr-x  2 jpombert jpombert 4.0K Mar  8 14:45 SHARED
-drwxr-xr-x  5 jpombert jpombert 4.0K Mar  8 14:45 SYNTENY
--rw-r--r--  1 jpombert jpombert  182 Mar  8 14:45 error.log
--rw-r--r--  1 jpombert jpombert  397 Mar  8 14:46 syny.log
+drwxr-xr-x  7 jpombert jpombert 4096 Apr 24 09:54 .
+drwx------ 20 jpombert jpombert 4096 Apr 24 09:54 ..
+drwxr-xr-x  6 jpombert jpombert 4096 Apr 24 09:54 ALIGNMENTS
+drwxr-xr-x  6 jpombert jpombert 4096 Apr 24 09:55 CLUSTERS
+drwxr-xr-x  2 jpombert jpombert 4096 Apr 24 09:54 LISTS
+drwxr-xr-x  7 jpombert jpombert 4096 Apr 24 09:55 PLOTS
+drwxr-xr-x  4 jpombert jpombert 4096 Apr 24 09:54 SEQUENCES
+-rw-r--r--  1 jpombert jpombert  526 Apr 24 09:55 error.log
+-rw-r--r--  1 jpombert jpombert 1574 Apr 24 09:57 syny.log
 ```
+
+Genome/protein sequences and gene lists extracted from GenBank GBFF files are located in the `SEQUENCES/` and `LISTS` directories, respectively. Data files from minimap2 pairwise genome alignments and from gene cluster inferences are located in the `ALIGNMENTS` and `CLUSTERS` directories, respectively. Plots are located in `PLOTS`.
 
 The contents of the subdirectories are:
 - ALIGNMENTS:
@@ -310,45 +304,48 @@ The contents of the subdirectories are:
 	- METRICS:
       - Alignment length vs. similarity scatter plots (in PNG format)
       - Alignment metrics summaries (in plain TXT format)
-- BARPLOTS:
-	- Barplots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
-	- Barplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
-- CIRCOS:
-	- Configuration files for Circos plots
-- CIRCOS_PLOTS:
-	- Circos plots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
-	- Circos plots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
-- CONSERVED:
-	- Lists of proteins that are conserved within the samples (.conserved)
-	- Summaries of all homology results and conservation within the samples (.conserved_summary)
-	- Lists of unique proteins and their locations (.unique)
-- DIAMOND:
-	- DB
-		- BLASTP databases
-	- Round-robin BLASTP results (.diamond.6)
-- DOTPLOTS:
-	- Dotplots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
-	- Dotplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
-- GENOME:
-	- FASTA files containing the sequences of the investigated genomes
-- HEATMAPS:
-	- Heatmaps (in PNG/SVG format) summarizing the percentages of colinear bases in pairwise alignments (.mmap.)
-	- Heatmaps (in PNG/SVG format) summarizing the percentages of proteins found in clusters (.gap_0., .gap_1., ...)
+- CLUSTERS:
+  - CONSERVED:
+    - Lists of proteins that are conserved within the samples (.conserved)
+    - Summaries of all homology results and conservation within the samples (.conserved_summary)
+    - Lists of unique proteins and their locations (.unique)
+  - DIAMOND:
+    - DB
+      - BLASTP databases
+    - Round-robin BLASTP results (.diamond.6)
+  - SHARED:
+    - Lists of all proteins and their top homologs (if any) in other species (.shared.tsv)
+    - Lists of proteins that are unique to each species (.uniques.tsv)
+  - SYNTENY:
+    - Cluster summary (clusters_summary.tsv)
+    - Tab-delimited cluster summary table (clusters_summary_table.tsv)
+    - Subdirectory per specified gap allowance (gap_#) containing:
+      - CLUSTERS:
+        - Round-robin reconstructed syntenic clusters for each species
+      - PAIRS:
+        - Round-robin identified gene pairs for each species
 - LISTS:
 	- Lists of protein coding genes with location details (.list)
-- PROT_SEQ:
-	- Protein sequences for each species (.faa) in FASTA format
-- SHARED:
-	- Lists of all proteins and their top homologs (if any) in other species (.shared.tsv)
-	- Lists of proteins that are unique to each species (.uniques.tsv)
-- SYNTENY:
-	- Cluster summary (clusters_summary.tsv)
-	- Tab-delimited cluster summary table (clusters_summary_table.tsv)
-	- Subdirectory per specified gap allowance (gap_#) containing:
-		- CLUSTERS:
-			- Round-robin reconstructed syntenic clusters for each species
-		- PAIRS:
-			- Round-robin identified gene pairs for each species
+- PLOTS:
+  - BARPLOTS
+	  - Barplots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+	  - Barplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
+  - CIRCOS:
+	  - Circos plots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+	  - Circos plots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
+  - CIRCOS_DATA:
+	  - Configuration files for Circos plots
+  - DOTPLOTS:
+  	- Dotplots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+  	- Dotplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
+  - HEATMAPS:
+    - Heatmaps (in PNG/SVG format) summarizing the percentages of colinear bases in pairwise alignments (.mmap.)
+    - Heatmaps (in PNG/SVG format) summarizing the percentages of proteins found in clusters (.gap_0., .gap_1., ...)
+- SEQUENCES:
+  - GENOMES:
+  	- FASTA files containing the sequences of the investigated genomes
+  - PROTEINS:
+    - Protein sequences for each species (.faa) in FASTA format
 
 ### <b>Step by step examples</b>
 
@@ -387,7 +384,7 @@ run_syny.pl \
 
 ##### Example of clusters identified with SYNY
 ```Bash
-head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
+head -n 32 $SYNY/CLUSTERS/SYNTENY/clusters_summary.tsv
 
 ##### JEC21_vs_WM276; Gap = 0 #####
   Total number of proteins in clusters:	5760
@@ -424,7 +421,7 @@ head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
 ```
 
 ```Bash
-head -n 22 $SYNY/SYNTENY/gap_0/CLUSTERS/JEC21_vs_WM276.clusters
+head -n 22 $SYNY/CLUSTERS/SYNTENY/gap_0/CLUSTERS/JEC21_vs_WM276.clusters
 
 ### Cluster 0001; CNA00020 to CNA00070; CGB_B0020C to CGB_B0070W; size = 6 ###
 CNA00020	-	CGB_B0020C	-
@@ -450,10 +447,10 @@ CNA00210	-	CGB_B0210C	-
 CNA00220	+	CGB_B0220W	+
 ```
 
-Overall cluster metrics are summarized in `SYNTENY/clusters_summary_table.tsv`.
+Overall cluster metrics are summarized in `CLUSTERS/SYNTENY/clusters_summary_table.tsv`.
 
 ```Bash
-head -n 7 $SYNY/SYNTENY/clusters_summary_table.tsv
+head -n 7 $SYNY/CLUSTERS/SYNTENY/clusters_summary_table.tsv
 
 ### Query       Total # proteins        Allowed Gaps    Total # proteins in clusters    % of proteins in clusters       # of clusters   Longest Shortest        Average  Median  N50     N75     N90
 JEC21_vs_WM276  6863    0       5762    83.96   779     64      2       7       5       10      6       4
@@ -521,7 +518,7 @@ run_syny.pl \
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.gap_0.normal.names.png">
 </p>
 
-All data and configuration files for the Circos plots are located in the `CIRCOS/` subdirectory. If desired, chromosome labels can be furter adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.normal.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
+All data and configuration files for the Circos plots are located in the `PLOTS/CIRCOS_DATA/` subdirectory. If desired, chromosome labels can be furter adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.normal.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
 
 ```Bash
 ## To see the first 5 lines from a karyotype file:
@@ -540,7 +537,7 @@ Once edited, Circos plots can be regenerated by running Circos on the correspond
 SYNY=~/SYNY_RESULTS
 
 circos \
-  -conf $SYNY/CIRCOS/concatenated/concatenated.gap_0.normal.conf \
+  -conf $SYNY/PLOTS/CIRCOS_DATA/concatenated/concatenated.gap_0.normal.conf \
   -outputdir ~/ \
   -outputfile circos.gap_0.normal.png
 ```
@@ -679,7 +676,7 @@ run_syny.pl \
 
 ##### Example of clusters identified with SYNY
 ```Bash
-head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
+head -n 32 $SYNY/CLUSTERS/SYNTENY/clusters_summary.tsv
 
 ##### cuniculi_50602_vs_hellem_50604; Gap = 0 #####
   Total number of proteins in clusters: 1827
@@ -716,7 +713,7 @@ head -n 32 $SYNY/SYNTENY/clusters_summary.tsv
 ```
 
 ```Bash
-head -n 22 $SYNY/SYNTENY/gap_0/CLUSTERS/intestinalis_50506_vs_cuniculi_50602.clusters
+head -n 22 $SYNY/CLUSTERS/SYNTENY/gap_0/CLUSTERS/intestinalis_50506_vs_cuniculi_50602.clusters
 
 ### Cluster 001; GPK93_01g00070 to GPK93_01g00480; J0A71_11g22950 to J0A71_11g23360; size = 41 ###
 GPK93_01g00070  -       J0A71_11g22950  -
