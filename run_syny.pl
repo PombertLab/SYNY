@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.1';
-my $updated = '2024-04-23';
+my $version = '0.6.2';
+my $updated = '2024-04-24';
 
 use strict;
 use warnings;
@@ -13,6 +13,10 @@ use Cwd qw(abs_path);
 use File::Path qw(make_path);
 use threads;
 use threads::shared;
+
+###################################################################################################
+## Options
+###################################################################################################
 
 my $usage = <<"EXIT";
 NAME		${name}
@@ -222,6 +226,24 @@ unless(@gaps){
 	@gaps = (0);
 }
 
+# Grabbing $path location from script
+my ($script,$path) = fileparse($0);
+my $circos_path = "$path/Circos";
+
+###################################################################################################
+## Print custom Circos presets then exit if --list_preset
+###################################################################################################
+
+if ($list_preset){
+
+	system("
+		$circos_path/nucleotide_biases.pl \\
+		--list_preset
+	") == 0 or checksig();
+	exit;
+
+}
+
 ###################################################################################################
 ## Checking dependencies
 ###################################################################################################
@@ -256,50 +278,53 @@ unless ($no_circos){
 ## Output directory creation and setup
 ###################################################################################################
 
-my ($script,$path) = fileparse($0);
-my $circos_path = "$path/Circos";
-
-### List available custom presets for Circos, then exit
-if ($list_preset){
-
-	system("
-		$circos_path/nucleotide_biases.pl \\
-		--list_preset
-	") == 0 or checksig();
-	exit;
-
-}
-
-### Otherwize, create output dir
-
-unless(-d $outdir){
-	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
-}
-
-## Convert $outdir to absolute path: required for Circos files
+## Converting $outdir to absolute path: required for Circos files
 if ($outdir !~ /^\//){
 	$outdir = abs_path($outdir);
 }
 
-my $list_dir = "$outdir/LISTS";
-my $prot_dir = "$outdir/PROT_SEQ";
-my $diamond_dir = "$outdir/DIAMOND";
-my $db_dir = "$diamond_dir/DB";
+my $minimap2_dir = $outdir.'/ALIGNMENTS';
+my $list_dir = $outdir.'/LISTS';
 
-# gene clusters subdirs
-my $conserved_dir = "$outdir/CONSERVED";
-my $shared_dir = "$outdir/SHARED";
-my $synteny_dir = "$outdir/SYNTENY";
+## Sequence subdirs
+my $seq_dir = $outdir.'/SEQUENCES';
+my $prot_dir = $seq_dir.'/PROTEINS';
+my $genome_dir = $seq_dir.'/GENOMES';
 
-# plots subdirs
-my $paf_hm_dir = "$outdir/HEATMAPS";
-my $barplot_dir = "$outdir/BARPLOTS";
-my $dotplot_dir = "$outdir/DOTPLOTS";
+# Gene cluster subdirs
+my $cluster_dir = $outdir.'/CLUSTERS';
+my $conserved_dir = $cluster_dir.'/CONSERVED';
+my $shared_dir = $cluster_dir.'/SHARED';
+my $diamond_dir = $cluster_dir.'/DIAMOND';
+my $db_dir = $diamond_dir.'/DB';
+my $cluster_synteny = $cluster_dir.'/SYNTENY';
 
-my @outdirs = ($list_dir,$prot_dir,$diamond_dir,$db_dir);
+# Plots subdirs
+my $plots_dir = $outdir.'/PLOTS';
+my $paf_hm_dir = $plots_dir.'/HEATMAPS';
+my $barplot_dir = $plots_dir.'/BARPLOTS';
+my $dotplot_dir = $plots_dir.'/DOTPLOTS';
+my $circos_plot_dir = $plots_dir.'/CIRCOS';
+my $circos_data_dir = $plots_dir.'/CIRCOS_DATA';
+my $circos_cat_dir = $circos_data_dir.'/concatenated';
+my $circos_pair_dir = $circos_data_dir.'/pairwise';
+
+my @outdirs = (
+	$outdir,
+	$list_dir,
+	$seq_dir,$prot_dir,
+	$genome_dir,
+	$plots_dir,
+	$circos_data_dir,
+	$circos_cat_dir,
+	$circos_pair_dir,
+	$diamond_dir,
+	$db_dir
+);
 
 unless ($noclus){
-	push (@outdirs, $synteny_dir);
+	push (@outdirs, $cluster_dir);
+	push (@outdirs, $cluster_synteny);
 }
 
 foreach my $dir (@outdirs){
@@ -319,7 +344,7 @@ my $time = localtime();
 my $tstart = time();
 
 print LOG "SYNY started on: ".$time."\n";
-print LOG "COMMAND: $0 @commands\n";
+print LOG "COMMAND: $0 @commands\n\n";
 
 ###################################################################################################
 ## Run list_maker.pl
@@ -339,6 +364,8 @@ for my $thread (@threads){
 for my $thread (@threads){
 	$thread ->join();
 }
+
+logs(\*LOG, 'Parsing data - list_maker.pl');
 
 ###################################################################################################
 ## Shared options flags
@@ -375,31 +402,6 @@ if ($dotpalette){
 	$dotpal_flag = "--palette $dotpalette";
 }
 
-###################################################################################################
-## Get PAF files with minimap2
-###################################################################################################
-
-my $genome_dir = "$outdir/GENOME";
-my $minimap2_dir = "$outdir/ALIGNMENTS";
-my $circos_dir = "$outdir/CIRCOS";
-my $circos_cat_dir = "$outdir/CIRCOS/concatenated";
-
-# Skip minimap if requested 
-if ($nomap){
-	goto HOMOLOGY;
-}
-
-## Running minimap2 with get_paf.pl
-print "\n##### Infering colinearity from pairwise genome alignments\n";
-print ERROR "\n### get_paf.pl ###\n";
-
-unless (-d $circos_dir){
-	mkdir ($circos_dir, 0755) or die "Can't create $circos_dir: $!\n";
-}
-unless (-d $circos_cat_dir){
-	mkdir ($circos_cat_dir, 0755) or die "Can't create $circos_cat_dir: $!\n";
-}
-
 my $asm_flag = '';
 if ($asm){
 	$asm_flag = "--asm $asm";
@@ -410,6 +412,20 @@ if ($resume){
 	$resume_flag = '--resume';
 }
 
+###################################################################################################
+## Get PAF files with minimap2
+###################################################################################################
+
+# Skip minimap if requested 
+if ($nomap){
+	goto HOMOLOGY;
+}
+
+## Running minimap2 with get_paf.pl
+$tstart = time();
+print "\n##### Infering colinearity from pairwise genome alignments\n";
+print ERROR "\n### get_paf.pl ###\n";
+
 system("
 	$path/get_paf.pl \\
 	  --fasta $genome_dir/*.fasta \\
@@ -419,8 +435,10 @@ system("
 	  $asm_flag
 ") == 0 or checksig();
 
-## Creating Circos links file
+logs(\*LOG, 'Genome alignments - get_paf.pl');
 
+## Creating Circos links file
+$tstart = time();
 print ERROR "\n### paf2links.pl ###\n";
 
 my $paf_dir = "$minimap2_dir/PAF";
@@ -432,16 +450,18 @@ system("
 	  --links $paf_links \\
 	  $cluster_flag \\
 	  $custom_cc \\
-	  $custom_cc_file
+	  $custom_cc_file \\
+	  2>> $log_err
 ") == 0 or checksig();
 
-#### Calculate/plot PAF metrics
+logs(\*LOG, 'Genome alignments - paf2links.pl');
 
+#### Calculate/plot PAF metrics
+$tstart = time();
 print ERROR "\n### paf_metrics.py ###\n";
 print "\n# Calculating alignment metrics (minimap2):\n";
 
 my $aln_length_dir = $minimap2_dir.'/METRICS';
-
 my @paf_files;
 opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
 
@@ -459,9 +479,10 @@ system ("
 	--height 10.8 \\
 	--width 19.2 \\
 	--color steelblue \\
-	2>> $outdir/error.log
+	2>> $log_err
 ") == 0 or checksig();
 
+logs(\*LOG, 'Genome alignments - paf_metrics.py');
 
 ###################################################################################################
 ## Creating barplots/dotplots/heatmaps from minimap2 PAF files
@@ -470,6 +491,7 @@ system ("
 # Barplots
 unless ($no_barplot){
 
+	$tstart = time();
 	print ERROR "\n### paf_to_barplot.py (minimap2) ###\n";
 	print "\n# Barplots (minimap2):\n";
 
@@ -486,14 +508,17 @@ unless ($no_barplot){
 		--affix mmap \\
 		$tick_flag \\
 		$monobar_flag \\
-		2>> $outdir/error.log
+		2>> $log_err
 	") == 0 or checksig();
+
+	logs(\*LOG, 'Genome alignments - paf_to_barplot.py');
 
 }
 
 # Doplots
 unless ($no_dotplot){
 
+	$tstart = time();
 	print ERROR "\n### paf_to_dotplot.py (minimap2) ###\n";
 	print "\n# Dotplots (minimap2):\n";
 
@@ -512,12 +537,16 @@ unless ($no_dotplot){
 		$dotpal_flag \\
 		--wdis $wdis \\
 		--hdis $hdis \\
-		2>> $outdir/error.log
+		2>> $log_err
 	") == 0 or checksig();
+
+	logs(\*LOG, 'Genome alignments - paf_to_dotplot.py');
+
 }
 
 unless ($no_heatmap){
 
+	$tstart = time();
 	print ERROR "\n### paf_to_hm.py (minimap2) ###\n";
 	print "\n# Heatmaps (minimap2):\n";
 
@@ -530,8 +559,10 @@ unless ($no_heatmap){
 		--width $hwidth \\
 		--palette $hmpalette \\
 		--matrix $minimap2_dir/paf_matrix.tsv \\
-		2>> $outdir/error.log
+		2>> $log_err
 	") == 0 or checksig();
+
+	logs(\*LOG, 'Genome alignments - paf_to_hm.py');
 
 }
 
@@ -547,22 +578,21 @@ if ($noclus){
 # Else, search for gene clusters
 HOMOLOGY:
 
+$tstart = time();
 print "\n##### Infering colinearity from protein-coding gene clusters\n";
+print ERROR "\n### get_homology.pl ###\n";
 
 my %linked_files;
 my @prot_files;
 
-opendir (FAA, "$outdir/PROT_SEQ") or die "\n\n[ERROR]\tCan't open $outdir/PROT_SEQ: $!\n\n";
-
+opendir (FAA, $prot_dir) or die "\n\n[ERROR]\tCan't open $prot_dir: $!\n\n";
 while (my $file = readdir(FAA)){
 	if ($file =~ /\.faa$/){
-		push (@prot_files, "$outdir/PROT_SEQ/$file");
+		push (@prot_files, "$prot_dir/$file");
 	}
 }
 
 link_files();
-
-print ERROR "\n### get_homology.pl ###\n";
 
 system("
 	$path/get_homology.pl \\
@@ -572,16 +602,19 @@ system("
 	--outdir $diamond_dir \\
 	--shared $shared_dir \\
 	--list $list_dir \\
-	2>> $outdir/error.log
+	2>> $log_err
 ") == 0 or checksig();
+
+logs(\*LOG, 'Gene clusters - get_homology.pl');
 
 ###################################################################################################
 ## Run get_synteny.pl
 ###################################################################################################
 
+$tstart = time();
 print ERROR "\n### get_synteny.pl ###\n";
 
-my $clu_sum_file = $synteny_dir.'/'.'clusters_summary.tsv';
+my $clu_sum_file = $cluster_synteny.'/'.'clusters_summary.tsv';
 if (-f $clu_sum_file){
 	system("rm $clu_sum_file") == 0 or checksig();
 }
@@ -607,9 +640,9 @@ foreach my $annot_file_1 (sort(@annot_files)){
 					--subject_list $list_dir/$file_name_2.list \\
 					--subject_blast $diamond_dir/${file_name_2}_vs_${file_name_1}.diamond.6 \\
 					--gap $gap \\
-					--outdir $synteny_dir/gap_$gap \\
-					--sumdir $synteny_dir \\
-					2>> $outdir/error.log
+					--outdir $cluster_synteny/gap_$gap \\
+					--sumdir $cluster_synteny \\
+					2>> $log_err
 				") == 0 or checksig();
 			}
 		}
@@ -620,15 +653,17 @@ foreach my $annot_file_1 (sort(@annot_files)){
 
 }
 
+logs(\*LOG, 'Gene clusters - get_synteny.pl');
+
 ### Grabbing total number of entries in .list files
 my %gene_count;
-opendir (LISTS, "$outdir/LISTS") or die "\n\n[ERROR]\tCan't open $outdir/LISTS: $!\n\n";
+opendir (LISTS, $list_dir) or die "\n\n[ERROR]\tCan't open $list_dir: $!\n\n";
 
 while (my $file = readdir(LISTS)){
 
 	if ($file =~ /\.list$/){
 
-		my $list_file = $outdir.'/LISTS/'.$file;
+		my $list_file = $list_dir.'/'.$file;
 		open TMP, '<', $list_file or die "$!\n";
 		my ($basename,$path) = fileparse($file);
 		$basename =~ s/\.list$//;
@@ -650,25 +685,29 @@ while (my $file = readdir(LISTS)){
 ###################################################################################################
 
 ### Create pseudo PAF files from clusters found
-
+$tstart = time();
 print ERROR "\n### clusters_to_paf.pl ###\n";
 
 foreach my $gap (@gaps){
 
-	my $clusdir = $synteny_dir.'/gap_'.$gap.'/CLUSTERS';
-	my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
+	my $clusdir = $cluster_synteny.'/gap_'.$gap.'/CLUSTERS';
+	my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
 
 	system ("$path/clusters_to_paf.pl \\
-	  --fasta $outdir/GENOME/*.fasta \\
+	  --fasta $genome_dir/*.fasta \\
 	  --lists $list_dir/*.list \\
 	  --clusters $clusdir/*.clusters \\
-	  --outdir $ppafdir
+	  --outdir $ppafdir \\
+	  2>> $log_err
 	") == 0 or checksig();
 }
+
+logs(\*LOG, 'Gene clusters - clusters_to_paf.pl');
 
 ### Create barplots from PAF files
 unless ($no_barplot){
 
+	$tstart = time();
 	print ERROR "\n### paf_to_barplot.py (SYNY) ###\n";
 	print "\n# Barplots (SYNY):\n";
 
@@ -676,7 +715,7 @@ unless ($no_barplot){
 
 	foreach my $gap (@gaps){
 
-		my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
+		my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
 		opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
 
 		while (my $file = readdir(PAFDIR)){
@@ -698,21 +737,24 @@ unless ($no_barplot){
 		--palette $palette \\
 		$tick_flag \\
 		$monobar_flag \\
-		2>> $outdir/error.log
+		2>> $log_err
 	") == 0 or checksig();
+
+	logs(\*LOG, 'Gene clusters - paf_to_barplot.py');
 
 }
 
 ### Create dotplots from PAF files
 unless ($no_dotplot){
 
+	$tstart = time();
 	print ERROR "\n### paf_to_dotplot.py (SYNY) ###\n";
 	print "\n# Dotplots (SYNY):\n";
 
 	my @dotplot_files;
 	foreach my $gap (@gaps){
 
-		my $ppafdir = $synteny_dir.'/gap_'.$gap.'/PAF';
+		my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
 		opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
 
 		while (my $file = readdir(PAFDIR)){
@@ -737,8 +779,10 @@ unless ($no_dotplot){
 		$dotpal_flag \\
 		--wdis $wdis \\
 		--hdis $hdis \\
-		2>> $outdir/error.log
+		2>> $log_err
 	") == 0 or checksig();
+
+	logs(\*LOG, 'Gene clusters - paf_to_dotplot.py');
 
 }
 
@@ -746,7 +790,7 @@ unless ($no_dotplot){
 
 print ERROR "\n### Cluster summary table ###\n";
 
-my $clu_sum_table = $synteny_dir.'/'.'clusters_summary_table.tsv';
+my $clu_sum_table = $cluster_synteny.'/'.'clusters_summary_table.tsv';
 open CLU, '<', $clu_sum_file or die "Can't read $clu_sum_file: $!\n";
 open TSV, '>', $clu_sum_table or die "Can't create $clu_sum_table: $!\n";
 
@@ -843,7 +887,7 @@ print ERROR "\n### Cluster data matrices ###\n";
 
 foreach my $gap (keys %matrices){
 
-	my $matrix_file = $synteny_dir."/gap_$gap"."/matrix_gap_$gap.tsv";
+	my $matrix_file = $cluster_synteny."/gap_$gap"."/matrix_gap_$gap.tsv";
 	open MM, '>', $matrix_file or die $!;
 
 	# header
@@ -876,26 +920,28 @@ foreach my $gap (keys %matrices){
 
 unless ($no_heatmap){
 
+	$tstart = time();
 	print ERROR "\n### protein_cluster_hm.py ###\n";
 	print "\n# Heatmaps (SYNY):\n";
 
-	my $hm_dir = $outdir.'/HEATMAPS';
 	my @hm_files;
-
 	foreach my $gap (@gaps){
-		my $matrix_file = $synteny_dir."/gap_$gap"."/matrix_gap_$gap.tsv";
+		my $matrix_file = $cluster_synteny."/gap_$gap"."/matrix_gap_$gap.tsv";
 		push (@hm_files, $matrix_file);
 	}
 
 	system("
 		$path/protein_cluster_hm.py \\
 		--tsv @hm_files \\
-		--outdir $hm_dir \\
+		--outdir $paf_hm_dir \\
 		--threads $threads \\
 		--height $hheight \\
 		--width $hwidth \\
-		--palette $hmpalette
+		--palette $hmpalette \\
+		2>> $log_err
 	") == 0 or checksig();
+
+	logs(\*LOG, 'Gene clusters - protein_cluster_hm.py');
 
 }
 
@@ -903,6 +949,7 @@ unless ($no_heatmap){
 ## Run id_conserved_regions.pl
 ###################################################################################################
 
+$tstart = time();
 print ERROR "\n### id_conserved_regions.pl ###\n";
 
 system("
@@ -910,24 +957,25 @@ system("
 	--lists $list_dir \\
 	--blasts $diamond_dir \\
 	--outdir $conserved_dir \\
-	2>> $outdir/error.log
+	2>> $log_err
 ") == 0 or checksig();
+
+logs(\*LOG, 'Gene clusters - id_conserved_regions.pl');
 
 ###################################################################################################
 ## Create links files, karyotypes and nucleotide biases for Circos
 ###################################################################################################
 
 ## Circos links files
+$tstart = time();
 print ERROR "\n### clusters2links.pl ###\n";
 
-my $cluster_dir = "$outdir/SYNTENY";
-
 my @cluster_dirs;
-opendir (CDIR, $cluster_dir) or die "Can't open $cluster_dir: $!\n";
+opendir (CDIR, $cluster_synteny) or die "Can't open $cluster_synteny: $!\n";
 while (my $dname = readdir(CDIR)) {
-	if (-d "$cluster_dir/$dname"){
+	if (-d "$cluster_synteny/$dname"){
 		unless (($dname eq '.') or ($dname eq '..')){
-			push (@cluster_dirs, "$cluster_dir/$dname");
+			push (@cluster_dirs, "$cluster_synteny/$dname");
 		}
 	}
 }
@@ -938,18 +986,21 @@ foreach my $cluster_subdir (@cluster_dirs){
 		$circos_path/clusters2links.pl \\
 		--cluster $cluster_subdir/CLUSTERS/*.clusters \\
 		--list $list_dir/*.list \\
-		--outdir $outdir/CIRCOS \\
+		--outdir $circos_data_dir \\
 		$cluster_flag \\
 		$custom_cc_file \\
 		$custom_cc \\
-		2>> $outdir/error.log
+		2>> $log_err
 	") == 0 or checksig();
 }
+
+logs(\*LOG, 'Gene clusters - clusters2links.pl');
 
 ###### Circos section
 CIRCOS:
 
 ## Karyotypes and nucleotide biases
+$tstart = time();
 print ERROR "\n### nucleotide_biases.pl ###\n";
 
 # Option flags
@@ -968,8 +1019,8 @@ my $gap = $gaps[0];
 ## Running nucleotide_biases.pl
 system("
 	$circos_path/nucleotide_biases.pl \\
-	--outdir $outdir/CIRCOS \\
-	--fasta $outdir/GENOME/*.fasta \\
+	--outdir $circos_data_dir \\
+	--fasta $genome_dir/*.fasta \\
 	--winsize $winsize \\
 	--step $stepsize \\
 	--gap $gap \\
@@ -984,7 +1035,7 @@ system("
 	--max_links $max_links \\
 	--max_points_per_track $max_points_per_track \\
 	$cluster_flag \\
-	2>> $outdir/error.log
+	2>> $log_err
 ") == 0 or checksig();
 
 ## Create circos configuration files per links file
@@ -1002,10 +1053,9 @@ unless ($nomap){
 }
 
 ##### Running Circos
-my %circos_todo_list;
-my $circos_plot_dir = $outdir.'/CIRCOS_PLOTS';
-
 ## Populating list of plots to generate
+my %circos_todo_list;
+
 unless ($no_circos){
 
 	print "\n# Circos plots:\n";
@@ -1037,6 +1087,7 @@ unless ($no_circos){
 			circos_plot($affix, 'pair');
 		}
 	}
+
 }
 
 ## Running one circos instance per thread
@@ -1067,6 +1118,8 @@ unless ($no_circos){
 
 }
 
+logs(\*LOG, 'Circos - configuration + runtime');
+
 ###################################################################################################
 ## Completion
 ###################################################################################################
@@ -1074,8 +1127,10 @@ unless ($no_circos){
 my $end_time = localtime();
 my $run_time = time - $tstart;
 
+print LOG "\n";
 print LOG "SYNY completed on: ".$end_time."\n";
 print LOG "Runtime: ".$run_time." seconds\n";
+close LOG;
 
 ###################################################################################################
 ## Subroutines
@@ -1105,6 +1160,18 @@ sub checksig {
 
 }
 
+sub logs {
+
+	my $fh = $_[0];
+	my $analysis = $_[1];
+
+	my $run_time = time - $tstart;
+	my $mend = localtime();
+
+	print $fh "$analysis:\t$run_time seconds;\tcompleted on $mend\n";
+
+}
+
 sub list_maker {
 
 	while (my $annotation = shift@annotations){
@@ -1116,7 +1183,7 @@ sub list_maker {
 			$path/list_maker.pl \\
 			--input $annotation \\
 			--outdir $outdir \\
-			2>> $outdir/error.log
+			2>> $log_err
 		") == 0 or checksig();
 
 	}
@@ -1158,12 +1225,12 @@ sub circos_conf {
 	foreach my $affix (shift @affix){
 
 		## Creating Circos configuration file(s) with desired link file
-		my $paf_links  = $outdir.'/CIRCOS/concatenated/concatenated.'.$affix.'.links';
+		my $paf_links  = $circos_cat_dir.'/concatenated.'.$affix.'.links';
 
 		for my $orientation ('normal', 'inverted'){
 
-			my $circos_conf_f = $outdir.'/CIRCOS/concatenated/concatenated.'.$orientation.'.conf';
-			my $new_conf = $outdir.'/CIRCOS/concatenated/concatenated.'.$affix.'.'.$orientation.'.conf';
+			my $circos_conf_f = $circos_cat_dir.'/concatenated.'.$orientation.'.conf';
+			my $new_conf = $circos_cat_dir.'/concatenated.'.$affix.'.'.$orientation.'.conf';
 
 				open CONF, '<', $circos_conf_f or die "Can't read $circos_conf_f: $!\n";
 				open NEWCONF, '>', $new_conf or die "Can't create $new_conf: $!\n";
@@ -1194,11 +1261,9 @@ sub pairwise_conf {
 	foreach my $affix (shift @affix){
 
 		## Creating Circos configuration file(s) with desired link file
-		my $paf_links = $outdir.'/CIRCOS/concatenated/concatenated.'.$affix.'.links';
+		my $paf_links = $circos_cat_dir.'/concatenated.'.$affix.'.links';
 
-		my $pairwisedir = $outdir.'/CIRCOS/pairwise';
-		opendir(PAIRS, $pairwisedir) or die "Can't open $pairwisedir: $!\n";
-
+		opendir(PAIRS, $circos_pair_dir) or die "Can't open $circos_pair_dir: $!\n";
 		my @pairs;
 		while (my $entry = readdir(PAIRS)){
 			if ($entry =~ /_vs_/){
@@ -1210,7 +1275,7 @@ sub pairwise_conf {
 
 			for my $orientation ('normal', 'inverted'){
 
-				my $subloc = $pairwisedir.'/'.$pair.'/'.$pair;
+				my $subloc = $circos_pair_dir.'/'.$pair.'/'.$pair;
 				my $circos_conf_f = $subloc.'.'.$orientation.'.conf';
 				my $pair_genotype = $subloc.'.'.$orientation.'.genotype';
 				my $new_conf = $subloc.'.'.$affix.'.'.$orientation.'.conf';
@@ -1261,7 +1326,7 @@ sub circos_plot {
 
 		for my $orientation ('normal', 'inverted'){
 
-			my $conf = "$outdir/CIRCOS/concatenated/concatenated.$affix.$orientation.conf";
+			my $conf = $circos_cat_dir."/concatenated.$affix.$orientation.conf";
 			my $circos_plot = "$circos_prefix.$affix.$orientation.png";
 
 			$circos_todo_list{$conf}{'dir'} = $plot_dir;
@@ -1283,8 +1348,7 @@ sub circos_plot {
 			}
 		}
 
-		my $pairwisedir = $outdir.'/CIRCOS/pairwise';
-		opendir(PAIRS, $pairwisedir) or die "Can't open $pairwisedir: $!\n";
+		opendir(PAIRS, $circos_pair_dir) or die "Can't open $circos_pair_dir: $!\n";
 		my @pairs;
 		while (my $entry = readdir(PAIRS)){
 			if ($entry =~ /_vs_/){
@@ -1296,7 +1360,7 @@ sub circos_plot {
 
 			for my $orientation ('normal', 'inverted'){
 
-				my $conf = $pairwisedir.'/'.$pair.'/'.$pair.'.'.$affix.'.'.$orientation.'.conf';
+				my $conf = $circos_pair_dir.'/'.$pair.'/'.$pair.'.'.$affix.'.'.$orientation.'.conf';
 				my $circos_plot = "$pair.$affix.$orientation.png";
 
 				$circos_todo_list{$conf}{'dir'} = $plot_dir;
