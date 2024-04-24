@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.2';
+my $version = '0.6.2a';
 my $updated = '2024-04-24';
 
 use strict;
@@ -341,6 +341,7 @@ open LOG, '>', $log_file or die "Can't create $log_err: $!\n";
 open ERROR, '>', $log_err or die "Can't create $log_err: $!\n";
 
 my $time = localtime();
+my $start_time = time();
 my $tstart = time();
 
 print LOG "SYNY started on: ".$time."\n";
@@ -1125,7 +1126,7 @@ logs(\*LOG, 'Circos - configuration + runtime');
 ###################################################################################################
 
 my $end_time = localtime();
-my $run_time = time - $tstart;
+my $run_time = time - $start_time;
 
 print LOG "\n";
 print LOG "SYNY completed on: ".$end_time."\n";
@@ -1164,11 +1165,17 @@ sub logs {
 
 	my $fh = $_[0];
 	my $analysis = $_[1];
+	my $len = length($analysis);
+	my $pad = 40 - $len;
+	my $spacer = ' ' x $pad;
 
 	my $run_time = time - $tstart;
 	my $mend = localtime();
+	my $tlen = length($run_time);
+	my $tpad = 6 - $tlen;
+	my $tspacer = ' ' x $tpad;
 
-	print $fh "$analysis:\t$run_time seconds;\tcompleted on $mend\n";
+	print $fh "$analysis:".$spacer.$tspacer."$run_time seconds; completed on $mend\n";
 
 }
 
