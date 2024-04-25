@@ -535,7 +535,7 @@ Unless the `--no_circos` command line switch is invoked, [Circos](https://circos
 
 In the pairwise plots (`--circos pair`), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. Both contenated and pairwise plots can be generated with the `--circos all` command line switch (set as default).
 
-Two circos plots, `.normal` and `.inverted`, will be generated for each approach. In the inverted plots, the contigs/chromosomes from the genome(s) being compared to the reference are plotted in reverse, from last to first.
+By default, two circos plots, `.normal` and `.inverted`, will be generated for each approach (either can be turned off with the corresponding `--no_invert`/`--no_normal` command line switches). In the inverted plots, the contigs/chromosomes from the genome(s) being compared to the reference are plotted in reverse, from last to first. 
 
 ##### Example of an image generated with Circos and SYNY from shared proteins clusters:
 <p align="left">
