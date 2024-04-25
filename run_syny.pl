@@ -38,6 +38,7 @@ USAGE		${name} \\
 		  --circos pair
 
 OPTIONS:
+-h (--help)	Display all command line options
 -t (--threads)	Number of threads to use [Default: 16]
 -a (--annot)	GenBank GBF/GBFF Annotation files (GZIP files are supported)
 -o (--outdir)	Output directory [Default = SYNY]
@@ -47,7 +48,6 @@ OPTIONS:
 --resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
 --no_clus	Skip gene cluster reconstructions
--h (--help)	Display all command line options
 EXIT
 
 my $plot_options = <<"PLOT_OPTIONS";

@@ -224,6 +224,7 @@ run_SYNY.pl \
 ```
 Options for run_SYNY.pl are:
 ```
+-h (--help)     Display all command line options
 -t (--threads)  Number of threads to use [Default: 16]
 -a (--annot)    GenBank GBF/GBFF Annotation files (GZIP files are supported)
 -o (--outdir)   Output directory [Default = SYNY]
@@ -233,10 +234,9 @@ Options for run_SYNY.pl are:
 --resume        Resume minimap2 computations (skip completed alignments)
 --no_map        Skip minimap2 pairwise genome alignments
 --no_clus       Skip gene cluster reconstructions
---help          Display all command line options
 
 ### Circos plots
--c (--circos)   Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: pair]
+-c (--circos)   Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: all]
 --circos_prefix Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)      Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
 -u (--unit)     Size unit (Kb or Mb) [Default: Mb]
@@ -258,8 +258,8 @@ Options for run_SYNY.pl are:
 --no_circos             Turn off Circos plots
 
 ### Barplots
--h (--height)   Barplot figure height in inches [Default: 10.8]
--w (--width)    Barplot figure width in inches [Default: 19.2]
+-bh (--bheight) Barplot figure height in inches [Default: 10.8]
+-bw (--bwidth)  Barplot figure width in inches [Default: 19.2]
 --palette       Barplot color palette [Default: Spectral]
 --monobar       Use a monochrome barplot color instead: e.g. --monobar blue
 --no_barplot    Turn off barplots
