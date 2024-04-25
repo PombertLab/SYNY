@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.2a';
-my $updated = '2024-04-24';
+my $version = '0.6.2b';
+my $updated = '2024-04-25';
 
 use strict;
 use warnings;
@@ -47,7 +47,7 @@ OPTIONS:
 --resume	Resume minimap2 computations (skip completed alignments)
 --no_map	Skip minimap2 pairwise genome alignments
 --no_clus	Skip gene cluster reconstructions
---help		Display all command line options
+-h (--help)	Display all command line options
 EXIT
 
 my $plot_options = <<"PLOT_OPTIONS";
@@ -74,8 +74,8 @@ my $plot_options = <<"PLOT_OPTIONS";
 --no_circos		Turn off Circos plots
 
 ### Barplots
--h (--height)	Barplot figure height in inches [Default: 10.8]
--w (--width)	Barplot figure width in inches [Default: 19.2]
+-bh (--bheight)	Barplot figure height in inches [Default: 10.8]
+-bw (--bwidth)	Barplot figure width in inches [Default: 19.2]
 --palette	Barplot color palette [Default: Spectral]
 --monobar	Use a monochrome barplot color instead: e.g. --monobar blue
 --no_barplot	Turn off barplots
@@ -170,7 +170,7 @@ GetOptions(
 	'no_clus' => \$noclus,
 	'resume' => \$resume,
 	'asm=i' => \$asm,
-	'help' => \$help,
+	'h|help' => \$help,
 	# Circos
 	'c|circos=s' => \$circos,
 	'r|ref|reference=s' => \$reference,
@@ -192,8 +192,8 @@ GetOptions(
 	'clusters' => \$clusters,
 	'no_circos' => \$no_circos,
 	# Barplots
-	'h|height=s' => \$bheight,
-	'w|width=s' => \$bwidth,
+	'bh|bheight=s' => \$bheight,
+	'bw|bwidth=s' => \$bwidth,
 	'palette=s' => \$palette,
 	'monobar=s' => \$monobar,
 	'no_barplot' => \$no_barplot,
