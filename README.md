@@ -404,21 +404,18 @@ curl \
 
 ##### Running SYNY and plotting comparisons with Circos:
 
-Running SYNY on all five genomes with no gaps allowed (`gap 0`) between gene pairs:
+SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gaps are allowed (`gap 0`) during gene cluster inferences. Pairwise Circos plots are produced but not concatenated ones, as the number of ideograms (one ideogram per contig/chromsosome) would likely render concatenated plots that are too dense to read.
 
 ```Bash
 SYNY=~/SYNY_CRYPT_ALL   ## Replace by desired SYNY output directory
 
 run_syny.pl \
-  -a $DATA/*.gbff.gz \
-  -o $SYNY \
-  -g 0 \
-  -e 1e-10 \
-  --circos all \
-  -r JEC21 \
-  --circos_prefix cryptococcus
+  --threads 16 \
+  --annot $DATA/*.gbff.gz \
+  --outdir $SYNY \
+  --gaps 0 \
+  --circos pair
 ```
-
 
 Running SYNY on a subset of two genomes (`JEC21` and `WM276`), this time also allowing  maximum gaps 1 and 5 gaps between gene pairs, and producing only the concatenated Circos plots:
 
@@ -426,6 +423,7 @@ Running SYNY on a subset of two genomes (`JEC21` and `WM276`), this time also al
 SYNY=~/SYNY_CRYPT_2     ## Replace by desired SYNY output directory
 
 run_syny.pl \
+  -t 16 \
   -a $DATA/{JEC21,WM276}.gbff.gz \
   -o $SYNY \
   -g 0 1 5 \
