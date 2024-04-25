@@ -255,7 +255,9 @@ Options for run_SYNY.pl are:
 --max_links             Set max number of links [Default: 25000]
 --max_points_per_track  Set max number of points per track [Default: 75000]
 --clusters              Color by cluster instead of contig/chromosome [Default: off]
---no_circos             Turn off Circos plots
+--no_invert             Turn off Circos plots (inverted orientation)
+--no_normal             Turn off Circos plots (normal orientation)
+--no_circos             Turn off all Circos plots
 
 ### Barplots
 -bh (--bheight) Barplot figure height in inches [Default: 10.8]
@@ -406,7 +408,7 @@ curl \
 
 ##### Running SYNY:
 
-SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed (`gap 0`) during gene cluster inferences. Here, both pairwise (`pair`) and concatenated (`cat`) Circos plots are produced using `--circos all`. In the concatenated plots, `JEC21` is used as the desired reference and `cryptoccocus` as the output file prefix. Note that when comparing several genomes, the concatenated plots can quickly become too dense for legibility.
+SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed (`gap 0`) during gene cluster inferences. Here, both pairwise (`pair`) and concatenated (`cat`) Circos plots are produced using `--circos all`. In the concatenated plots, `JEC21` is used as the desired reference and `cryptococcus` as the output file prefix. Note that when comparing several genomes, the concatenated plots can quickly become too dense for legibility.
 
 ```Bash
 SYNY=~/SYNY_CRYPT_ALL   ## Replace by desired SYNY output directory
