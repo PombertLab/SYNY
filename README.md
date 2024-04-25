@@ -350,35 +350,88 @@ The contents of the subdirectories are:
 ### <b>Step by step examples</b>
 
 #### Example 1 - <i>Cryptococcus</i>
-Below is a quick example describing how to compare two genomes from [<i>Cryptococcus neoformans</i> var. <i>neoformans</i> JEC21](https://pubmed.ncbi.nlm.nih.gov/15653466/) and [<i>Cryptococcus gattii</i> WM276](https://pubmed.ncbi.nlm.nih.gov/21304167/) using annotation data available in public databases.
+Below is a quick example describing how to compare a few select <i>Cryptococcus</i> genomes using annotation data available in public databases: <i>C. neoformans</i> var. <i>neoformans</i> strain [JEC21](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13856/), <i>C. gattii</i> strain [WM276](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13692/), <i>C. gattii</i> VGV strain [MF34](hhttps://www.ncbi.nlm.nih.gov/bioproject/PRJNA487802/), <i>C. decagattii</i> strain [7685027](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA660466/), and <i>C. deuterogattii</i> strain [R265](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395628/).
 
 ##### Downloading annotation data from GenBank (NCBI):
+
+Downloading <i>Cryptococcus</i> example data automatically from NCBI using the provided `Cryptococcus.sh` shell script in the `Examples/` subdirectory:
 ```bash
-DATA=~/DATA      ## Replace by desired annotation data directory
+DATA=~/DATA ## Replace ~/DATA by desired annotation data directory
+Cryptococcus.sh $DATA
+```
+
+Downloading <i>Cryptococcus</i> example data manually:
+```bash
+DATA=~/DATA ## Replace ~/DATA by desired annotation data directory
 mkdir -p $DATA
 
-# Cryptococcus neoformans JEC21
+##### Downloading data from NCBI ####
+### Cryptococcus neoformans strain JEC21
+outfile=${DATA}/JEC21.gbff.gz
+printf "\nDownloading Cryptococcus neoformans strain JEC21 as ${outfile}\n\n"
 curl \
-  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/091/045/GCF_000091045.1_ASM9104v1/GCF_000091045.1_ASM9104v1_genomic.gbff.gz \
-  -o $DATA/JEC21.gbff.gz
+  -L ${BASEURL}/GCF/000/091/045/GCF_000091045.1_ASM9104v1/GCF_000091045.1_ASM9104v1_genomic.gbff.gz \
+  -o $outfile
 
-# Cryptococcus gattii WM276
+### Cryptococcus gattii strain WM276
+outfile=${DATA}/WM276.gbff.gz
+printf "\nDownloading Cryptococcus neoformans strain JEC21 as ${outfile}\n\n"
 curl \
-  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/185/945/GCF_000185945.1_ASM18594v1/GCF_000185945.1_ASM18594v1_genomic.gbff.gz \
-  -o $DATA/WM276.gbff.gz
+  -L ${BASEURL}/GCF/000/185/945/GCF_000185945.1_ASM18594v1/GCF_000185945.1_ASM18594v1_genomic.gbff.gz \
+  -o $outfile
+
+### Cryptococcus gattii VGV strain MF34
+outfile=${DATA}/MF34.gbff.gz
+printf "\nDownloading Cryptococcus gattii VGV strain MF34 as ${outfile}\n\n"
+curl \
+  -L ${BASEURL}/GCA/009/650/685/GCA_009650685.1_Cryp_gatt_MF34/GCA_009650685.1_Cryp_gatt_MF34_genomic.gbff.gz \
+  -o $outfile
+
+### Cryptococcus decagattii strain 7685027
+outfile=${DATA}/D7685.gbff.gz
+printf "\nDownloading Cryptococcus decagattii strain 7685027 as ${outfile}\n\n"
+curl \
+  -L ${BASEURL}/GCA/036/417/295/GCA_036417295.1_ASM3641729v1/GCA_036417295.1_ASM3641729v1_genomic.gbff.gz \
+  -o $outfile
+
+### Cryptococcus deuterogattii strain R265
+outfile=${DATA}/R265.gbff.gz
+printf "\nDownloading Cryptococcus deuterogattii strain R265 as ${outfile}\n\n"
+curl \
+  -L ${BASEURL}/GCF/002/954/075/GCF_002954075.1_C._deuterogattii_R265_chr/GCF_002954075.1_C._deuterogattii_R265_chr_genomic.gbff.gz \
+  -o $outfile
 ```
 
 ##### Running SYNY and plotting comparisons with Circos:
+
+Running SYNY on all five genomes with no gaps allowed (`gap 0`) between gene pairs:
+
 ```Bash
-SYNY=~/SYNY_RESULTS      ## Replace by desired SYNY output directory
+SYNY=~/SYNY_CRYPT_ALL   ## Replace by desired SYNY output directory
 
 run_syny.pl \
   -a $DATA/*.gbff.gz \
+  -o $SYNY \
+  -g 0 \
+  -e 1e-10 \
+  --circos all \
+  -r JEC21 \
+  --circos_prefix cryptococcus
+```
+
+
+Running SYNY on a subset of two genomes (`JEC21` and `WM276`), this time also allowing  maximum gaps 1 and 5 gaps between gene pairs, and producing only the concatenated Circos plots:
+
+```Bash
+SYNY=~/SYNY_CRYPT_2     ## Replace by desired SYNY output directory
+
+run_syny.pl \
+  -a $DATA/{JEC21,WM276}.gbff.gz \
+  -o $SYNY \
   -g 0 1 5 \
   -e 1e-10 \
+  --circos cat \
   -r JEC21 \
-  -o $SYNY \
-  --circos all \
   --circos_prefix WM276_vs_JEC21
 ```
 
@@ -465,7 +518,7 @@ WM276_vs_JEC21  6565    5       5957    90.74   51      477     2       117     
 
 To faciliate comparisons when working with large datasets, heatmaps displaying the percentages of colinear bases in pairwise genome alignments (`.mmap.`) and the percentages of protein coding-genes found in colinear clusters between each pair of genomes (e.g. `.gap_0.`) are generated with matplotlib.
 
-In the current example, small heatmaps with 4 datapoints (2 * 2 genomes) will be generated for the minimap2 pairwise alignments and for the protein clusters found for each gap value investigated (0, 1 and 5). In these heatmaps, percentages between pairs of genomes will vary based on the total number of bases and proteins found in the query used: <i>i.e.</i> `(colinear bases / total bases) * 100` and `(proteins in clusters / total proteins) * 100`.
+In the above example, small heatmaps with 25 datapoints (5 * 5 genomes) will be generated for the minimap2 pairwise alignments and for the protein clusters found for each gap value investigated. In these heatmaps, percentages between pairs of genomes will vary based on the total number of bases and proteins found in the query used: <i>i.e.</i> `(colinear bases / total bases) * 100` and `(proteins in clusters / total proteins) * 100`.
 
 ##### Example of a heatmap showing percentages of colinear protein-coding genes between investigated genomes:
 <p align="left">
@@ -827,5 +880,7 @@ run_syny.pl \
 [The genome of the basidiomycetous yeast and human pathogen <i>Cryptococcus neoformans</i>](https://pubmed.ncbi.nlm.nih.gov/15653466/). Loftus BJ, Fung E, Roncaglia P, Rowley D, Amedeo P, Bruno D, Vamathevan J, Miranda M, Anderson IJ, Fraser JA, Allen JE, Bosdet IE, Brent MR, Chiu R, Doering TL, Donlin MJ, D'Souza CA, Fox DS, Grinberg V, Fu J, Fukushima M, Haas BJ, Huang JC, Janbon G, Jones SJ, Koo HL, Krzywinski MI, Kwon-Chung JK, Lengeler KB, Maiti R, Marra MA, Marra RE, Mathewson CA, Mitchell TG, Pertea M, Riggs FR, Salzberg SL, Schein JE, Shvartsbeyn A, Shin H, Shumway M, Specht CA, Suh BB, Tenney A, Utterback TR, Wickes BL, Wortman JR, Wye NH, Kronstad JW, Lodge JK, Heitman J, Davis RW, Fraser CM, Hyman RW. <b>Science.</b> 2005 Feb 25;307(5713):1321-4. doi: 10.1126/science.1103773. Epub 2005 Jan 13. PMID: 15653466; PMCID: PMC3520129.
 
 [Genome variation in <i>Cryptococcus gattii</i>, an emerging pathogen of immunocompetent hosts](https://pubmed.ncbi.nlm.nih.gov/21304167/). D'Souza CA, Kronstad JW, Taylor G, Warren R, Yuen M, Hu G, Jung WH, Sham A, Kidd SE, Tangen K, Lee N, Zeilmaker T, Sawkins J, McVicker G, Shah S, Gnerre S, Griggs A, Zeng Q, Bartlett K, Li W, Wang X, Heitman J, Stajich JE, Fraser JA, Meyer W, Carter D, Schein J, Krzywinski M, Kwon-Chung KJ, Varma A, Wang J, Brunham R, Fyfe M, Ouellette BF, Siddiqui A, Marra M, Jones S, Holt R, Birren BW, Galagan JE, Cuomo CA. <b>mBio</b>. 2011 Feb 8;2(1):e00342-10. doi: 10.1128/mBio.00342-10. PMID: 21304167; PMCID: PMC3037005.
+
+[A New Lineage of Cryptococcus gattii (VGV) Discovered in the Central Zambezian Miombo Woodlands](https://pubmed.ncbi.nlm.nih.gov/31719178/). Farrer RA, Chang M, Davis MJ, van Dorp L, Yang DH, Shea T, Sewell TR, Meyer W, Balloux F, Edwards HM, Chanda D, Kwenda G, Vanhove M, Chang YC, Cuomo CA, Fisher MC, Kwon-Chung KJ. <b>mBio</b>. 2019 Nov 12;10(6):e02306-19. doi: 10.1128/mBio.02306-19. PMID: 31719178; PMCID: PMC6851281.
 
 [Telomere-to-Telomere genome assemblies of human-infecting <i>Encephalitozoon</i> species](https://pubmed.ncbi.nlm.nih.gov/37142951/). Mascarenhas Dos Santos AC, Julian AT, Liang P, Juárez O, Pombert JF. <b>BMC Genomics</b>. 2023 May 4;24(1):237. doi: 10.1186/s12864-023-09331-3. PMID: 37142951; PMCID: PMC10158259.
