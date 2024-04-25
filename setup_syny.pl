@@ -2,8 +2,8 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.1e';
-my $updated = '2024-03-30';
+my $version = '0.2';
+my $updated = '2024-04-25';
 
 use strict;
 use warnings;
@@ -201,6 +201,7 @@ if (-e $config){
 open CFG, "$diamond", $config or die "Can't open $config: $!\n";
 print CFG "\n\n";
 print CFG 'PATH=$PATH:'.$syny_path.'                    ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'/Examples           ## SYNY'."\n";
 
 
 ###################################################################################################
@@ -291,7 +292,5 @@ print CFG "\n";
 print CFG 'export PATH'."\n";
 close CFG;
 
-print "\nCompleted. Please run source on your configuration file, i.e.:\n";
+print "\nCompleted. Please run source on your configuration file, i.e.:\n\n";
 print "source $config\n\n";
-
-
