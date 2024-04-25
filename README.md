@@ -350,7 +350,7 @@ The contents of the subdirectories are:
 ### <b>Step by step examples</b>
 
 #### Example 1 - <i>Cryptococcus</i>
-Below is a quick example describing how to compare a few select <i>Cryptococcus</i> genomes using annotation data available in public databases: <i>C. neoformans</i> var. <i>neoformans</i> strain [JEC21](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13856/), <i>C. gattii</i> strain [WM276](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13692/), <i>C. gattii</i> VGV strain [MF34](hhttps://www.ncbi.nlm.nih.gov/bioproject/PRJNA487802/), <i>C. decagattii</i> strain [7685027](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA660466/), and <i>C. deuterogattii</i> strain [R265](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395628/).
+Below is a quick example describing how to compare a few select <i>Cryptococcus</i> genomes (<i>C. neoformans</i> var. <i>neoformans</i> strain [JEC21](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13856/), <i>C. gattii</i> strain [WM276](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13692/), <i>C. gattii</i> VGV strain [MF34](hhttps://www.ncbi.nlm.nih.gov/bioproject/PRJNA487802/), <i>C. decagattii</i> strain [7685027](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA660466/), <i>C. deuterogattii</i> strain [R265](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395628/)) using annotation data available in public databases.
 
 ##### Downloading annotation data from GenBank (NCBI):
 
@@ -360,7 +360,7 @@ DATA=~/DATA ## Replace ~/DATA by desired annotation data directory
 Cryptococcus.sh $DATA
 ```
 
-Downloading <i>Cryptococcus</i> example data manually:
+Or downloading the <i>Cryptococcus</i> data manually instead:
 ```bash
 DATA=~/DATA ## Replace ~/DATA by desired annotation data directory
 mkdir -p $DATA
