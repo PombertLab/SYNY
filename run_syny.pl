@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.2b';
+my $version = '0.6.3';
 my $updated = '2024-04-25';
 
 use strict;
@@ -71,7 +71,9 @@ my $plot_options = <<"PLOT_OPTIONS";
 --max_links		Set max number of links [Default: 25000]
 --max_points_per_track	Set max number of points per track [Default: 75000]
 --clusters		Color by cluster instead of contig/chromosome [Default: off]
---no_circos		Turn off Circos plots
+--no_invert		Turn off Circos plots (inverted orientation)
+--no_normal		Turn off Circos plots (normal orientation)
+--no_circos		Turn off all Circos plots
 
 ### Barplots
 -bh (--bheight)	Barplot figure height in inches [Default: 10.8]
@@ -133,6 +135,8 @@ my $max_ideograms = 200;
 my $max_links = 25000;
 my $max_points_per_track = 75000;
 my $clusters;
+my $no_invert;
+my $no_normal;
 my $no_circos;
 
 # Barplots
@@ -190,6 +194,8 @@ GetOptions(
 	'max_links=i' => \$max_links,
 	'max_points_per_track=i' => \$max_points_per_track,
 	'clusters' => \$clusters,
+	'no_invert' => \$no_invert,
+	'no_normal' => \$no_normal,
 	'no_circos' => \$no_circos,
 	# Barplots
 	'bh|bheight=s' => \$bheight,
@@ -460,7 +466,7 @@ logs(\*LOG, 'Genome alignments - paf2links.pl');
 #### Calculate/plot PAF metrics
 $tstart = time();
 print ERROR "\n### paf_metrics.py ###\n";
-print "\n# Calculating alignment metrics (minimap2):\n";
+print "\n# Calculating metrics (genome alignments):\n";
 
 my $aln_length_dir = $minimap2_dir.'/METRICS';
 my @paf_files;
@@ -493,8 +499,8 @@ logs(\*LOG, 'Genome alignments - paf_metrics.py');
 unless ($no_barplot){
 
 	$tstart = time();
-	print ERROR "\n### paf_to_barplot.py (minimap2) ###\n";
-	print "\n# Barplots (minimap2):\n";
+	print ERROR "\n### paf_to_barplot.py (genome alignments) ###\n";
+	print "\n# Barplots (genome alignments):\n";
 
 	system("
 		$path/paf_to_barplot.py \\
@@ -502,11 +508,9 @@ unless ($no_barplot){
 		--fasta $genome_dir/*.fasta \\
 		--outdir $barplot_dir \\
 		--threads $threads \\
-		--affix mmap \\
 		--height $bheight \\
 		--width $bwidth \\
 		--palette $palette \\
-		--affix mmap \\
 		$tick_flag \\
 		$monobar_flag \\
 		2>> $log_err
@@ -520,15 +524,14 @@ unless ($no_barplot){
 unless ($no_dotplot){
 
 	$tstart = time();
-	print ERROR "\n### paf_to_dotplot.py (minimap2) ###\n";
-	print "\n# Dotplots (minimap2):\n";
+	print ERROR "\n### paf_to_dotplot.py (genome alignments) ###\n";
+	print "\n# Dotplots (genome alignments):\n";
 
 	system("
 		$path/paf_to_dotplot.py \\
 		--paf $paf_dir/*.paf \\
 		--fasta $genome_dir/*.fasta \\
 		--threads $threads \\
-		--affix mmap \\
 		--outdir $dotplot_dir \\
 		--unit $multiplier \\
 		--height $dheight \\
@@ -548,8 +551,8 @@ unless ($no_dotplot){
 unless ($no_heatmap){
 
 	$tstart = time();
-	print ERROR "\n### paf_to_hm.py (minimap2) ###\n";
-	print "\n# Heatmaps (minimap2):\n";
+	print ERROR "\n### paf_to_hm.py (genome alignments) ###\n";
+	print "\n# Heatmaps (genome alignments):\n";
 
 	system("
 		$path/paf_to_heatmap.py \\
@@ -709,8 +712,8 @@ logs(\*LOG, 'Gene clusters - clusters_to_paf.pl');
 unless ($no_barplot){
 
 	$tstart = time();
-	print ERROR "\n### paf_to_barplot.py (SYNY) ###\n";
-	print "\n# Barplots (SYNY):\n";
+	print ERROR "\n### paf_to_barplot.py (gene clusters) ###\n";
+	print "\n# Barplots (gene clusters):\n";
 
 	my @barplot_files;
 
@@ -749,8 +752,8 @@ unless ($no_barplot){
 unless ($no_dotplot){
 
 	$tstart = time();
-	print ERROR "\n### paf_to_dotplot.py (SYNY) ###\n";
-	print "\n# Dotplots (SYNY):\n";
+	print ERROR "\n### paf_to_dotplot.py (gene clusters) ###\n";
+	print "\n# Dotplots (gene clusters):\n";
 
 	my @dotplot_files;
 	foreach my $gap (@gaps){
@@ -922,8 +925,8 @@ foreach my $gap (keys %matrices){
 unless ($no_heatmap){
 
 	$tstart = time();
-	print ERROR "\n### protein_cluster_hm.py ###\n";
-	print "\n# Heatmaps (SYNY):\n";
+	print ERROR "\n### protein_cluster_hm.py (gene clusters) ###\n";
+	print "\n# Heatmaps (gene clusters):\n";
 
 	my @hm_files;
 	foreach my $gap (@gaps){
@@ -1383,14 +1386,41 @@ sub circos_plot {
 
 sub run_circos {
 
+	if (($no_invert) or ($no_normal)){
+		$circos_num = $circos_num / 2;
+	}
+
 	while (my $conf = shift@circos_files){
+
+		if ($no_invert){
+			if ($conf =~ /\.inverted\.conf$/){
+				next;
+			}
+		}
+		elsif ($no_normal){
+			if ($conf =~ /\.normal\.conf$/){
+				next;
+			}
+		}
 
 		my $plot_dir = $circos_todo_list{$conf}{'dir'};
 		my $circos_plot = $circos_todo_list{$conf}{'png'};
 
-		my $x = $circos_num - scalar(@circos_files);
+		## Progess counter
+		my $x;
+		if ($no_invert){
+			$x = $circos_num - (scalar(@circos_files) / 2);
+		}
+		elsif ($no_normal){
+			$x = $circos_num - ((scalar(@circos_files) + 1) / 2);
+		}
+		else {
+			$x = $circos_num - scalar(@circos_files);
+
+		}
 		print "$x / $circos_num - plotting $plot_dir/$circos_plot\n";
 
+		## Plot circos configuration file
 		system ("
 			circos \\
 				-conf $conf \\
