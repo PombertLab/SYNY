@@ -421,7 +421,7 @@ run_syny.pl \
   --ref JEC21
 ```
 
-In the command line below, SYNY is run on a subset of two genomes (`JEC21` and `WM276`), this time also allowing for different maximum gap thresholds between gene pairs. It also produces only the pairsiw Circos plots.
+In the command line below, SYNY is run on a subset of two genomes (`JEC21` and `WM276`), this time also allowing for different maximum gap thresholds between gene pairs. Only the pairwise Circos plots are also produced when invoking `--circos pair`.
 
 ```Bash
 SYNY=~/SYNY_CRYPT_2     ## Replace by desired SYNY output directory
