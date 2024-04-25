@@ -402,9 +402,9 @@ curl \
   -o $outfile
 ```
 
-##### Running SYNY and plotting comparisons with Circos:
+##### Running SYNY:
 
-SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gaps are allowed (`gap 0`) during gene cluster inferences. Pairwise Circos plots are produced but not concatenated ones, as the number of ideograms (one ideogram per contig/chromsosome) would likely render concatenated plots that are too dense to read.
+SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed (`gap 0`) during gene cluster inferences. Here, both pairwise (`pair`) and concatenated (`cat`) Circos plots are produced using `--circos all`. In the concatenated plots, `JEC21` is used as the desired reference and `cryptoccocus`. Note that when comparing several genomes, the concatenated plots can quickly become too dense for legibility.
 
 ```Bash
 SYNY=~/SYNY_CRYPT_ALL   ## Replace by desired SYNY output directory
@@ -414,10 +414,12 @@ run_syny.pl \
   --annot $DATA/*.gbff.gz \
   --outdir $SYNY \
   --gaps 0 \
-  --circos pair
+  --circos all \
+  --circos_prefix cryptococcus \
+  --ref JEC21
 ```
 
-Running SYNY on a subset of two genomes (`JEC21` and `WM276`), this time also allowing  maximum gaps 1 and 5 gaps between gene pairs, and producing only the concatenated Circos plots:
+In the command line below, SYNY is run on a subset of two genomes (`JEC21` and `WM276`), this time also allowing for different maximum gap thresholds between gene pairs. It also produces only the pairsiw Circos plots.
 
 ```Bash
 SYNY=~/SYNY_CRYPT_2     ## Replace by desired SYNY output directory
@@ -428,9 +430,7 @@ run_syny.pl \
   -o $SYNY \
   -g 0 1 5 \
   -e 1e-10 \
-  --circos cat \
-  -r JEC21 \
-  --circos_prefix WM276_vs_JEC21
+  --circos pair
 ```
 
 ##### Example of clusters identified with SYNY
@@ -619,7 +619,7 @@ In these plots, colinear regions found between the compared genomes are highligh
 
 If desired, the barplots can instead be generated using a single monochromatic color with the `--monobar` command line switch; <i>e.g.</i> `--monobar red`. If this option is selected, the color-coding legend will be omitted from the plot.
 
-By default, the barplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--height` and `--width` command line switches.
+By default, the barplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--bheight` and `--bwidth` command line switches.
 
 #### Dotplots
 
