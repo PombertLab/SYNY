@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 DATA=$1 ## Desired annotation data directory
-BASEURL=https://ftp.ncbi.nlm.nih.gov/genomes/all
 
 ## Readme
 if [[ ( $@ == "--help") ||  $@ == "-h" || $# -le 0 ]]
@@ -10,11 +9,12 @@ then
 	exit 0
 fi 
 
-
 ### Create dir
 mkdir -p $DATA
 
 ##### Downloading data from NCBI ####
+BASEURL=https://ftp.ncbi.nlm.nih.gov/genomes/all
+
 ### Cryptococcus neoformans strain JEC21
 outfile=${DATA}/JEC21.gbff.gz
 printf "\nDownloading Cryptococcus neoformans strain JEC21 as ${outfile}\n\n"
