@@ -810,7 +810,7 @@ In the above [Circos](https://circos.ca/) plot, links between the reference and 
 Note that while SYNY can plot multiple genomes together in a single figure with `--circos cat` / `--circos all`, adding too much data can quickly clutter the Circos plots generated (drawing too many ideograms can make the figure illegible). If too dense, drawing pairwise plots with `--circos pair` rather than concatenated ones should help with readability. However, when comparing genomes featuring many chromosomes/contigs, cluttering can also occur even when performing pairwise genome comparisons.
 
 #### Custom Circos colors
-Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files containing color names and their associated RGB values (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Circos/custom_color_1.txt) for an example). A few custom presets are also available to use in SYNY.
+Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files containing color names and their associated RGB values (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Examples/custom_color_1.txt) for an example). A few custom presets are also available to use in SYNY.
 
 ##### Running SYNY with custom colors loaded from a tab-delimited file:
 ```Bash
