@@ -357,7 +357,7 @@ Below is a quick example describing how to compare a few select <i>Cryptococcus<
 
 ##### Downloading annotation data from GenBank (NCBI):
 
-Downloading <i>Cryptococcus</i> example data automatically from NCBI using the provided `Cryptococcus.sh` shell script in the `Examples/` subdirectory:
+Downloading <i>Cryptococcus</i> example data automatically from NCBI using the provided [Cryptococcus.sh](https://github.com/PombertLab/SYNY/blob/main/Examples/Cryptococcus.sh) shell script from the `Examples/` subdirectory:
 ```bash
 DATA=~/DATA ## Replace ~/DATA by desired annotation data directory
 Cryptococcus.sh $DATA
@@ -613,7 +613,7 @@ In the inverted karyotype image, the order of the karyotype(s) to be compared to
 In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see [Dotplots](https://github.com/PombertLab/SYNY?tab=readme-ov-file#Dotplots) section below).
 
 #### Barplots
-Chromosome maps (aka barplots) highlighting collinear genome segments will be generated with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/)  from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`).
+Chromosome maps (aka barplots) highlighting collinear genome segments will be generated with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/Plots/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/)  from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`).
 
 ##### Example of a barplot generated from minimap2 PAF files using defaults settings:
 <p align="left">
@@ -628,7 +628,7 @@ By default, the barplots are formatted for a widescreen (landscape) output (widt
 
 #### Dotplots
 
-Unless the `--no_dotplot` command line switch is invoked, dotplots will be generated with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/) from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY, (e.g. `.gap_0.`).
+Unless the `--no_dotplot` command line switch is invoked, dotplots will be generated with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/Plots/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/) from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY, (e.g. `.gap_0.`).
 
 ##### Example of a dotplot generated from minimap2 PAF files using defaults settings:
 
