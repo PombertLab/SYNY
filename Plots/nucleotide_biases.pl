@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.6a';
-my $updated = '2024-04-18';
+my $version = '0.6b';
+my $updated = '2024-04-26';
 
 use strict;
 use warnings;
@@ -745,6 +745,12 @@ sub print_circos_conf {
 				## Rules
 				print $cg '<rules>'."\n\n";
 
+				## Use first entry if pairwise reference does not exits
+				unless (exists $sequences{$pairwise_ref}){
+					my @tmp = sort (keys %sequences);
+					$pairwise_ref = $tmp[0];
+				}
+
 				## Counting for required colors
 				my $ref_sequence_count = scalar (keys %{$sequences{$pairwise_ref}});
 
@@ -759,15 +765,16 @@ sub print_circos_conf {
 				}
 
 				## Creating an increment so that it will use the full range of colors
-				## not just the start
+				## not just the start of the list
 				my $increment = scalar(@color_set)/$ref_sequence_count;
 				my $rounded_increment = round($increment);
-				my $color_start = 0;
 
 				## Making sure that the increment is >= 1
 				if ($rounded_increment == 0){
 					$rounded_increment = 1;
 				}
+
+				my $color_start = 0;
 				
 				foreach my $refseq (sort (keys %{$sequences{$pairwise_ref}})){
 					foreach my $queseq (sort (keys %sequences)){
