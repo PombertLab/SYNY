@@ -16,7 +16,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
     * [Example 1: <i>Cryptococcus</i>](#Example-1---Cryptococcus)
       * [Heatmaps](#Heatmaps)
       * [Circos plots](#Circos-plots)
-      * [Barplots (aka chromosome maps)](#Barplots-\(aka-chromosome-maps\))
+      * [Barplots (aka chromosome maps)](#Barplots)
       * [Dotplots](#Dotplots)
       * [PAF metrics](#PAF-metrics)
     * [Example 2: <i>Encephalitozoon</i>](#Example-2---Encephalitozoon)
@@ -612,8 +612,8 @@ In the inverted karyotype image, the order of the karyotype(s) to be compared to
 
 In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see [Dotplots](https://github.com/PombertLab/SYNY?tab=readme-ov-file#Dotplots) section below).
 
-#### Barplots (aka chromosome maps)
-Barplots highlighting collinear genome segments will be generated with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/)  from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`).
+#### Barplots
+Chromosome maps (aka barplots) highlighting collinear genome segments will be generated with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/)  from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`).
 
 ##### Example of a barplot generated from minimap2 PAF files using defaults settings:
 <p align="left">
