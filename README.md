@@ -409,7 +409,7 @@ curl \
 
 ##### Running SYNY:
 
-SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed (`gap 0`) during gene cluster inferences. Here, both pairwise (`pair`) and concatenated (`cat`) Circos plots are produced using `--circos all`. In the concatenated plots, `JEC21` is used as the desired reference and `cryptococcus` as the output file prefix. Note that when comparing several genomes, the concatenated plots can quickly become too dense for legibility.
+SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed (`gap 0`) during gene cluster inferences. Here, both pairwise (`pair`) and concatenated (`cat`) Circos plots are produced using `--circos all`. In the concatenated plots, `JEC21` is used as the reference and `cryptococcus` as the output file prefix. Note that when comparing several genomes, the concatenated plots can quickly become too dense for legibility.
 
 ```Bash
 SYNY=~/SYNY_CRYPT_ALL   ## Replace by desired SYNY output directory
@@ -548,7 +548,7 @@ In this figure, nucleotides biases are plotted in the concentric rings (from out
 - GT and AC nucleotide biases (blue and green lines)
 - GA and CT nucleotide biases (purple and yellow lines)
 
-Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used.
+Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. If desired, color coding can be set by cluster instead with `--clusters`. This option is useful when working with prokaryotes featuring a single chromosome, so that the ribbons are not all of the same color.
 
 By default, contigs will be labelled by numbers in the Circos plots. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) and fonts can be futher adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
 `normal`, `default`, `semibold`, `bold`, `italic`, `bolditalic`, `italicbold` (see this Circos [tutorial](https://circos.ca/documentation/tutorials/ideograms/labels/) for details).
