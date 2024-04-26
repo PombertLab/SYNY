@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.4';
+my $version = '0.6.4a';
 my $updated = '2024-04-26';
 
 use strict;
@@ -302,8 +302,7 @@ my $genome_dir = $seq_dir.'/GENOMES';
 
 # Gene cluster subdirs
 my $cluster_dir = $outdir.'/CLUSTERS';
-my $conserved_dir = $cluster_dir.'/CONSERVED';
-my $shared_dir = $cluster_dir.'/SHARED';
+my $conserved_dir = $cluster_dir.'/HOMOLOGS';
 my $diamond_dir = $cluster_dir.'/DIAMOND';
 my $db_dir = $diamond_dir.'/DB';
 my $cluster_synteny = $cluster_dir.'/SYNTENY';
@@ -607,7 +606,7 @@ system("
 	--evalue $evalue \\
 	--threads $threads \\
 	--outdir $diamond_dir \\
-	--shared $shared_dir \\
+	--shared $conserved_dir \\
 	--list $list_dir \\
 	2>> $log_err
 ") == 0 or checksig();
