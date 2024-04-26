@@ -240,7 +240,7 @@ my $plot_path = $path.'/Plots';
 my $util_path = $path.'/Utils';
 
 ###################################################################################################
-## Print custom Circos presets then exit if --list_preset
+## Precheck Circos options
 ###################################################################################################
 
 if ($list_preset){
@@ -251,6 +251,29 @@ if ($list_preset){
 	") == 0 or checksig();
 	exit;
 
+}
+
+my %circos_fonts = (
+	'light' => '',
+	'normal' => '',
+	'default' => '',
+	'semibold' => '',
+	'bold' => '',
+	'italic' => '',
+	'bolditalic' => '',
+	'italicbold' => ''
+);
+
+if ($label_font){
+	my $font = lc($label_font);
+	if (!exists $circos_fonts{$font}){
+		print "\nCircos font $font not found. Possible fonts are:"."\n\n";
+		for my $key (sort (keys %circos_fonts)){
+			print '  '.$key."\n";
+		}
+		print "\n";
+		exit;
+	}
 }
 
 ###################################################################################################
