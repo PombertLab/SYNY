@@ -2,8 +2,8 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.2a';
-my $updated = '2024-04-25';
+my $version = '0.2b';
+my $updated = '2024-04-26';
 
 use strict;
 use warnings;
@@ -51,7 +51,7 @@ GetOptions(
 my $init_dir = getcwd();
 $install_dir = abs_path($install_dir);
 $config = abs_path($config);
-my ($script,$syny_path) = fileparse($0);
+my ($script,$syny_path) = fileparse(abs_path($0));
 
 ###################################################################################################
 ## Installing Linux dependencies (requires sudo)
@@ -117,7 +117,7 @@ if ($package_manager eq 'apt'){
         libperlio-gzip-perl \\
         cpanminus \\
         libgd-perl
-    ");
+    ") == 0 or checksig();
 }
 
 elsif ($package_manager eq 'dnf'){
@@ -137,7 +137,7 @@ elsif ($package_manager eq 'dnf'){
         perl-PerlIO-gzip \\
         perl-App-cpanminus \\
         perl-GD
-    ");
+    ") == 0 or checksig();
 
 }
 
@@ -157,7 +157,7 @@ elsif ($package_manager eq 'zypper'){
         perl-PerlIO-gzip \\
         perl-App-cpanminus \\
         perl-GD
-    ");
+    ") == 0 or checksig();
 
 }
 
@@ -179,7 +179,7 @@ system ("
         Statistics::Basic \\
         SVG \\
         Text::Format
-");
+") == 0 or checksig();
 
 ###################################################################################################
 ## Creating installation directory
@@ -201,11 +201,11 @@ if (-e $config){
 open CFG, "$diamond", $config or die "Can't open $config: $!\n";
 print CFG "\n\n";
 print CFG 'PATH=$PATH:'.$syny_path.'                    ## SYNY'."\n";
-print CFG 'PATH=$PATH:'.$syny_path.'/Alignments         ## SYNY'."\n";
-print CFG 'PATH=$PATH:'.$syny_path.'/Clusters           ## SYNY'."\n";
-print CFG 'PATH=$PATH:'.$syny_path.'/Examples           ## SYNY'."\n";
-print CFG 'PATH=$PATH:'.$syny_path.'/Plots              ## SYNY'."\n";
-print CFG 'PATH=$PATH:'.$syny_path.'/Utils              ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'Alignments          ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'Clusters            ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'Examples            ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'Plots               ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'Utils               ## SYNY'."\n";
 
 
 ###################################################################################################
@@ -221,7 +221,7 @@ system("
     -L https://circos.ca/distribution/circos-0.69-9.tgz \\
     --insecure \\
     -o $install_dir/circos-0.69-9.tgz
-");
+") == 0 or checksig();
 
 system("tar -zxvf $install_dir/circos-0.69-9.tgz --directory $install_dir");
 system("rm $install_dir/circos-0.69-9.tgz");
@@ -248,7 +248,7 @@ system ("
     curl \\
     -L https://github.com/bbuchfink/diamond/releases/download/$diamond_ver/diamond-linux64.tar.gz \\
     -o $install_dir/diamond-linux64.tar.gz
-");
+") == 0 or checksig();
 
 system("
     tar -zxvf $install_dir/diamond-linux64.tar.gz --directory $diamond_dir
@@ -272,13 +272,13 @@ if (-d $minimap_dir){
 
 system("git clone https://github.com/lh3/minimap2 $minimap_dir");
 chdir $minimap_dir;
-system("make");
+system("make") == 0 or checksig();
 
 system("
     curl \\
     -L https://github.com/attractivechaos/k8/releases/download/v0.2.4/k8-0.2.4.tar.bz2 \\
     -o $install_dir/k8-0.2.4.tar.bz2
-");
+") == 0 or checksig();
 
 system("tar -jxf $install_dir/k8-0.2.4.tar.bz2 --directory $minimap_dir");
 system("cp $minimap_dir/k8-0.2.4/k8-`uname -s` $minimap_dir/k8");
@@ -298,3 +298,23 @@ close CFG;
 
 print "\nCompleted. Please run source on your configuration file, i.e.:\n\n";
 print "source $config\n\n";
+
+###################################################################################################
+## Subroutine(s)
+###################################################################################################
+
+sub checksig {
+
+	my $exit_code = $?;
+	my $modulo = $exit_code % 255;
+
+	if ($modulo == 2) {
+		print "\nSIGINT detected: Ctrl+C => exiting...\n\n";
+		exit(2);
+	}
+	elsif ($modulo == 131) {
+		print "\nSIGTERM detected: Ctrl+\\ => exiting...\n\n";
+		exit(131);
+	}
+
+}
