@@ -16,7 +16,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
     * [Example 1: <i>Cryptococcus</i>](#Example-1---Cryptococcus)
       * [Heatmaps](#Heatmaps)
       * [Circos plots](#Circos-plots)
-      * [Barplots (aka chromosome maps)](#Barplots)
+      * [Barplots (chromosome maps)](#Barplots)
       * [Dotplots](#Dotplots)
       * [PAF metrics](#PAF-metrics)
     * [Example 2: <i>Encephalitozoon</i>](#Example-2---Encephalitozoon)
