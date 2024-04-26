@@ -19,7 +19,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
       * [Barplots (chromosome maps)](#Barplots)
       * [Dotplots](#Dotplots)
       * [PAF metrics](#PAF-metrics)
-    * [Example 2: <i>Encephalitozoonidae</i>](#Example-2---Encephalitozoonidae)
+    * [Example 2: Encephalitozoonidae](#Example-2---Encephalitozoonidae)
       * [Custom Circos colors](#Custom-Circos-colors)
 * [References](#References)
 
@@ -691,7 +691,7 @@ Likewise, the total average sequence identity percentage listed in the PAF metri
 
 As a rule of thumb, pairwise alignments featuring lower sequence identity percentages will produce fewer and/or more fragmented collinear segments.
 
-#### Example 2 - <i>Encephalitozoonidae</i>
+#### Example 2 - Encephalitozoonidae
 Below is a quick example describing how to compare a total of genomes from the Encephalitozoonidae (<i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), [<i>E. hellem</i> ATCC 50604](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), [<i>E. cuniculi</i> ATCC 50602](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA705735/) and Ordospora species [<i>O. colligata</i> OC4](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA210314/) and [<i>O. pajunii</i> FI-F-10](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA630072/)) using annotation data available in public databases. The Encephalitozoonidae genomes provided in this example are highly collinear yet display a high level of sequence divergence. As such, they consitute a good case scenario to assess the benefits of using gene clusters to complement inferences based on pairwise genome alignments.
 
 ##### Downloading annotation data from GenBank (NCBI):
