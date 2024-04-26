@@ -750,7 +750,7 @@ curl \
 ```
 
 ##### Running SYNY:
-To reduce runtime, here we will skip the Circos plots with the `--no_circos` option.
+To reduce runtime, we will skip the Circos plots with the `--no_circos` option.
 
 ```Bash
 SYNY=~/SYNY_ENCE      ## Replace by desired SYNY output directory
@@ -763,7 +763,7 @@ run_syny.pl \
   --no_circos
 ```
 
-Here, while the pairwise alignments and gene cluster collinear inference produce similar results within species (not shown), they differ susbtantially between species. For example, below are two barplots between <i>Encephalitozoon hellem</i> and <i>Ordospora colligata</i>. While the results are congruent, gene clusters inferences `.gap_0.` perform better than those based on pairwise alignments (`.mmap.`), the latter of which struggle due to the high levels of sequence divergence involved. These differences will also be reflected in the dotplots, heatmaps and Circos plots generated (not shown).
+Here, while the pairwise alignments and gene cluster collinear inferences produce similar results within species (not shown), they differ susbtantially between species. For example, below are two barplots between <i>Encephalitozoon hellem</i> and <i>Ordospora colligata</i>. While the results are congruent, gene clusters inferences `.gap_0.` perform better than those based on pairwise alignments (`.mmap.`), the latter of which struggle due to the high levels of sequence divergence involved. These differences will also be reflected in the dotplots, heatmaps and Circos plots generated (not shown).
 
 Barplots (gene clusters): 
 <p align="left">
