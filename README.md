@@ -19,7 +19,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
       * [Barplots (chromosome maps)](#Barplots)
       * [Dotplots](#Dotplots)
       * [PAF metrics](#PAF-metrics)
-    * [Example 2: <i>Encephalitozoon</i>](#Example-2---Encephalitozoon)
+    * [Example 2: <i>Encephalitozoonidae</i>](#Example-2---Encephalitozoonidae)
       * [Custom Circos colors](#Custom-Circos-colors)
 * [References](#References)
 
@@ -691,117 +691,106 @@ Likewise, the total average sequence identity percentage listed in the PAF metri
 
 As a rule of thumb, pairwise alignments featuring lower sequence identity percentages will produce fewer and/or more fragmented collinear segments.
 
-#### Example 2 - <i>Encephalitozoon</i>
-Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
+#### Example 2 - <i>Encephalitozoonidae</i>
+Below is a quick example describing how to compare a total of genomes from the <i>Encephalitozoonidae (<i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), [<i>E. hellem</i> ATCC 50604](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), [<i>E. cuniculi</i> ATCC 50602](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA705735/) and Ordospora species [<i>O. colligata</i> OC4](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA210314/) and [<i>O. pajunii</i> FI-F-10](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA630072/)) using annotation data available in public databases. The Encephalitozoonidae genomes provided in this example are highly collinear yet display a high level of sequence divergence. As such, they consitute a good case scenario to assess the benefits of using gene clusters to complement inferences based on pairwise genome alignments.
 
 ##### Downloading annotation data from GenBank (NCBI):
+
+Downloading genome data automatically from NCBI using the provided [Encephalitozoonidae.sh](https://github.com/PombertLab/SYNY/blob/main/Examples/Encephalitozoonidae.sh) shell script from the `Examples/` subdirectory:
+
 ```bash
-DATA=~/ENCE
+DATA=~/ENCE ## Replace ~/ENCE by desired annotation data directory
+Encephalitozoonidae.sh $DATA
+```
+Or downloading the Encephalitozoonidae data manually instead:
+
+```bash
+DATA=~/ENCE ## Replace ~/ENCE by desired annotation data directory
 mkdir -p $DATA
 
+##### Downloading data from NCBI ####
+BASEURL=https://ftp.ncbi.nlm.nih.gov/genomes/all
+
 ## Encephalitozoon intestinalis ATCC 50506 telomere-to-telomere (T2T) genome
+outfile=${DATA}/Ei50506.gbff.gz
+printf "\nDownloading Encephalitozoon intestinalis ATCC 50506 as ${outfile}\n\n"
 curl \
-  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/024/399/295/GCA_024399295.1_ASM2439929v1/GCA_024399295.1_ASM2439929v1_genomic.gbff.gz \
-  -o $DATA/intestinalis_50506.gbff.gz
+  -L ${BASEURL}/GCA/024/399/295/GCA_024399295.1_ASM2439929v1/GCA_024399295.1_ASM2439929v1_genomic.gbff.gz \
+  -o $outfile
 
 ## Encephalitozoon hellem ATCC 50604 telomere-to-telomere (T2T) genome
+outfile=${DATA}/Eh50604.gbff.gz
+printf "\nDownloading Encephalitozoon hellem ATCC 50604 as ${outfile}\n\n"
 curl \
-  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/024/399/255/GCA_024399255.1_ASM2439925v1/GCA_024399255.1_ASM2439925v1_genomic.gbff.gz \
-  -o $DATA/hellem_50604.gbff.gz
+  -L ${BASEURL}/GCA/024/399/255/GCA_024399255.1_ASM2439925v1/GCA_024399255.1_ASM2439925v1_genomic.gbff.gz \
+  -o $outfile
 
 ## Encephalitozoon cuniculi ATCC 50602 telomere-to-telomere (T2T) genome
+outfile=${DATA}/Ec50602.gbff.gz
+printf "\nDownloading Encephalitozoon cuniculi ATCC 50602 as ${outfile}\n\n"
 curl \
-  -L https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/027/571/585/GCA_027571585.1_ASM2757158v1/GCA_027571585.1_ASM2757158v1_genomic.gbff.gz \
-  -o $DATA/cuniculi_50602.gbff.gz
+  -L ${BASEURL}/GCA/027/571/585/GCA_027571585.1_ASM2757158v1/GCA_027571585.1_ASM2757158v1_genomic.gbff.gz \
+  -o $outfile
 
+## Ordospora colligata OC4
+outfile=${DATA}/OcOC4.gbff.gz
+printf "\nDownloading Ordospora colligata OC4 as ${outfile}\n\n"
+curl \
+  -L ${BASEURL}/GCF/000/803/265/GCF_000803265.1_ASM80326v1/GCF_000803265.1_ASM80326v1_genomic.gbff.gz \
+  -o $outfile
+
+## Ordospora Ordospora pajunii FI-F-10
+outfile=${DATA}/OpFIF10.gbff.gz
+printf "\nDownloading Ordospora pajunii FI-F-10 as ${outfile}\n\n"
+curl \
+  -L ${BASEURL}/GCF/021/821/965/GCF_021821965.1_FI-F-10_v._1/GCF_021821965.1_FI-F-10_v._1_genomic.gbff.gz \
+  -o $outfile
 ```
 
-##### Running SYNY and plotting comparisons with Circos:
+##### Running SYNY:
+To reduce runtime, here we will skip the Circos plots with the `--no_circos` option.
+
 ```Bash
 SYNY=~/SYNY_ENCE      ## Replace by desired SYNY output directory
 
 run_syny.pl \
   -a $DATA/*.gbff.gz \
-  -g 0 1 5 \
+  -g 0 \
   -e 1e-10 \
-  -r intestinalis_50506 \
   -o $SYNY \
-  --circos all \
+  --no_circos
+```
+
+Here, while the pairwise alignments and gene cluster collinear inference produce similar results within species (not shown), they differ susbtantially between species. For example, below are two barplots between <i>Encephalitozoon hellem</i> and <i>Ordospora colligata</i>. While the results are congruent, gene clusters inferences `.gap_0.` perform better than those based on pairwise alignments (`.mmap.`), the latter of which struggle due to the high levels of sequence divergence involved. These differences will also be reflected in the dotplots, heatmaps and Circos plots generated (not shown).
+
+Barplots (gene clusters): 
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/Eh50604_vs_OcOC4.gap_0.barplot.19.2x10.8.Spectral.png">
+</p>
+
+Barplots (genome alignments): 
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/Eh50604_vs_OcOC4.mmap.barplot.19.2x10.8.Spectral.png">
+</p>
+
+##### About concatenated Circos plots:
+Because comparing more than two genomes can be useful, concatenated Circos plots can be generated by SYNY using the `--circos all` or the` --circos cat` command line switches. Below is a quick example of how to generate such plots using the genomes from the 3 <i>Encephalitozoon</i> species downloaded previously.
+
+```Bash
+SYNY=~/SYNY_ENCE_3      ## Replace by desired SYNY output directory
+
+run_syny.pl \
+  -a $DATA/E*.gbff.gz \
+  -g 0 \
+  -e 1e-10 \
+  -r Ei50506 \
+  -o $SYNY \
+  --circos cat \
   --circos_prefix encephalitozoon
 ```
 
-##### Example of clusters identified with SYNY
-```Bash
-head -n 32 $SYNY/CLUSTERS/SYNTENY/clusters_summary.tsv
 
-##### cuniculi_50602_vs_hellem_50604; Gap = 0 #####
-  Total number of proteins in clusters: 1827
-  # of clusters:        86
-  Longest:      109
-  Shortest:     2
-  Average cluster size: 21
-  Median cluster size:  12
-  N50:  38
-  N75:  23
-  N90:  10
-
-##### cuniculi_50602_vs_hellem_50604; Gap = 1 #####
-  Total number of proteins in clusters: 1834
-  # of clusters:        24
-  Longest:      184
-  Shortest:     2
-  Average cluster size: 76
-  Median cluster size:  48
-  N50:  148
-  N75:  128
-  N90:  48
-
-##### cuniculi_50602_vs_hellem_50604; Gap = 5 #####
-  Total number of proteins in clusters: 1838
-  # of clusters:        19
-  Longest:      194
-  Shortest:     2
-  Average cluster size: 97
-  Median cluster size:  92
-  N50:  160
-  N75:  146
-  N90:  55
-```
-
-```Bash
-head -n 22 $SYNY/CLUSTERS/SYNTENY/gap_0/CLUSTERS/intestinalis_50506_vs_cuniculi_50602.clusters
-
-### Cluster 001; GPK93_01g00070 to GPK93_01g00480; J0A71_11g22950 to J0A71_11g23360; size = 41 ###
-GPK93_01g00070  -       J0A71_11g22950  -
-GPK93_01g00080  +       J0A71_11g22960  +
-GPK93_01g00090  +       J0A71_11g22970  +
-GPK93_01g00100  +       J0A71_11g22980  +
-GPK93_01g00110  +       J0A71_11g22990  +
-GPK93_01g00120  +       J0A71_11g23000  +
-GPK93_01g00130  -       J0A71_11g23010  -
-GPK93_01g00140  -       J0A71_11g23020  -
-GPK93_01g00150  -       J0A71_11g23030  -
-GPK93_01g00160  +       J0A71_11g23040  +
-GPK93_01g00170  -       J0A71_11g23050  -
-GPK93_01g00180  +       J0A71_11g23060  +
-GPK93_01g00190  -       J0A71_11g23070  -
-GPK93_01g00200  -       J0A71_11g23080  -
-GPK93_01g00210  -       J0A71_11g23090  -
-GPK93_01g00220  +       J0A71_11g23100  +
-GPK93_01g00230  -       J0A71_11g23110  -
-GPK93_01g00240  -       J0A71_11g23120  -
-GPK93_01g00250  -       J0A71_11g23130  -
-GPK93_01g00260  -       J0A71_11g23140  -
-GPK93_01g00270  -       J0A71_11g23150  -
-```
-
-##### Example of a heatmap showing percentages of collinear protein-coding genes between a total 3 genomes:
-<p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.heatmap_ence.png">
-</p>
-
-
-##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using defaults settings):
+##### Example of a concatenated Circos plot comparing a total of 3 genomes (using defaults settings):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.syny.normal.png">
 </p>
@@ -819,10 +808,10 @@ SYNY=~/SYNY_ENCE_CC         ## Replace by desired SYNY output directory
 COLORS=~/custom_color_2.txt ## Replace by desired custom color file
 
 run_syny.pl \
-  -a $DATA/*.gbff.gz \
+  -a $DATA/E*.gbff.gz \
   -g 0 1 5 \
   -e 1e-10 \
-  -r intestinalis_50506 \
+  -r Ei50506 \
   -o $SYNY \
   --custom_file $COLORS \
   --circos all \
@@ -849,10 +838,10 @@ encephalitozoon 11 colors
 SYNY=~/SYNY_ENCE_CC_PRESET   ## Replace by desired SYNY output directory
 
 run_syny.pl \
-  -a $DATA/*.gbff.gz \
+  -a $DATA/E*.gbff.gz \
   -g 0 1 5 \
   -e 1e-10 \
-  -r intestinalis_50506 \
+  -r Ei50506 \
   -o $SYNY \
   --circos all \
   --circos_prefix encephalitozoon_blues \
@@ -887,3 +876,7 @@ run_syny.pl \
 [A New Lineage of Cryptococcus gattii (VGV) Discovered in the Central Zambezian Miombo Woodlands](https://pubmed.ncbi.nlm.nih.gov/31719178/). Farrer RA, Chang M, Davis MJ, van Dorp L, Yang DH, Shea T, Sewell TR, Meyer W, Balloux F, Edwards HM, Chanda D, Kwenda G, Vanhove M, Chang YC, Cuomo CA, Fisher MC, Kwon-Chung KJ. <b>mBio</b>. 2019 Nov 12;10(6):e02306-19. doi: 10.1128/mBio.02306-19. PMID: 31719178; PMCID: PMC6851281.
 
 [Telomere-to-Telomere genome assemblies of human-infecting <i>Encephalitozoon</i> species](https://pubmed.ncbi.nlm.nih.gov/37142951/). Mascarenhas Dos Santos AC, Julian AT, Liang P, Juárez O, Pombert JF. <b>BMC Genomics</b>. 2023 May 4;24(1):237. doi: 10.1186/s12864-023-09331-3. PMID: 37142951; PMCID: PMC10158259.
+
+[A new microsporidian parasite, Ordospora pajunii sp. nov (Ordosporidae), of Daphnia longispina highlights the value of genomic data for delineating species boundaries](https://pubmed.ncbi.nlm.nih.gov/35279911/). de Albuquerque NRM, Haag KL, Fields PD, Cabalzar A, Ben-Ami F, Pombert JF, Ebert D. <b>J Eukaryot Microbiol</b>. 2022 May;69(3):e12902. doi: 10.1111/jeu.12902. Epub 2022 Mar 28. PMID: 35279911.
+
+[The Ordospora colligata genome: Evolution of extreme reduction in microsporidia and host-to-parasite horizontal gene transfer](https://pubmed.ncbi.nlm.nih.gov/25587016/). Pombert JF, Haag KL, Beidas S, Ebert D, Keeling PJ. <b>mBio</b>. 2015 Jan 13;6(1):e02400-14. doi: 10.1128/mBio.02400-14. PMID: 25587016; PMCID: PMC4313915.
