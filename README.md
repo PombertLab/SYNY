@@ -30,6 +30,7 @@ Synteny is the measure of similarity in gene organization between two species. T
 #### <b>Why use synteny?</b>
 Synteny inferences can be used to:
 - Improve genome annotation (by helping to identify mispredicted and/or missing genes)
+- Help differentiate between orthologous and paralogous genes (by leveraging positional information)
 - Perform evolutionary distance analyses (<i>e.g.</i> species sharing similar/identical genome reorganization events are likely more closely related than species that do not share these events).
 
 ## <b>Requirements</b>
