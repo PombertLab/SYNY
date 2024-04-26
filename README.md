@@ -308,17 +308,17 @@ The contents of the subdirectories are:
       - Alignment length vs. similarity scatter plots (in PNG format)
       - Alignment metrics summaries (in plain TXT format)
 - CLUSTERS:
-  - CONSERVED:
-    - Lists of proteins that are conserved within the samples (.conserved)
-    - Summaries of all homology results and conservation within the samples (.conserved_summary)
-    - Lists of unique proteins and their locations (.unique)
   - DIAMOND:
     - DB
       - BLASTP databases
     - Round-robin BLASTP results (.diamond.6)
-  - SHARED:
-    - Lists of all proteins and their top homologs (if any) in other species (.shared.tsv)
-    - Lists of proteins that are unique to each species (.uniques.tsv)
+  - HOMOLOGS:
+    - Lists of proteins that are conserved within the samples (.conserved)
+    - Homology and conservation summaries (.conserved_summary)
+    - Lists of unique proteins and their locations (.unique)
+    - Tab-delimited protein/description lists of proteins and their top homologs in other species (.shared.tsv)
+    - Tab-delimited protein/description lists of proteins uniques to each species (.uniques.tsv)
+    - Tab-delimited protein/description lists of all proteins, shared or not (.all.tsv)
   - SYNTENY:
     - Cluster summary (clusters_summary.tsv)
     - Tab-delimited cluster summary table (clusters_summary_table.tsv)
