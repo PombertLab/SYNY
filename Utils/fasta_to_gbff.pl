@@ -24,7 +24,7 @@ COMMAND     $name \\
               --gzip
 
 OPTIONS:
--f (--fasta)    FASTA file to convert
+-f (--fasta)    FASTA file(s) to convert (gziped files are supported)
 -o (--outdir)   Output directory [Default: GBFF]
 -g (--gzip)     Compress the GBFF output files
 -v (--verbose)  Add verbosity
@@ -61,12 +61,13 @@ while (my $fasta = shift@fasta){
         print 'Parsing           : '.$fasta."\n";
     }
 
-    ## checking for gzip file extension
+    ## Checking for gzip file extension
     my $gzip = '';
     if ($fasta =~ /.gz$/){
         $gzip = ':gzip';
     }
 
+    ## Grabbing basename + I/O
     open FASTA, "<$gzip", $fasta or die "Can't read $fasta: $!\n";
     my ($basename,$path) = fileparse($fasta);
     $basename =~ s/\.gz$//;
@@ -74,6 +75,7 @@ while (my $fasta = shift@fasta){
     my $outfile = $outdir.'/'.$basename.'.gbff';
     open GBFF, '>', $outfile or die "Can't create $outfile: $!\n";
 
+    ## Creating a database of sequences
     my %sequences;
     my $header;
     while (my $line = <FASTA>){
@@ -88,6 +90,7 @@ while (my $fasta = shift@fasta){
 
     }
 
+    ## Iterating though each sequence found in FASTA file
     for my $sequence (sort(keys %sequences)){
 
         ## GBFF header
