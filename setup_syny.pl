@@ -2,7 +2,7 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.2';
+my $version = '0.2a';
 my $updated = '2024-04-25';
 
 use strict;
@@ -201,7 +201,11 @@ if (-e $config){
 open CFG, "$diamond", $config or die "Can't open $config: $!\n";
 print CFG "\n\n";
 print CFG 'PATH=$PATH:'.$syny_path.'                    ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'/Alignments         ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'/Clusters           ## SYNY'."\n";
 print CFG 'PATH=$PATH:'.$syny_path.'/Examples           ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'/Plots              ## SYNY'."\n";
+print CFG 'PATH=$PATH:'.$syny_path.'/Utils              ## SYNY'."\n";
 
 
 ###################################################################################################

@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.3';
-my $updated = '2024-04-25';
+my $version = '0.6.4';
+my $updated = '2024-04-26';
 
 use strict;
 use warnings;
@@ -234,7 +234,10 @@ unless(@gaps){
 
 # Grabbing $path location from script
 my ($script,$path) = fileparse($0);
-my $circos_path = "$path/Circos";
+my $align_path = $path.'/Alignments';
+my $cluster_path = $path.'/Clusters';
+my $plot_path = $path.'/Plots';
+my $util_path = $path.'/Utils';
 
 ###################################################################################################
 ## Print custom Circos presets then exit if --list_preset
@@ -243,7 +246,7 @@ my $circos_path = "$path/Circos";
 if ($list_preset){
 
 	system("
-		$circos_path/nucleotide_biases.pl \\
+		$plot_path/nucleotide_biases.pl \\
 		--list_preset
 	") == 0 or checksig();
 	exit;
@@ -434,7 +437,7 @@ print "\n##### Infering colinearity from pairwise genome alignments\n";
 print ERROR "\n### get_paf.pl ###\n";
 
 system("
-	$path/get_paf.pl \\
+	$align_path/get_paf.pl \\
 	  --fasta $genome_dir/*.fasta \\
 	  --outdir $minimap2_dir \\
 	  --threads $threads \\
@@ -452,7 +455,7 @@ my $paf_dir = "$minimap2_dir/PAF";
 my $paf_links = "$circos_cat_dir/concatenated.mmap.links";
 
 system("
-	$path/paf2links.pl \\
+	$align_path/paf2links.pl \\
 	  --paf $paf_dir \\
 	  --links $paf_links \\
 	  $cluster_flag \\
@@ -479,7 +482,7 @@ while (my $file = readdir(PAFDIR)){
 }
 
 system ("
-	$path/paf_metrics.py \\
+	$align_path/paf_metrics.py \\
 	--paf @paf_files \\
 	--outdir $aln_length_dir \\
 	--threads $threads \\
@@ -503,7 +506,7 @@ unless ($no_barplot){
 	print "\n# Barplots (genome alignments):\n";
 
 	system("
-		$path/paf_to_barplot.py \\
+		$plot_path/paf_to_barplot.py \\
 		--paf $paf_dir/*.paf \\
 		--fasta $genome_dir/*.fasta \\
 		--outdir $barplot_dir \\
@@ -528,7 +531,7 @@ unless ($no_dotplot){
 	print "\n# Dotplots (genome alignments):\n";
 
 	system("
-		$path/paf_to_dotplot.py \\
+		$plot_path/paf_to_dotplot.py \\
 		--paf $paf_dir/*.paf \\
 		--fasta $genome_dir/*.fasta \\
 		--threads $threads \\
@@ -555,7 +558,7 @@ unless ($no_heatmap){
 	print "\n# Heatmaps (genome alignments):\n";
 
 	system("
-		$path/paf_to_heatmap.py \\
+		$plot_path/paf_to_heatmap.py \\
 		--paf $paf_dir/*.paf \\
 		--fasta $genome_dir/*.fasta \\
 		--outdir $paf_hm_dir \\
@@ -599,7 +602,7 @@ while (my $file = readdir(FAA)){
 link_files();
 
 system("
-	$path/get_homology.pl \\
+	$cluster_path/get_homology.pl \\
 	--input @prot_files \\
 	--evalue $evalue \\
 	--threads $threads \\
@@ -638,7 +641,7 @@ foreach my $annot_file_1 (sort(@annot_files)){
 
 			foreach my $gap (@gaps){
 				system("
-					$path/get_synteny.pl \\
+					$cluster_path/get_synteny.pl \\
 					--query_list $list_dir/$file_name_1.list \\
 					--query_blast $diamond_dir/${file_name_1}_vs_${file_name_2}.diamond.6 \\
 					--subject_list $list_dir/$file_name_2.list \\
@@ -697,12 +700,13 @@ foreach my $gap (@gaps){
 	my $clusdir = $cluster_synteny.'/gap_'.$gap.'/CLUSTERS';
 	my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
 
-	system ("$path/clusters_to_paf.pl \\
-	  --fasta $genome_dir/*.fasta \\
-	  --lists $list_dir/*.list \\
-	  --clusters $clusdir/*.clusters \\
-	  --outdir $ppafdir \\
-	  2>> $log_err
+	system ("
+		$cluster_path/clusters_to_paf.pl \\
+		--fasta $genome_dir/*.fasta \\
+		--lists $list_dir/*.list \\
+		--clusters $clusdir/*.clusters \\
+		--outdir $ppafdir \\
+		2>> $log_err
 	") == 0 or checksig();
 }
 
@@ -731,7 +735,7 @@ unless ($no_barplot){
 	}
 
 	system("
-		$path/paf_to_barplot.py \\
+		$plot_path/paf_to_barplot.py \\
 		--paf @barplot_files \\
 		--fasta $genome_dir/*.fasta \\
 		--threads $threads \\
@@ -770,7 +774,7 @@ unless ($no_dotplot){
 	}
 
 	system("
-		$path/paf_to_dotplot.py \\
+		$plot_path/paf_to_dotplot.py \\
 		--paf @dotplot_files \\
 		--fasta $genome_dir/*.fasta \\
 		--threads $threads \\
@@ -935,7 +939,7 @@ unless ($no_heatmap){
 	}
 
 	system("
-		$path/protein_cluster_hm.py \\
+		$plot_path/protein_cluster_hm.py \\
 		--tsv @hm_files \\
 		--outdir $paf_hm_dir \\
 		--threads $threads \\
@@ -957,7 +961,7 @@ $tstart = time();
 print ERROR "\n### id_conserved_regions.pl ###\n";
 
 system("
-	$path/id_conserved_regions.pl \\
+	$cluster_path/id_conserved_regions.pl \\
 	--lists $list_dir \\
 	--blasts $diamond_dir \\
 	--outdir $conserved_dir \\
@@ -987,7 +991,7 @@ while (my $dname = readdir(CDIR)) {
 foreach my $cluster_subdir (@cluster_dirs){
 	my ($basedir) = fileparse($cluster_subdir);
 	system("
-		$circos_path/clusters2links.pl \\
+		$cluster_path/clusters2links.pl \\
 		--cluster $cluster_subdir/CLUSTERS/*.clusters \\
 		--list $list_dir/*.list \\
 		--outdir $circos_data_dir \\
@@ -1022,7 +1026,7 @@ my $gap = $gaps[0];
 
 ## Running nucleotide_biases.pl
 system("
-	$circos_path/nucleotide_biases.pl \\
+	$plot_path/nucleotide_biases.pl \\
 	--outdir $circos_data_dir \\
 	--fasta $genome_dir/*.fasta \\
 	--winsize $winsize \\
@@ -1190,7 +1194,7 @@ sub list_maker {
 		print "$x / $annot_num - Extracting data from $annotation\n";
 
 		system("
-			$path/list_maker.pl \\
+			$util_path/list_maker.pl \\
 			--input $annotation \\
 			--outdir $outdir \\
 			2>> $log_err
