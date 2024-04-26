@@ -741,7 +741,7 @@ curl \
   -L ${BASEURL}/GCF/000/803/265/GCF_000803265.1_ASM80326v1/GCF_000803265.1_ASM80326v1_genomic.gbff.gz \
   -o $outfile
 
-## Ordospora Ordospora pajunii FI-F-10
+## Ordospora pajunii FI-F-10
 outfile=${DATA}/OpFIF10.gbff.gz
 printf "\nDownloading Ordospora pajunii FI-F-10 as ${outfile}\n\n"
 curl \
