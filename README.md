@@ -1,6 +1,6 @@
 ## <b>Synopsis</b>
 
-The SYNY pipeline investigates gene colinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches. It also infers colinearity from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
+The SYNY pipeline investigates gene collinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches. It also infers collinearity from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
 
 [![DOI](https://zenodo.org/badge/491274225.svg)](https://zenodo.org/doi/10.5281/zenodo.10790180)
 
@@ -204,16 +204,16 @@ printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
 1. Extracts genome and protein sequences from GenBank (.gbf/.gbff) annotation files.
 2. Performs round-robin pairwize genome alignments with [minimap2](https://github.com/lh3/minimap2).
-3. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches, identifies conserved protein gene pairs, and reconstructs colinear clusters from these searches.
-4. Generates dotplots, barplots and [Circos](https://circos.ca/) plots highlighting colinear regions inferred from pairwise genome alignments and from shared protein cluster reconstructions.
+3. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches, identifies conserved protein gene pairs, and reconstructs collinear clusters from these searches.
+4. Generates dotplots, barplots and [Circos](https://circos.ca/) plots highlighting collinear regions inferred from pairwise genome alignments and from shared protein cluster reconstructions.
 
 #### Why use two distinct approaches?
 
-When working with well-annotated, closely related genomes, colinear regions inferred from pairwise genome alignments and shared protein cluster reconstructions should yield similar results.
+When working with well-annotated, closely related genomes, collinear regions inferred from pairwise genome alignments and shared protein cluster reconstructions should yield similar results.
 
-However, when working with genomes featuring high levels of sequence divergence, pairwise genome alignments may struggle. In those instances, colinear regions inferred from protein cluster reconstructions should outperform those from genome alignments; silent mutations/codon usage biases do not affect amino acid sequences and hypervariable intergenic regions are not considered in protein cluster reconstructions.
+However, when working with genomes featuring high levels of sequence divergence, pairwise genome alignments may struggle. In those instances, collinear regions inferred from protein cluster reconstructions should outperform those from genome alignments; silent mutations/codon usage biases do not affect amino acid sequences and hypervariable intergenic regions are not considered in protein cluster reconstructions.
 
-Conversely, when working with poorly annotated or unannotated genomes, colinear regions inferred from genome alignments should outperform those inferred from protein cluster reconstructions (if there is sufficient sequence similarity to perform pairwise alignments).
+Conversely, when working with poorly annotated or unannotated genomes, collinear regions inferred from genome alignments should outperform those inferred from protein cluster reconstructions (if there is sufficient sequence similarity to perform pairwise alignments).
 
 ### Command line options
 
@@ -342,7 +342,7 @@ The contents of the subdirectories are:
   	- Dotplots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
   	- Dotplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
   - HEATMAPS:
-    - Heatmaps (in PNG/SVG format) summarizing the percentages of colinear bases in pairwise alignments (.mmap.)
+    - Heatmaps (in PNG/SVG format) summarizing the percentages of collinear bases in pairwise alignments (.mmap.)
     - Heatmaps (in PNG/SVG format) summarizing the percentages of proteins found in clusters (.gap_0., .gap_1., ...)
 - SEQUENCES:
   - GENOMES:
@@ -519,11 +519,11 @@ WM276_vs_JEC21  6565    5       5957    90.74   51      477     2       117     
 
 #### Heatmaps
 
-To faciliate comparisons when working with large datasets, heatmaps displaying the percentages of colinear bases in pairwise genome alignments (`.mmap.`) and the percentages of protein coding-genes found in colinear clusters between each pair of genomes (e.g. `.gap_0.`) are generated with matplotlib.
+To faciliate comparisons when working with large datasets, heatmaps displaying the percentages of collinear bases in pairwise genome alignments (`.mmap.`) and the percentages of protein coding-genes found in collinear clusters between each pair of genomes (e.g. `.gap_0.`) are generated with matplotlib.
 
-In the above example, small heatmaps with 25 datapoints (5 * 5 genomes) will be generated for the minimap2 pairwise alignments and for the protein clusters found for each gap value investigated. In these heatmaps, percentages between pairs of genomes will vary based on the total number of bases and proteins found in the query used: <i>i.e.</i> `(colinear bases / total bases) * 100` and `(proteins in clusters / total proteins) * 100`.
+In the above example, small heatmaps with 25 datapoints (5 * 5 genomes) will be generated for the minimap2 pairwise alignments and for the protein clusters found for each gap value investigated. In these heatmaps, percentages between pairs of genomes will vary based on the total number of bases and proteins found in the query used: <i>i.e.</i> `(collinear bases / total bases) * 100` and `(proteins in clusters / total proteins) * 100`.
 
-##### Example of a heatmap showing percentages of colinear protein-coding genes between investigated genomes:
+##### Example of a heatmap showing percentages of collinear protein-coding genes between investigated genomes:
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.heatmap.png">
 </p>
@@ -613,14 +613,14 @@ In the inverted karyotype image, the order of the karyotype(s) to be compared to
 In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see [Dotplots](https://github.com/PombertLab/SYNY?tab=readme-ov-file#Dotplots) section below).
 
 #### Barplots
-Barplots highlighting colinear genome segments will be generated with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/)  from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`).
+Barplots highlighting collinear genome segments will be generated with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/)  from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`).
 
 ##### Example of a barplot generated from minimap2 PAF files using defaults settings:
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.mmap.barplot.19.2x10.8.Spectral.png">
 </p>
 
-In these plots, colinear regions found between the compared genomes are highlighted by colored rectangles. By default, these rectangles are color-coded based on the contigs/chromosomes of the query. The above barplot image was generated using the Spectral color palette from [seaborn](https://seaborn.pydata.org/tutorial/color_palettes.html) (set as default in SYNY). This palette can be replaced using the `--palette` command line switch; <i>e.g.</i> `--palette husl` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
+In these plots, collinear regions found between the compared genomes are highlighted by colored rectangles. By default, these rectangles are color-coded based on the contigs/chromosomes of the query. The above barplot image was generated using the Spectral color palette from [seaborn](https://seaborn.pydata.org/tutorial/color_palettes.html) (set as default in SYNY). This palette can be replaced using the `--palette` command line switch; <i>e.g.</i> `--palette husl` (see this [URL](https://www.practicalpythonfordatascience.com/ap_seaborn_palette) for a detailed list of available palettes).
 
 If desired, the barplots can instead be generated using a single monochromatic color with the `--monobar` command line switch; <i>e.g.</i> `--monobar red`. If this option is selected, the color-coding legend will be omitted from the plot.
 
@@ -689,7 +689,7 @@ $(\\#\ of\ residue\ matches / Alignment\ block\ length) * 100$
 
 Likewise, the total average sequence identity percentage listed in the PAF metrics insert is calculated by dividing the sum of all residue matches by the sum of all aligned block lengths.
 
-As a rule of thumb, pairwise alignments featuring lower sequence identity percentages will produce fewer and/or more fragmented colinear segments.
+As a rule of thumb, pairwise alignments featuring lower sequence identity percentages will produce fewer and/or more fragmented collinear segments.
 
 #### Example 2 - <i>Encephalitozoon</i>
 Below is a quick example describing how to compare a total of three telomere-to-telomere (T2T) genomes from <i>Encephalitozoon</i> species [<i>E. intestinalis</i> ATCC 50506](https://pubmed.ncbi.nlm.nih.gov/37142951/), [<i>E. hellem</i> ATCC 50604](https://pubmed.ncbi.nlm.nih.gov/37142951/), and [<i>E. cuniculi</i> ATCC 50602](https://pubmed.ncbi.nlm.nih.gov/37142951/) using annotation data available in public databases.
@@ -795,7 +795,7 @@ GPK93_01g00260  -       J0A71_11g23140  -
 GPK93_01g00270  -       J0A71_11g23150  -
 ```
 
-##### Example of a heatmap showing percentages of colinear protein-coding genes between a total 3 genomes:
+##### Example of a heatmap showing percentages of collinear protein-coding genes between a total 3 genomes:
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.heatmap_ence.png">
 </p>
