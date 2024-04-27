@@ -799,7 +799,7 @@ run_syny.pl \
 
 In the above [Circos](https://circos.ca/) plot, links between the reference and the queried genomes are color-coded based on the reference genotype; links between the queried genomes are shown in light gray. In these plots, each chromosome/contig is plotted as a distinct [ideogram](https://circos.ca/documentation/tutorials/ideograms/ideograms/).
 
-Note that while SYNY can plot multiple genomes together with `--circos cat` / `--circos all`, adding too much data can quickly clutter the ocnatenated Circos plots (drawing too many ideograms can make the figure illegible). If the concatenated plots are too dense, drawing pairwise plots with `--circos pair` should help with readability. However, when comparing genomes featuring many chromosomes/contigs, cluttering can occur even in pairwise plots.
+Note that while SYNY can plot multiple genomes together with `--circos cat` / `--circos all`, adding too much data can quickly clutter the concatenated Circos plots (drawing too many ideograms can make the figure illegible). If the concatenated plots are too dense, drawing pairwise plots with `--circos pair` should help with readability. However, when comparing genomes featuring many chromosomes/contigs, cluttering can occur even in pairwise plots.
 
 #### Custom Circos colors
 Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from tab-delimited text files containing color names and their associated RGB values (see [custom_color_1.txt](https://github.com/PombertLab/SYNY/blob/main/Examples/custom_color_1.txt) for an example). A few custom presets are also available to use in SYNY.
