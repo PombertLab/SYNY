@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.4a';
-my $updated = '2024-04-26';
+my $version = '0.6.4b';
+my $updated = '2024-04-27';
 
 use strict;
 use warnings;
@@ -38,66 +38,63 @@ USAGE		${name} \\
 		  --circos pair
 
 OPTIONS:
--h (--help)	Display all command line options
--t (--threads)	Number of threads to use [Default: 16]
--a (--annot)	GenBank GBF/GBFF Annotation files (GZIP files are supported)
--o (--outdir)	Output directory [Default = SYNY]
--e (--evalue)	DIAMOND BLASTP evalue cutoff [Default = 1e-10]
--g (--gaps)	Allowable number of gaps between gene pairs [Default = 0]
---asm		Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
---resume	Resume minimap2 computations (skip completed alignments)
---no_map	Skip minimap2 pairwise genome alignments
---no_clus	Skip gene cluster reconstructions
+-h (--help)		Display all command line options
+-t (--threads)		Number of threads to use [Default: 16]
+-a (--annot)		GenBank GBF/GBFF Annotation files (GZIP files are supported)
+-o (--outdir)		Output directory [Default = SYNY]
+-e (--evalue)		DIAMOND BLASTP evalue cutoff [Default = 1e-10]
+-g (--gaps)		Allowable number of gaps between gene pairs [Default = 0]
+--asm			Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
+--resume		Resume minimap2 computations (skip completed alignments)
+--no_map		Skip minimap2 pairwise genome alignments
+--no_clus		Skip gene cluster reconstructions
 EXIT
 
 my $plot_options = <<"PLOT_OPTIONS";
 ### Circos plots
--c (--circos)	Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: all]
---circos_prefix	Desired Circos plot prefix for concatenated plots [Default: circos]
--r (--ref)	Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
--u (--unit)	Size unit (Kb or Mb) [Default: Mb]
---winsize	Sliding windows size (nucleotide biases) [Default: 10000]
---stepsize	Sliding windows step (nucleotide biases) [Default: 5000]
---labels	Contig label type: numbers or names [Defaut: numbers]
---label_size	Contig label size [Default: 36]
---label_font	Contig label font [Default: bold] - https://circos.ca/documentation/tutorials/ideograms/labels/
---custom_file	Load custom colors from file
---list_preset	List available custom color presets
---custom_preset	Use a custom color preset; e.g.
-		# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
-		# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+-c (--circos)		Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: all]
+--orientation		Karyotype orientation: normal, inverted or both [Default: normal]
+--circos_prefix		Desired Circos plot prefix for concatenated plots [Default: circos]
+-r (--ref)		Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
+-u (--unit)		Size unit (Kb or Mb) [Default: Mb]
+--winsize		Sliding windows size (nucleotide biases) [Default: 10000]
+--stepsize		Sliding windows step (nucleotide biases) [Default: 5000]
+--labels		Contig label type: numbers or names [Defaut: numbers]
+--label_size		Contig label size [Default: 36]
+--label_font		Contig label font [Default: bold] - https://circos.ca/documentation/tutorials/ideograms/labels/
+--custom_file		Load custom colors from file
+--list_preset		List available custom color presets
+--custom_preset		Use a custom color preset, e.g.: --custom_preset chloropicon
 --max_ticks		Set max number of ticks [Default: 5000]
 --max_ideograms		Set max number of ideograms [Default: 200]
 --max_links		Set max number of links [Default: 25000]
 --max_points_per_track	Set max number of points per track [Default: 75000]
 --clusters		Color by cluster instead of contig/chromosome [Default: off]
---no_invert		Turn off Circos plots (inverted orientation)
---no_normal		Turn off Circos plots (normal orientation)
 --no_circos		Turn off all Circos plots
 
 ### Barplots
--bh (--bheight)	Barplot figure height in inches [Default: 10.8]
--bw (--bwidth)	Barplot figure width in inches [Default: 19.2]
---palette	Barplot color palette [Default: Spectral]
---monobar	Use a monochrome barplot color instead: e.g. --monobar blue
---no_barplot	Turn off barplots
+-bh (--bheight)		Barplot figure height in inches [Default: 10.8]
+-bw (--bwidth)		Barplot figure width in inches [Default: 19.2]
+--palette		Barplot color palette [Default: Spectral]
+--monobar		Use a monochrome barplot color instead: e.g. --monobar blue
+--no_barplot		Turn off barplots
 
 ### Dotplots
--dh (--dheight)	Dotplot figure height in inches [Default: 10.8]
--dw (--dwidth)	Dotplot figure width in inches [Default: 19.2]
--m (--multi)	Axes units multiplier (for dotplots) [Default: 1e5]
---color		Dotplot color [Default: blue]
---dotpalette	Use a color palette instead: e.g. --dotpalette inferno
---noticks	Turn off ticks on x and y axes
---wdis		Horizontal distance (width) between subplots [Default: 0.05]
---hdis		Vertical distance (height) between subplots [Default: 0.1]
---no_dotplot	Turn off dotplots
+-dh (--dheight)		Dotplot figure height in inches [Default: 10.8]
+-dw (--dwidth)		Dotplot figure width in inches [Default: 19.2]
+-m (--multi)		Axes units multiplier (for dotplots) [Default: 1e5]
+--color			Dotplot color [Default: blue]
+--dotpalette		Use a color palette instead: e.g. --dotpalette inferno
+--noticks		Turn off ticks on x and y axes
+--wdis			Horizontal distance (width) between subplots [Default: 0.05]
+--hdis			Vertical distance (height) between subplots [Default: 0.1]
+--no_dotplot		Turn off dotplots
 
 ### Heatmaps
--hh (--hheight)	Heatmap figure height in inches [Default: 10]
--hw (--hwidth)	Heatmap figure width in inches [Default: 10]
---hmpalette	Heatmap color palette [Default: winter_r]
---no_heatmap	Turn off heatmaps
+-hh (--hheight)		Heatmap figure height in inches [Default: 10]
+-hw (--hwidth)		Heatmap figure width in inches [Default: 10]
+--hmpalette		Heatmap color palette [Default: winter_r]
+--no_heatmap		Turn off heatmaps
 PLOT_OPTIONS
 
 die ("\n$usage\n") unless (@ARGV);
@@ -135,8 +132,7 @@ my $max_ideograms = 200;
 my $max_links = 25000;
 my $max_points_per_track = 75000;
 my $clusters;
-my $no_invert;
-my $no_normal;
+my $circos_orientation = 'normal';
 my $no_circos;
 
 # Barplots
@@ -194,8 +190,7 @@ GetOptions(
 	'max_links=i' => \$max_links,
 	'max_points_per_track=i' => \$max_points_per_track,
 	'clusters' => \$clusters,
-	'no_invert' => \$no_invert,
-	'no_normal' => \$no_normal,
+	'orientation=s' => \$circos_orientation,
 	'no_circos' => \$no_circos,
 	# Barplots
 	'bh|bheight=s' => \$bheight,
@@ -253,6 +248,27 @@ if ($list_preset){
 
 }
 
+## Check for plot orientation
+my %circos_orientations = (
+	'normal' => '',
+	'inverted' => '',
+	'both' => ''
+);
+
+unless ($no_circos){
+	$circos_orientation = lc($circos_orientation);
+	if (!exists $circos_orientations{$circos_orientation}){
+		print "\nCircos orientation $circos_orientation not found. Possible oritentations are:"."\n\n";
+		for my $key (sort (keys %circos_orientations)){
+			print '  '.$key."\n";
+		}
+		print "\n";
+		exit;
+	}
+
+}
+
+## Check for plot fonts
 my %circos_fonts = (
 	'light' => '',
 	'normal' => '',
@@ -1412,18 +1428,18 @@ sub circos_plot {
 
 sub run_circos {
 
-	if (($no_invert) or ($no_normal)){
+	if ($circos_orientation ne 'both'){
 		$circos_num = $circos_num / 2;
 	}
 
 	while (my $conf = shift@circos_files){
 
-		if ($no_invert){
+		if ($circos_orientation eq 'normal'){
 			if ($conf =~ /\.inverted\.conf$/){
 				next;
 			}
 		}
-		elsif ($no_normal){
+		elsif ($circos_orientation eq 'inverted'){
 			if ($conf =~ /\.normal\.conf$/){
 				next;
 			}
@@ -1434,10 +1450,10 @@ sub run_circos {
 
 		## Progess counter
 		my $x;
-		if ($no_invert){
+		if ($circos_orientation eq 'normal'){
 			$x = $circos_num - (scalar(@circos_files) / 2);
 		}
-		elsif ($no_normal){
+		elsif ($circos_orientation eq 'inverted'){
 			$x = $circos_num - ((scalar(@circos_files) + 1) / 2);
 		}
 		else {
