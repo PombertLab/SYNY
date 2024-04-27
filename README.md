@@ -857,7 +857,7 @@ run_syny.pl \
 </p>
 
 ### <b>File conversion</b>
-SYNY uses [GenBank flat files](https://www.ncbi.nlm.nih.gov/genbank/samplerecord/) (.gbff) containing DNA sequences and annotated features as input. However, when performing genome alignment-based comparisons, the latter annotated features are not required. Because users may want to compare genomes before their annotation becomes available (this process often comes in late stages of genome sequencing projects), a simple FASTA to GBFF converter [fasta_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/fasta_to_gbff.pl) producing feature-less .gbff files is available in the `Utils/` subdirectory.
+SYNY uses [GenBank flat files](https://www.ncbi.nlm.nih.gov/genbank/samplerecord/) (.gbff) containing DNA sequences and annotated features as input. However, when performing genome alignment-based comparisons, the latter annotated features are not required. Because users may want to compare genomes before their annotation becomes available (this process often comes in the late stages of genome sequencing projects), a simple FASTA to GBFF converter [fasta_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/fasta_to_gbff.pl) producing feature-less .gbff files is available in the `Utils/` subdirectory.
 
 To convert FASTA file(s) to feature-less GBFF files compressed in gzip format:
 ```Bash
@@ -874,7 +874,7 @@ Options for `fasta_to_gbff.pl` are:
 -g (--gzip)     Compress the GBFF output files
 -v (--verbose)  Add verbosity
 ```
-When compressing files the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, or `gzip` otherwise.
+When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, or `gzip` otherwise.
 
 ## <b>References</b>
 [Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi: 10.1038/s41592-021-01101-x
