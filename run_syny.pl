@@ -52,7 +52,7 @@ EXIT
 
 my $plot_options = <<"PLOT_OPTIONS";
 ### Circos plots
--c (--circos)		Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: all]
+-c (--circos)		Circos plot mode: pair (pairwise), cat (concatenated), all (cat + pair) [Default: pair]
 --orientation		Karyotype orientation: normal, inverted or both [Default: normal]
 --circos_prefix		Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)		Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
@@ -119,7 +119,7 @@ my $unit = 'Mb';
 my $labels = 'numbers';
 my $label_size = 36;
 my $label_font = 'bold';
-my $circos = 'all';
+my $circos = 'pair';
 my $circos_prefix = 'circos';
 my $winsize = 10000;
 my $stepsize = 5000;
