@@ -256,7 +256,7 @@ Options for run_SYNY.pl are:
 --max_links             Set max number of links [Default: 25000]
 --max_points_per_track  Set max number of points per track [Default: 75000]
 --clusters              Color by cluster instead of contig/chromosome [Default: off]
---no_circos             Turn off all Circos plots
+--no_circos             Turn off Circos plots
 
 ### Barplots
 -bh (--bheight)         Barplot figure height in inches [Default: 10.8]
