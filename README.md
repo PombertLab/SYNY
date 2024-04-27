@@ -226,64 +226,61 @@ run_SYNY.pl \
 ```
 Options for run_SYNY.pl are:
 ```
--h (--help)     Display all command line options
--t (--threads)  Number of threads to use [Default: 16]
--a (--annot)    GenBank GBF/GBFF Annotation files (GZIP files are supported)
--o (--outdir)   Output directory [Default = SYNY]
--e (--evalue)   DIAMOND BLASTP evalue cutoff [Default = 1e-10]
--g (--gaps)     Allowable number of gaps between gene pairs [Default = 0]
---asm           Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
---resume        Resume minimap2 computations (skip completed alignments)
---no_map        Skip minimap2 pairwise genome alignments
---no_clus       Skip gene cluster reconstructions
+-h (--help)             Display all command line options
+-t (--threads)          Number of threads to use [Default: 16]
+-a (--annot)            GenBank GBF/GBFF Annotation files (GZIP files are supported)
+-o (--outdir)           Output directory [Default = SYNY]
+-e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
+-g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
+--asm                   Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
+--resume                Resume minimap2 computations (skip completed alignments)
+--no_map                Skip minimap2 pairwise genome alignments
+--no_clus               Skip gene cluster reconstructions
 
 ### Circos plots
--c (--circos)   Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: all]
---circos_prefix Desired Circos plot prefix for concatenated plots [Default: circos]
--r (--ref)      Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
--u (--unit)     Size unit (Kb or Mb) [Default: Mb]
---winsize       Sliding windows size (nucleotide biases) [Default: 10000]
---stepsize      Sliding windows step (nucleotide biases) [Default: 5000]
---labels        Contig label type: numbers or names [Defaut: numbers]
---label_size    Contig label size [Default: 36]
---label_font    Contig label font [Default: bold] - https://circos.ca/documentation/tutorials/ideograms/labels/
---custom_file   Load custom colors from file
---list_preset   List available custom color presets
---custom_preset Use a custom color preset; e.g.
-                # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
-                # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+-c (--circos)           Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: all]
+--orientation           Karyotype orientation: normal, inverted or both [Default: normal]
+--circos_prefix         Desired Circos plot prefix for concatenated plots [Default: circos]
+-r (--ref)              Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
+-u (--unit)             Size unit (Kb or Mb) [Default: Mb]
+--winsize               Sliding windows size (nucleotide biases) [Default: 10000]
+--stepsize              Sliding windows step (nucleotide biases) [Default: 5000]
+--labels                Contig label type: numbers or names [Defaut: numbers]
+--label_size            Contig label size [Default: 36]
+--label_font            Contig label font [Default: bold] - https://circos.ca/documentation/tutorials/ideograms/labels/
+--custom_file           Load custom colors from file
+--list_preset           List available custom color presets
+--custom_preset         Use a custom color preset, e.g.: --custom_preset chloropicon
 --max_ticks             Set max number of ticks [Default: 5000]
 --max_ideograms         Set max number of ideograms [Default: 200]
 --max_links             Set max number of links [Default: 25000]
 --max_points_per_track  Set max number of points per track [Default: 75000]
 --clusters              Color by cluster instead of contig/chromosome [Default: off]
---no_invert             Turn off Circos plots (inverted orientation)
---no_normal             Turn off Circos plots (normal orientation)
 --no_circos             Turn off all Circos plots
 
 ### Barplots
--bh (--bheight) Barplot figure height in inches [Default: 10.8]
--bw (--bwidth)  Barplot figure width in inches [Default: 19.2]
---palette       Barplot color palette [Default: Spectral]
---monobar       Use a monochrome barplot color instead: e.g. --monobar blue
---no_barplot    Turn off barplots
+-bh (--bheight)         Barplot figure height in inches [Default: 10.8]
+-bw (--bwidth)          Barplot figure width in inches [Default: 19.2]
+--palette               Barplot color palette [Default: Spectral]
+--monobar               Use a monochrome barplot color instead: e.g. --monobar blue
+--no_barplot            Turn off barplots
 
 ### Dotplots
--dh (--dheight) Dotplot figure height in inches [Default: 10.8]
--dw (--dwidth)  Dotplot figure width in inches [Default: 19.2]
--m (--multi)    Axes units multiplier (for dotplots) [Default: 1e5]
---color         Dotplot color [Default: blue]
---dotpalette    Use a color palette instead: e.g. --dotpalette inferno
---noticks       Turn off ticks on x and y axes
---wdis          Horizontal distance (width) between subplots [Default: 0.05]
---hdis          Vertical distance (height) between subplots [Default: 0.1]
---no_dotplot    Turn off dotplots
+-dh (--dheight)         Dotplot figure height in inches [Default: 10.8]
+-dw (--dwidth)          Dotplot figure width in inches [Default: 19.2]
+-m (--multi)            Axes units multiplier (for dotplots) [Default: 1e5]
+--color                 Dotplot color [Default: blue]
+--dotpalette            Use a color palette instead: e.g. --dotpalette inferno
+--noticks               Turn off ticks on x and y axes
+--wdis                  Horizontal distance (width) between subplots [Default: 0.05]
+--hdis                  Vertical distance (height) between subplots [Default: 0.1]
+--no_dotplot            Turn off dotplots
 
 ### Heatmaps
--hh (--hheight) Heatmap figure height in inches [Default: 10]
--hw (--hwidth)  Heatmap figure width in inches [Default: 10]
---hmpalette     Heatmap color palette [Default: winter_r]
---no_heatmap    Turn off heatmaps
+-hh (--hheight)         Heatmap figure height in inches [Default: 10]
+-hw (--hwidth)          Heatmap figure width in inches [Default: 10]
+--hmpalette             Heatmap color palette [Default: winter_r]
+--no_heatmap            Turn off heatmaps
 ```
 The output directory will be structured as follows: 
 ```Bash
@@ -413,7 +410,7 @@ curl \
 SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed (`gap 0`) during gene cluster inferences. Here, both pairwise (`pair`) and concatenated (`cat`) Circos plots are produced using `--circos all`. In the concatenated plots, `JEC21` is used as the reference and `cryptococcus` as the output file prefix. Note that when comparing several genomes, the concatenated plots can quickly become too dense for legibility.
 
 ```Bash
-SYNY=~/SYNY_CRYPT_ALL   ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/CRYPT_ALL   ## Replace by desired SYNY output directory
 
 run_syny.pl \
   --threads 16 \
@@ -428,7 +425,7 @@ run_syny.pl \
 In the command line below, SYNY is run on a subset of two genomes (`JEC21` and `WM276`), this time allowing for different maximum gap thresholds between gene pairs. Only the pairwise Circos plots are produced when invoking `--circos pair`.
 
 ```Bash
-SYNY=~/SYNY_CRYPT_2     ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/CRYPT_SUB     ## Replace by desired SYNY output directory
 
 run_syny.pl \
   -t 16 \
@@ -537,7 +534,7 @@ Unless the `--no_circos` command line switch is invoked, [Circos](https://circos
 
 In the pairwise plots (`--circos pair`), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. Both contenated and pairwise plots can be generated with the `--circos all` command line switch (set as default).
 
-By default, two circos plots, `.normal` and `.inverted`, will be generated for each approach (either can be turned off with the corresponding `--no_invert`/`--no_normal` command line switches). In the inverted plots, the contigs/chromosomes from the genome(s) being compared to the reference are plotted in reverse, from last to first. 
+Karyotypes can be plotted with Circos in normal and/or inverted orientation(s). In the inverted plots, the contigs/chromosomes from the genome(s) being compared to the reference are plotted in reverse, from last to first. By default, the Circos plots are plotted in normal orientation. This behavior can be modified with the `--orientation` command line switch (possible values are `normal`, `inverted` and `both`).
 
 ##### Example of an image generated with Circos and SYNY from shared proteins clusters:
 <p align="left">
