@@ -414,7 +414,7 @@ SYNY can be run from the command line with the `run_syny.pl` master script. In t
 # Total: 16 min; Circos: 11 min
 
 DATA=~/DATA                   ## Replace by annotation data directory
-SYNY=~/SYNY_RESULTS/CRYPT_ALL ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/CRYPT_ALL ## Replace by desired output directory
 
 run_syny.pl \
   --threads 16 \
@@ -429,7 +429,7 @@ In the command line below, SYNY is run on a subset of two genomes (`JEC21` and `
 # Total: 2 min; Circos: 1 min)
 
 DATA=~/DATA                   ## Replace by annotation data directory
-SYNY=~/SYNY_RESULTS/CRYPT_SUB ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/CRYPT_SUB ## Replace by desired output directory
 
 run_syny.pl \
   -t 16 \
@@ -559,7 +559,7 @@ By default, contigs will be labelled by numbers in the Circos plots. If desired,
 # Total: 2 min; Circos: 1 min
 
 DATA=~/DATA                         ## Replace by annotation data directory
-SYNY=~/SYNY_RESULTS/CRYPT_SUB_NAMES ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/CRYPT_SUB_NAMES ## Replace by desired output directory
 
 run_syny.pl \
   -a $DATA/{JEC21,WM276}.gbff.gz \
@@ -665,7 +665,7 @@ The default monochromatic color (blue) can be changed with the `--color` option 
 # Total: < 1 min; Circos: N/A
 
 DATA=~/DATA                     ## Replace by annotation data directory
-SYNY=~/SYNY_RESULTS/CRYPT_HUSL  ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/CRYPT_HUSL  ## Replace by desired output directory
 
 ## Running SYNY with the husl color palette (for dotplots)
 ## and the --no_circos option to skip Circos plotting
@@ -766,7 +766,7 @@ To reduce runtime, we will skip the Circos plots with the `--no_circos` option.
 # Total: 1 min; Circos: N/A
 
 DATA=~/ENCE                ## Replace by annotation data directory
-SYNY=~/SYNY_RESULTS/ENCE   ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/ENCE   ## Replace by desired output directory
 
 run_syny.pl \
   -a $DATA/*.gbff.gz \
@@ -796,7 +796,7 @@ Because comparing more than two genomes can be useful, concatenated Circos plots
 # Total: < 1 min; Circos: 17 sec
 
 DATA=~/ENCE                    ## Replace by annotation data directory
-SYNY=~/SYNY_RESULTS/SYNY_3_spp ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/SYNY_3_spp ## Replace by desired output directory
 
 run_syny.pl \
   -a $DATA/E*.gbff.gz \
@@ -827,7 +827,7 @@ Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from
 # Total: 1 min; Circos: 37 sec
 
 DATA=~/ENCE                  ## Replace by annotation data directory
-SYNY=~/SYNY_RESULTS/ENCE_CC  ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/ENCE_CC  ## Replace by desired output directory
 COLORS=~/custom_color_2.txt  ## Replace by desired custom color file
 
 run_syny.pl \
@@ -862,7 +862,7 @@ encephalitozoon 11 colors
 # Total: 1 min; Circos: 37 sec
 
 DATA=~/ENCE                        ## Replace by annotation data directory
-SYNY=~/SYNY_RESULTS/ENCE_CC_PRESET ## Replace by desired SYNY output directory
+SYNY=~/SYNY_RESULTS/ENCE_CC_PRESET ## Replace by desired output directory
 
 run_syny.pl \
   -a $DATA/E*.gbff.gz \
