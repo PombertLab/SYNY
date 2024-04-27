@@ -874,7 +874,7 @@ Options for `fasta_to_gbff.pl` are:
 -g (--gzip)     Compress the GBFF output files
 -v (--verbose)  Add verbosity
 ```
-When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, or `gzip` otherwise.
+When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
 
 ## <b>References</b>
 [Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi: 10.1038/s41592-021-01101-x
