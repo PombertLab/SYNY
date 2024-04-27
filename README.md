@@ -204,7 +204,7 @@ printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
 1. Extracts genome and protein sequences from GenBank (.gbf/.gbff) annotation files.
-2. Performs round-robin pairwize genome alignments with [minimap2](https://github.com/lh3/minimap2).
+2. Performs round-robin pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
 3. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches, identifies conserved protein gene pairs, and reconstructs collinear clusters from these searches.
 4. Generates dotplots, barplots and [Circos](https://circos.ca/) plots highlighting collinear regions inferred from pairwise genome alignments and from shared protein cluster reconstructions.
 
@@ -238,7 +238,7 @@ Options for run_SYNY.pl are:
 --no_clus               Skip gene cluster reconstructions
 
 ### Circos plots
--c (--circos)           Circos plot mode: pair (pairwize), cat (concatenated), all (cat + pair) [Default: all]
+-c (--circos)           Circos plot mode: pair (pairwise), cat (concatenated), all (cat + pair) [Default: pair]
 --orientation           Karyotype orientation: normal, inverted or both [Default: normal]
 --circos_prefix         Desired Circos plot prefix for concatenated plots [Default: circos]
 -r (--ref)              Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
@@ -407,33 +407,36 @@ curl \
 
 ##### Running SYNY:
 
-SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed (`gap 0`) during gene cluster inferences. Here, both pairwise (`pair`) and concatenated (`cat`) Circos plots are produced using `--circos all`. In the concatenated plots, `JEC21` is used as the reference and `cryptococcus` as the output file prefix. Note that when comparing several genomes, the concatenated plots can quickly become too dense for legibility.
+SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed during gene cluster inferences, and Circos plots are produced in pairwise mode. The latter can be changed with the `--circos` command line switch (possible values are: `pair`, `concatenated`, `both`). Note that when comparing several genomes, concatenated plots can quickly become too dense for legibility. Producing concatenated plots can also significantly increase computation time.
 
 ```Bash
-SYNY=~/SYNY_RESULTS/CRYPT_ALL   ## Replace by desired SYNY output directory
+##### Runtime (Intel i5-12500H mobile CPU)
+# Total: 16 min; Circos: 11 min
+
+DATA=~/DATA                   ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/CRYPT_ALL ## Replace by desired SYNY output directory
 
 run_syny.pl \
   --threads 16 \
   --annot $DATA/*.gbff.gz \
-  --outdir $SYNY \
-  --gaps 0 \
-  --circos all \
-  --circos_prefix cryptococcus \
-  --ref JEC21
+  --outdir $SYNY
 ```
 
-In the command line below, SYNY is run on a subset of two genomes (`JEC21` and `WM276`), this time allowing for different maximum gap thresholds between gene pairs. Only the pairwise Circos plots are produced when invoking `--circos pair`.
+In the command line below, SYNY is run on a subset of two genomes (`JEC21` and `WM276`), this time allowing for different maximum gap thresholds between gene pairs.
 
 ```Bash
-SYNY=~/SYNY_RESULTS/CRYPT_SUB     ## Replace by desired SYNY output directory
+##### Runtime (Intel i5-12500H mobile CPU)
+# Total: 2 min; Circos: 1 min)
+
+DATA=~/DATA                   ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/CRYPT_SUB ## Replace by desired SYNY output directory
 
 run_syny.pl \
   -t 16 \
   -a $DATA/{JEC21,WM276}.gbff.gz \
   -o $SYNY \
   -g 0 1 5 \
-  -e 1e-10 \
-  --circos pair
+  -e 1e-10
 ```
 
 ##### Example of clusters identified with SYNY
@@ -530,9 +533,9 @@ Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `
 
 #### Circos plots
 
-Unless the `--no_circos` command line switch is invoked, [Circos](https://circos.ca/) (concatenated and/or pairwise) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and/or from the genome alignments computed with minimap2 (`.mmap.`).
+Unless the `--no_circos` command line switch is invoked, [Circos](https://circos.ca/) (pairwise and/or concatenated) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and/or from the genome alignments computed with minimap2 (`.mmap.`).
 
-In the pairwise plots (`--circos pair`), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. Both contenated and pairwise plots can be generated with the `--circos all` command line switch (set as default).
+In the pairwise plots (`--circos pair`), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. Both contenated and pairwise plots can be generated with the `--circos all` command line switch.
 
 Karyotypes can be plotted with Circos in normal and/or inverted orientation(s). In the inverted plots, the contigs/chromosomes from the genome(s) being compared to the reference are plotted in reverse, from last to first. By default, the Circos plots are plotted in normal orientation. This behavior can be modified with the `--orientation` command line switch (possible values are `normal`, `inverted` and `both`).
 
@@ -551,11 +554,15 @@ Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are c
 By default, contigs will be labelled by numbers in the Circos plots. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) and fonts can be futher adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
 `normal`, `default`, `semibold`, `bold`, `italic`, `bolditalic`, `italicbold` (see this Circos [tutorial](https://circos.ca/documentation/tutorials/ideograms/labels/) for details).
 
-```
-SYNY=~/SYNY_NAMES      ## Replace by desired SYNY output directory
+```Bash
+##### Runtime (Intel i5-12500H mobile CPU)
+# Total: 2 min; Circos: 1 min
+
+DATA=~/DATA                         ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/CRYPT_SUB_NAMES ## Replace by desired SYNY output directory
 
 run_syny.pl \
-  -a $DATA/*.gbff.gz \
+  -a $DATA/{JEC21,WM276}.gbff.gz \
   -g 0 1 5 \
   -e 1e-10 \
   -r JEC21 \
@@ -588,11 +595,12 @@ chr - NC_014941 4 0 2233617 black
 Once edited, Circos plots can be regenerated by running Circos on the corresponding configuration files, <i>e.g.</i>:
 
 ```Bash
-SYNY=~/SYNY_RESULTS
+SYNY=~/SYNY_RESULTS/CRYPT_SUB_NAMES  ## Replace by SYNY results directory
+OUTDIR=~/PLOTS                       ## Replace by desired output directory
 
 circos \
   -conf $SYNY/PLOTS/CIRCOS_DATA/concatenated/concatenated.gap_0.normal.conf \
-  -outputdir ~/ \
+  -outputdir $OUTDIR \
   -outputfile circos.gap_0.normal.png
 ```
 
@@ -653,18 +661,21 @@ The default monochromatic color (blue) can be changed with the `--color` option 
 ##### Example of a dotplot generated from minimap2 PAF files using the husl color palette:
 
 ```Bash
-SYNY=~/SYNY_RESULTS      ## Replace by desired SYNY output directory
+##### Runtime (Intel i5-12500H mobile CPU);
+# Total: < 1 min; Circos: N/A
 
-## Running SYNY with the husl color palette (for dotplots) and the
-## resume option to skip previously computed minimap2 alignments
+DATA=~/DATA                     ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/CRYPT_HUSL  ## Replace by desired SYNY output directory
+
+## Running SYNY with the husl color palette (for dotplots)
+## and the --no_circos option to skip Circos plotting
 run_syny.pl \
-  -a $DATA/*.gbff.gz \
+  -a $DATA/{JEC21,WM276}.gbff.gz \
   -g 0 1 5 \
   -e 1e-10 \
-  -r JEC21 \
   -o $SYNY \
   --dotpalette husl \
-  --resume
+  --no_circos
 ```
 
 <p align="left">
@@ -751,7 +762,11 @@ curl \
 To reduce runtime, we will skip the Circos plots with the `--no_circos` option.
 
 ```Bash
-SYNY=~/SYNY_ENCE      ## Replace by desired SYNY output directory
+##### Runtime (Intel i5-12500H mobile CPU);
+# Total: 1 min; Circos: N/A
+
+DATA=~/ENCE                ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/ENCE   ## Replace by desired SYNY output directory
 
 run_syny.pl \
   -a $DATA/*.gbff.gz \
@@ -777,7 +792,11 @@ Barplots (genome alignments):
 Because comparing more than two genomes can be useful, concatenated Circos plots can be generated by SYNY using the `--circos all` or the` --circos cat` command line switches. Below is a quick example of how to generate such plots using the genomes from the three <i>Encephalitozoon</i> species downloaded previously.
 
 ```Bash
-SYNY=~/SYNY_ENCE_3      ## Replace by desired SYNY output directory
+##### Runtime (Intel i5-12500H mobile CPU);
+# Total: < 1 min; Circos: 17 sec
+
+DATA=~/ENCE                    ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/SYNY_3_spp ## Replace by desired SYNY output directory
 
 run_syny.pl \
   -a $DATA/E*.gbff.gz \
@@ -804,8 +823,12 @@ Custom colors for [Circos](https://circos.ca/) plots can be loaded directly from
 
 ##### Running SYNY with custom colors loaded from a tab-delimited file:
 ```Bash
-SYNY=~/SYNY_ENCE_CC         ## Replace by desired SYNY output directory
-COLORS=~/custom_color_2.txt ## Replace by desired custom color file
+##### Runtime (Intel i5-12500H mobile CPU);
+# Total: 1 min; Circos: 37 sec
+
+DATA=~/ENCE                  ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/ENCE_CC  ## Replace by desired SYNY output directory
+COLORS=~/custom_color_2.txt  ## Replace by desired custom color file
 
 run_syny.pl \
   -a $DATA/E*.gbff.gz \
@@ -835,7 +858,11 @@ encephalitozoon 11 colors
 
 ##### Running SYNY with a custom color preset:
 ```Bash
-SYNY=~/SYNY_ENCE_CC_PRESET   ## Replace by desired SYNY output directory
+##### Runtime (Intel i5-12500H mobile CPU);
+# Total: 1 min; Circos: 37 sec
+
+DATA=~/ENCE                        ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/ENCE_CC_PRESET ## Replace by desired SYNY output directory
 
 run_syny.pl \
   -a $DATA/E*.gbff.gz \
