@@ -59,7 +59,7 @@ my $plot_options = <<"PLOT_OPTIONS";
 -u (--unit)		Size unit (Kb or Mb) [Default: Mb]
 --winsize		Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize		Sliding windows step (nucleotide biases) [Default: 5000]
---labels		Contig label type: numbers or names [Defaut: numbers]
+--labels		Contig label type: numbers or names [Default: numbers]
 --label_size		Contig label size [Default: 36]
 --label_font		Contig label font [Default: bold] - https://circos.ca/documentation/tutorials/ideograms/labels/
 --custom_file		Load custom colors from file

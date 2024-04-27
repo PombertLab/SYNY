@@ -245,7 +245,7 @@ Options for run_SYNY.pl are:
 -u (--unit)             Size unit (Kb or Mb) [Default: Mb]
 --winsize               Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize              Sliding windows step (nucleotide biases) [Default: 5000]
---labels                Contig label type: numbers or names [Defaut: numbers]
+--labels                Contig label type: numbers or names [Default: numbers]
 --label_size            Contig label size [Default: 36]
 --label_font            Contig label font [Default: bold] - https://circos.ca/documentation/tutorials/ideograms/labels/
 --custom_file           Load custom colors from file
@@ -520,7 +520,7 @@ WM276_vs_JEC21  6565    5       5957    90.74   51      477     2       117     
 
 #### Heatmaps
 
-To faciliate comparisons when working with large datasets, heatmaps displaying the percentages of collinear bases in pairwise genome alignments (`.mmap.`) and the percentages of protein coding-genes found in collinear clusters between each pair of genomes (e.g. `.gap_0.`) are generated with matplotlib.
+To facilitate comparisons when working with large datasets, heatmaps displaying the percentages of collinear bases in pairwise genome alignments (`.mmap.`) and the percentages of protein coding-genes found in collinear clusters between each pair of genomes (e.g. `.gap_0.`) are generated with matplotlib.
 
 In the above example, small heatmaps with 25 datapoints (5 * 5 genomes) will be generated for the minimap2 pairwise alignments and for the protein clusters found for each gap value investigated. In these heatmaps, percentages between pairs of genomes will vary based on the total number of bases and proteins found in the query used: <i>i.e.</i> `(collinear bases / total bases) * 100` and `(proteins in clusters / total proteins) * 100`.
 
@@ -535,7 +535,7 @@ Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `
 
 Unless the `--no_circos` command line switch is invoked, [Circos](https://circos.ca/) (pairwise and/or concatenated) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and/or from the genome alignments computed with minimap2 (`.mmap.`).
 
-In the pairwise plots (`--circos pair`), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. Both contenated and pairwise plots can be generated with the `--circos all` command line switch.
+In the pairwise plots (`--circos pair`), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. Both concatenated and pairwise plots can be generated with the `--circos all` command line switch.
 
 Karyotypes can be plotted with Circos in normal and/or inverted orientation(s). In the inverted plots, the contigs/chromosomes from the genome(s) being compared to the reference are plotted in reverse, from last to first. By default, the Circos plots are plotted in normal orientation. This behavior can be modified with the `--orientation` command line switch (possible values are `normal`, `inverted` and `both`).
 
@@ -551,7 +551,7 @@ In this figure, nucleotides biases are plotted in the concentric rings (from out
 
 Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. If desired, color coding can be set by cluster instead with `--clusters`. This option is useful when working with prokaryotes featuring a single chromosome, so that the ribbons are not all of the same color.
 
-By default, contigs will be labelled by numbers in the Circos plots. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) and fonts can be futher adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
+By default, contigs will be labelled by numbers in the Circos plots. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) and fonts can be further adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
 `normal`, `default`, `semibold`, `bold`, `italic`, `bolditalic`, `italicbold` (see this Circos [tutorial](https://circos.ca/documentation/tutorials/ideograms/labels/) for details).
 
 ```Bash
@@ -579,7 +579,7 @@ run_syny.pl \
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.gap_0.normal.names.png">
 </p>
 
-All data and configuration files for the Circos plots are located in the `PLOTS/CIRCOS_DATA/` subdirectory. If desired, chromosome labels can be furter adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.normal.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
+All data and configuration files for the Circos plots are in the `PLOTS/CIRCOS_DATA/` subdirectory. If desired, chromosome labels can be further adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.normal.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
 
 ```Bash
 ## To see the first 5 lines from a karyotype file:
@@ -703,7 +703,7 @@ As a rule of thumb, pairwise alignments featuring lower sequence identity percen
 ### Example 2 - Encephalitozoonidae
 Below is a quick example describing how to compare a few select genomes from the Encephalitozoonidae (<i>Encephalitozoon/Ordospora</i> species <i>E. intestinalis</i> strain [ATCC 50506](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. hellem</i> strain [ATCC 50604](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. cuniculi</i> strain [ATCC 50602](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA705735/), <i>O. colligata</i> strain [OC4](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA210314/) and <i>O. pajunii</i> strain [FI-F-10](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA630072/)) using annotation data from NCBI.
 
-The Encephalitozoonidae genomes in this example are highly collinear yet display a high level of sequence divergence. As such, they consitute a good case scenario to assess the benefits of using gene clusters to complement inferences based on pairwise genome alignments.
+The Encephalitozoonidae genomes in this example are highly collinear yet display a high level of sequence divergence. As such, they constitute a good case scenario to assess the benefits of using gene clusters to complement inferences based on pairwise genome alignments.
 
 ##### Downloading annotation data from GenBank (NCBI):
 
@@ -776,7 +776,7 @@ run_syny.pl \
   --no_circos
 ```
 
-Here, while the pairwise alignments and gene cluster collinear inferences produce similar results within species (not shown), they differ susbtantially between species. For example, below are two barplots between <i>Encephalitozoon hellem</i> and <i>Ordospora colligata</i>. While the results are congruent, gene clusters inferences `.gap_0.` perform better than those based on pairwise alignments (`.mmap.`), the latter of which struggle due to the high levels of sequence divergence involved. These differences will also be reflected in the dotplots, heatmaps and Circos plots generated (not shown).
+Here, while the pairwise alignments and gene cluster collinear inferences produce similar results within species (not shown), they differ substantially between species. For example, below are two barplots between <i>Encephalitozoon hellem</i> and <i>Ordospora colligata</i>. While the results are congruent, gene clusters inferences `.gap_0.` perform better than those based on pairwise alignments (`.mmap.`), the latter of which struggle due to the high levels of sequence divergence involved. These differences will also be reflected in the dotplots, heatmaps and Circos plots generated (not shown).
 
 Barplots (gene clusters): 
 <p align="left">
