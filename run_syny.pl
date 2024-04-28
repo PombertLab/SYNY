@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.4b';
-my $updated = '2024-04-27';
+my $version = '0.6.4c';
+my $updated = '2024-04-28';
 
 use strict;
 use warnings;
