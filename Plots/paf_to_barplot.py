@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.3'
-updated = '2024-04-20a'
+version = '0.3a'
+updated = '2024-04-28b'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -9,7 +9,6 @@ import os
 import re
 import argparse
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 import matplotlib.patches as mpatches
 from matplotlib.patches import Rectangle
 from multiprocessing import Pool, Value
