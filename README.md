@@ -241,14 +241,14 @@ Options for run_SYNY.pl are:
 ### Circos plots
 -c (--circos)           Circos plot mode: pair (pairwise), cat (concatenated), all (cat + pair) [Default: pair]
 --orientation           Karyotype orientation: normal, inverted or both [Default: normal]
---circos_prefix         Desired Circos plot prefix for concatenated plots [Default: circos]
--r (--ref)              Genome to use as reference for concatenated plots (defaults to first one alphabetically if none provided)
+--circos_prefix         Prefix for concatenated plots [Default: circos]
+-r (--ref)              Reference to use for concatenated plots; uses first genome (alphabetically) if ommitted
 -u (--unit)             Size unit (Kb or Mb) [Default: Mb]
 --winsize               Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize              Sliding windows step (nucleotide biases) [Default: 5000]
 --labels                Contig label type: numbers or names [Default: numbers]
 --label_size            Contig label size [Default: 36]
---label_font            Contig label font [Default: bold] - https://circos.ca/documentation/tutorials/ideograms/labels/
+--label_font            Contig label font [Default: bold]
 --custom_file           Load custom colors from file
 --list_preset           List available custom color presets
 --custom_preset         Use a custom color preset, e.g.: --custom_preset chloropicon
