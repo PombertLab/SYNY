@@ -521,9 +521,9 @@ WM276_vs_JEC21  6565    5       5957    90.74   51      477     2       117     
 
 #### Heatmaps
 
-To facilitate comparisons when working with large datasets, heatmaps displaying the percentages of collinear bases in pairwise genome alignments (`.mmap.`) and the percentages of protein coding-genes found in collinear clusters between each pair of genomes (e.g. `.gap_0.`) are generated with matplotlib.
+To facilitate comparisons when working with large datasets, heatmaps summarizing the percentages of collinear bases in pairwise genome alignments (`.mmap.`) and the percentages of protein coding-genes found in collinear clusters between each pair of genomes (e.g. `.gap_0.`) are generated with matplotlib.
 
-In the above example, small heatmaps with 25 datapoints (5 * 5 genomes) will be generated for the minimap2 pairwise alignments and for the protein clusters found for each gap value investigated. In these heatmaps, percentages between pairs of genomes will vary based on the total number of bases and proteins found in the query used: <i>i.e.</i> `(collinear bases / total bases) * 100` and `(proteins in clusters / total proteins) * 100`.
+In the above example, small heatmaps with 25 datapoints (5 * 5 genomes) will be generated for the minimap2 pairwise alignments and for the protein clusters found for each gap value investigated. In these heatmaps, percentages between pairs of genomes will vary based on the total number of bases and proteins found in the query used: <i>i.e.</i> `(collinear bases / total bases in query) * 100` and `(proteins in clusters / total proteins in query) * 100`.
 
 ##### Example of a heatmap showing percentages of collinear protein-coding genes between investigated genomes:
 <p align="left">
