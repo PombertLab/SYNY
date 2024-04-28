@@ -207,6 +207,7 @@ The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SY
 2. Performs round-robin pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
 3. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches, identifies conserved protein gene pairs, and reconstructs collinear clusters from these searches.
 4. Generates dotplots, barplots and [Circos](https://circos.ca/) plots highlighting collinear regions inferred from pairwise genome alignments and from shared protein cluster reconstructions.
+5. Generates heatmaps summarizing the percentages of collinear bases found in pairwise genome alignments and the percentages of proteins found in collinear clusters between all genomes.
 
 #### Why use two distinct approaches?
 
