@@ -530,7 +530,7 @@ In the above example, small heatmaps with 25 datapoints (5 * 5 genomes) will be 
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.heatmap.png">
 </p>
 
-Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: winter_r) can be modified with the `--hmpalette` command line switch (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a list of available seaborn color palettes).
+Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: winter_r) can be modified with the `--hmpalette` command line switch (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a list of color palettes). Color palettes available on the operating system can be listed and/or plotted with [check_mp_colors.py](https://github.com/PombertLab/SYNY/blob/main/Utils/check_mp_colors.py).
 
 #### Circos plots
 
@@ -627,7 +627,7 @@ Chromosome maps (aka barplots) highlighting collinear genome segments will be ge
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.mmap.barplot.19.2x10.8.Spectral.png">
 </p>
 
-In these plots, collinear regions found between the compared genomes are highlighted by colored rectangles. By default, these rectangles are color-coded based on the contigs/chromosomes of the query. The above barplot image was generated using the Spectral color palette from [seaborn](https://seaborn.pydata.org/tutorial/color_palettes.html) (set as default in SYNY). This palette can be replaced using the `--palette` command line switch; <i>e.g.</i> `--palette husl` (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a detailed list of available palettes).
+In these plots, collinear regions found between the compared genomes are highlighted by colored rectangles. By default, these rectangles are color-coded based on the contigs/chromosomes of the query. The above barplot image was generated using the Spectral color palette from [seaborn](https://seaborn.pydata.org/tutorial/color_palettes.html) (set as default in SYNY). This palette can be replaced using the `--palette` command line switch; <i>e.g.</i> `--palette husl` (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a list of color palettes). Color palettes available on the operating system can be listed and/or plotted with [check_mp_colors.py](https://github.com/PombertLab/SYNY/blob/main/Utils/check_mp_colors.py).
 
 If desired, the barplots can instead be generated using a single monochromatic color with the `--monobar` command line switch; <i>e.g.</i> `--monobar red`. If this option is selected, the color-coding legend will be omitted from the plot.
 
@@ -657,7 +657,7 @@ Alternatively, ticks/numbers in the x and y axes can be turned off with the `--n
 
 By default, the dotplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--dheight` and `--dwidth` command line switches.
 
-The default monochromatic color (blue) can be changed with the `--color` option (<i>e.g.</i> `--color red`). If desired, dotplots can instead be color-coded based on the query contigs/chromosomes with the `--dotpalette` option; <i>e.g.</i> `--dotpalette husl` (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a detailed list of available seaborn palettes).
+The default monochromatic color (blue) can be changed with the `--color` option (<i>e.g.</i> `--color red`). If desired, dotplots can instead be color-coded based on the query contigs/chromosomes with the `--dotpalette` option; <i>e.g.</i> `--dotpalette husl` (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a list of color palettes). Color palettes available on the operating system can be listed and/or plotted with [check_mp_colors.py](https://github.com/PombertLab/SYNY/blob/main/Utils/check_mp_colors.py).
 
 ##### Example of a dotplot generated from minimap2 PAF files using the husl color palette:
 
