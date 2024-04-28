@@ -203,7 +203,7 @@ printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ## <b>Using SYNY</b>
 
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
-1. Extracts genome and protein sequences from GenBank (.gbf/.gbff) annotation files.
+1. Extracts genome/protein sequences and annotation data from GenBank (.gbf/.gbff) flat files.
 2. Performs round-robin pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
 3. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches, identifies conserved protein gene pairs, and reconstructs collinear clusters from these searches.
 4. Generates dotplots, barplots and [Circos](https://circos.ca/) plots highlighting collinear regions inferred from pairwise genome alignments and from shared protein cluster reconstructions.
