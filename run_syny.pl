@@ -1330,7 +1330,7 @@ sub pairwise_conf {
 
 				my $subloc = $circos_pair_dir.'/'.$pair.'/'.$pair;
 				my $circos_conf_f = $subloc.'.'.$orientation.'.conf';
-				my $pair_genotype = $subloc.'.'.$orientation.'.genotype';
+				my $pair_genotype = $subloc.'.'.$orientation.'.karyotype';
 				my $new_conf = $subloc.'.'.$affix.'.'.$orientation.'.conf';
 
 					open CONF, '<', $circos_conf_f or die "Can't read $circos_conf_f: $!\n";

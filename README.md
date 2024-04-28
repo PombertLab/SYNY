@@ -580,11 +580,11 @@ run_syny.pl \
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.gap_0.normal.names.png">
 </p>
 
-All data and configuration files for the Circos plots are in the `PLOTS/CIRCOS_DATA/` subdirectory. If desired, chromosome labels can be further adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file (`concatenated.normal.genotype` / `concatenated.inverted.genotype` from `CIRCOS/concatenated/`).
+All data and configuration files for the Circos plots are in the `PLOTS/CIRCOS_DATA/` subdirectory. If desired, chromosome labels can be further adjusted manually by editing the `LABEL` column in the corresponding Circos [karyotype](https://circos.ca/documentation/tutorials/ideograms/karyotypes/) file(s). Karyotype files created by SYNY (in `PLOTS/CIRCOS_DATA/` ) ends with `*.karyotype`.
 
 ```Bash
 ## To see the first 5 lines from a karyotype file:
-head -n 5 concatenated.normal.genotype
+head -n 5 concatenated.normal.karyotype
 
 #chr - ID LABEL START END COLOR
 chr - NC_014938 1 0 1984822 black
@@ -815,7 +815,7 @@ run_syny.pl \
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.syny.normal.png">
 </p>
 
-In the above [Circos](https://circos.ca/) plot, links between the reference and the queried genomes are color-coded based on the reference genotype; links between the queried genomes are shown in light gray. In these plots, each chromosome/contig is plotted as a distinct [ideogram](https://circos.ca/documentation/tutorials/ideograms/ideograms/).
+In the above [Circos](https://circos.ca/) plot, links between the reference and the queried genomes are color-coded based on the reference karyotype; links between the queried genomes are shown in light gray. In these plots, each chromosome/contig is plotted as a distinct [ideogram](https://circos.ca/documentation/tutorials/ideograms/ideograms/).
 
 Note that while SYNY can plot multiple genomes together with `--circos cat` / `--circos all`, adding too much data can quickly clutter the concatenated Circos plots (drawing too many ideograms can make the figure illegible). If the concatenated plots are too dense, drawing pairwise plots with `--circos pair` should help with readability. However, when comparing genomes featuring many chromosomes/contigs, cluttering can occur even in pairwise plots.
 

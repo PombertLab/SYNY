@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.6b';
-my $updated = '2024-04-26';
+my $version = '0.7';
+my $updated = '2024-04-28';
 
 use strict;
 use warnings;
@@ -264,17 +264,17 @@ while (my $fasta = shift@fasta){
 ### Circos
 ####################################################################
 
-############## Creating genotype/karyotype files
+############## Creating karyotype files
 
-# Normal = genotypes in the same order as encountered
-# Inverted = genotypes in reversed order (except in the contatenated file):
-# In the inverted concatenated file, all but the reference genotypes
+# Normal = karyotypes in the same order as encountered
+# Inverted = karyotypes in reversed order (except in the contatenated file):
+# In the inverted concatenated file, all but the reference karyotypes
 # are in reversed order. This can help visualize synteny when comparing
 # genomes to the reference => sometimes the reversed order is more
 # informative than the normal one
 
-my $cat_kar = $catdir.'/concatenated.normal.genotype';
-my $cat_kar_inv = $catdir.'/concatenated.inverted.genotype';
+my $cat_kar = $catdir.'/concatenated.normal.karyotype';
+my $cat_kar_inv = $catdir.'/concatenated.inverted.karyotype';
 
 open CONCAT, ">", $cat_kar or die "Can't create $cat_kar: $!\n";
 open CONCATINV, ">", $cat_kar_inv or die "Can't create $cat_kar_inv: $!\n";
@@ -292,8 +292,8 @@ foreach my $fileprefix (keys (%sequences)){
 
 	## Creating a "karyotype" file for Circos
 	my $circos_dir = $singledir.'/'.$fileprefix;
-	my $circos_kar = $circos_dir.'/'.$fileprefix.'.normal.genotype';
-	my $circos_kar_inv = $circos_dir.'/'.$fileprefix.'.inverted.genotype';
+	my $circos_kar = $circos_dir.'/'.$fileprefix.'.normal.karyotype';
+	my $circos_kar_inv = $circos_dir.'/'.$fileprefix.'.inverted.karyotype';
 
 	open KAR, ">", $circos_kar or die "Can't create $circos_kar: $!\n";
 	open KARINV, ">", $circos_kar_inv or die "Can't create $circos_kar_inv: $!\n";
@@ -383,8 +383,8 @@ foreach my $query (keys (%sequences)){
 			unless (-d $subdir){
 				mkdir($subdir,0755) or die "Can't create $subdir: $!\n";
 			}
-			my $circos_kar = $subdir.'/'.$prefix.'.normal.genotype';
-			my $circos_kar_inv = $subdir.'/'.$prefix.'.inverted.genotype';
+			my $circos_kar = $subdir.'/'.$prefix.'.normal.karyotype';
+			my $circos_kar_inv = $subdir.'/'.$prefix.'.inverted.karyotype';
 
 			open PAIR, ">", $circos_kar or die "Can't create $circos_kar: $!\n";
 			open PAIRINV, ">", $circos_kar_inv or die "Can't create $circos_kar_inv: $!\n";
@@ -608,7 +608,7 @@ my %colors = (
 	'NN' => 'black'
 );
 
-### Creating files for both normal and inverted genotypes (single and concatenated)
+### Creating files for both normal and inverted karyotypes (single and concatenated)
 for my $genome ((keys %sequences), 'concatenated'){
 
 	my $subfile;
@@ -635,7 +635,7 @@ for my $genome ((keys %sequences), 'concatenated'){
 
 }
 
-### Creating pairwise files for both normal and inverted genotypes
+### Creating pairwise files for both normal and inverted karyotypes
 for my $genome (keys %sequences){
 
 	for my $subject (keys %sequences){
@@ -670,7 +670,7 @@ sub print_circos_conf {
 	my $link_status = $_[3];
 
 	my $config = $subfile.'.'.$orientation.'.conf';
-	my $karyotype = $subfile.'.'.$orientation.'.genotype';
+	my $karyotype = $subfile.'.'.$orientation.'.karyotype';
 
 	my $bias_file = $subfile;
 	if ($cat_status){
