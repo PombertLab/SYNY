@@ -813,7 +813,7 @@ run_syny.pl \
 
 ##### Example of a concatenated Circos plot comparing a total of 3 genomes (using defaults settings):
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.syny.normal.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.gap_0.normal.png">
 </p>
 
 In the above [Circos](https://circos.ca/) plot, links between the reference and the queried genomes are color-coded based on the reference karyotype; links between the queried genomes are shown in light gray. In these plots, each chromosome/contig is plotted as a distinct [ideogram](https://circos.ca/documentation/tutorials/ideograms/ideograms/).
@@ -845,7 +845,7 @@ run_syny.pl \
 
 ##### Example of an image generated with Circos and SYNY comparing a total of 3 genomes (using a custom color set):
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_cc.syny.normal.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_cc.gap_0.normal.png">
 </p>
 
 ##### Listing custom color presets available in SYNY:
@@ -879,7 +879,7 @@ run_syny.pl \
 
 ##### Example of an image generated with the blues custom color preset:
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_blues.syny.normal.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon_blues.gap_0.normal.png">
 </p>
 
 ### <b>File conversion</b>
