@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.4f';
+my $version = '0.6.5';
 my $updated = '2024-04-29';
 
 use strict;
@@ -71,6 +71,7 @@ my $plot_options = <<"PLOT_OPTIONS";
 --max_links		Set max number of links [Default: 25000]
 --max_points_per_track	Set max number of points per track [Default: 75000]
 --clusters		Color by cluster instead of contig/chromosome [Default: off]
+--no_ntbiases		Turn off nucleotide biases subplots
 --no_cticks		Turn off ticks in Circos plots
 --no_circos		Turn off Circos plots
 
@@ -137,6 +138,7 @@ my $max_links = 25000;
 my $max_points_per_track = 75000;
 my $clusters;
 my $circos_orientation = 'normal';
+my $no_ntbiases;
 my $no_circos;
 my $no_cticks;
 
@@ -198,6 +200,7 @@ GetOptions(
 	'max_points_per_track=i' => \$max_points_per_track,
 	'clusters' => \$clusters,
 	'orientation=s' => \$circos_orientation,
+	'no_ntbiases' => \$no_ntbiases,
 	'no_circos' => \$no_circos,
 	'no_cticks' => \$no_cticks,
 	# Barplots
@@ -1079,6 +1082,11 @@ if ($no_cticks){
 	$circos_ticks_flag = '--noticks';
 }
 
+my $circos_ntbiases_flag = '';
+if ($no_ntbiases){
+	$circos_ntbiases_flag = '--no_biases';
+}
+
 my $gap = $gaps[0];
 
 ## Running nucleotide_biases.pl
@@ -1101,6 +1109,7 @@ system("
 	--max_points_per_track $max_points_per_track \\
 	$cluster_flag \\
 	$circos_ticks_flag \\
+	$circos_ntbiases_flag \\
 	2>> $log_err
 ") == 0 or checksig();
 

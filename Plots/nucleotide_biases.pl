@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.7a';
+my $version = '0.7b';
 my $updated = '2024-04-29';
 
 use strict;
@@ -57,6 +57,7 @@ OPTIONS (Circos data files options)
 -max_points_per_track	Set max number of points per track [Default: 75000]
 -zdepth			Set links zdepth in ruleset [Default: 50]
 -clusters		Color by clusters [Default: off]
+-no_biases		Skip nucleotide bias subplots in Circos configuration files
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
@@ -83,6 +84,7 @@ my $max_links = 25000;
 my $max_points_per_track = 75000;
 my $zdepth = 50;
 my $clusters;
+my $no_biases;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
 	'o|outdir=s' => \$outdir,
@@ -106,7 +108,8 @@ GetOptions(
 	'max_links=i' => \$max_links,
 	'max_points_per_track=i' => \$max_points_per_track,
 	'zdepth=i' => \$zdepth,
-	'clusters' => \$clusters
+	'clusters' => \$clusters,
+	'no_biases' => \$no_biases
 );
 
 ### List presets and stop
@@ -704,12 +707,19 @@ sub print_circos_conf {
 		}
 		print $cg 'chromosomes_units='.$unit_width."\n\n";
 
+
+
 		## Biases plots
+		my $r_start = 0.99;
+		my $r_end = 0.95;
+
+		if ($no_biases){
+			goto LINKS;
+		}
+
 		print $cg '<plots>'."\n";
 		print $cg '################# BIASES'."\n\n";
 
-		my $r_start = 0.99;
-		my $r_end = 0.95;
 		my $modulo_counter = 0;
 
 		for my $bias (@biases) {
@@ -739,6 +749,7 @@ sub print_circos_conf {
 
 		print $cg '</plots>'."\n\n";
 
+		LINKS:
 		unless ($link_status eq 'nolink'){
 
 			my $link_start = $r_end + 0.04;
