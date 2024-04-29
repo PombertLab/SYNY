@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.3d'
+version = '0.3e'
 updated = '2024-04-29'
 name = 'paf_to_barplot.py'
 
@@ -246,6 +246,12 @@ def barplot(paf):
     ax.set_yticks(ax.get_yticks()[:-1])
     ax.set_yticklabels(ylabels)
 
+    ## Hiding border frame
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    # ax.spines['bottom'].set_visible(False)
+
     ## Writing to output file
     basename = os.path.basename(paf)
     output = basename
@@ -254,7 +260,7 @@ def barplot(paf):
     if monochrome:
         next
     else:
-        plt.legend(handles=legend, loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.legend(handles=legend, loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
 
 
     affix_color = color_palette
