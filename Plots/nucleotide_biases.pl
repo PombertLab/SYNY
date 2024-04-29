@@ -50,6 +50,7 @@ OPTIONS (Circos data files options)
 			# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
 			# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
 			# presets can be added to the cc_colors subroutine
+-noticks		Comment out ticks.conf in Circos configuration file
 -max_ticks		Set max number of ticks [Default: 5000]
 -max_ideograms		Set max number of ideograms [Default: 200]
 -max_links		Set max number of links [Default: 25000]
@@ -75,6 +76,7 @@ my $custom_file;
 my $custom_cc;
 my $list_preset;
 my $tsv;
+my $noticks;
 my $max_ticks = 5000;
 my $max_ideograms = 200;
 my $max_links = 25000;
@@ -98,6 +100,7 @@ GetOptions(
 	'custom_preset=s' => \$custom_cc,
 	'list_preset'	=> \$list_preset,
 	't|tsv' => \$tsv,
+	'noticks' => \$noticks,
 	'max_ticks=i' => \$max_ticks,
 	'max_ideograms=i' => \$max_ideograms,
 	'max_links=i' => \$max_links,
@@ -689,6 +692,9 @@ sub print_circos_conf {
 	open my $cg, '>', $config or die "Can't create $config: $!\n";
 
 		print $cg "<<include $ideogram>>"."\n";
+		if ($noticks){
+			print $cg '#';
+		}
 		print $cg "<<include $ticks>>"."\n\n";
 		print $cg "karyotype = $karyotype"."\n";
 
