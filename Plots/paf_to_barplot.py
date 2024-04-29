@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.3b'
+version = '0.3c'
 updated = '2024-04-29'
 name = 'paf_to_barplot.py'
 
@@ -250,7 +250,6 @@ def barplot(paf):
     output = basename
     fig.suptitle(basename)
 
-    lgd = None
     if monochrome:
         next
     else:
@@ -280,6 +279,8 @@ def barplot(paf):
         counter.value += 1
     print(f"{counter.value} / {lsize} - plotting {svg}...")
     if monochrome:
+        plt.savefig(svg)
+    else:
         plt.savefig(svg, bbox_inches='tight')
 
     ## Close fig
