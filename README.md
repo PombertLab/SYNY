@@ -553,7 +553,7 @@ In this figure, nucleotides biases are plotted in the concentric rings (from out
 
 Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. If desired, color coding can be set by cluster instead with `--clusters`. This option is useful when working with prokaryotes featuring a single chromosome, so that the ribbons are not all of the same color.
 
-By default, contigs will be labelled by numbers in the Circos plots. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) and fonts can be further adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
+By default, contigs will be labelled by arabic and roman numerals in the Circos plots. Contigs from the reference (query) are labelled by roman numerals; others are labelled by arabic numerals. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) and fonts can be further adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
 `normal`, `default`, `semibold`, `bold`, `italic`, `bolditalic`, `italicbold` (see this Circos [tutorial](https://circos.ca/documentation/tutorials/ideograms/labels/) for details).
 
 ```Bash
