@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.4c';
+my $version = '0.6.4d';
 my $updated = '2024-04-28';
 
 use strict;
@@ -71,6 +71,7 @@ my $plot_options = <<"PLOT_OPTIONS";
 --max_links		Set max number of links [Default: 25000]
 --max_points_per_track	Set max number of points per track [Default: 75000]
 --clusters		Color by cluster instead of contig/chromosome [Default: off]
+--no_cticks		Turn off ticks in Circos plots
 --no_circos		Turn off Circos plots
 
 ### Barplots
@@ -135,6 +136,7 @@ my $max_points_per_track = 75000;
 my $clusters;
 my $circos_orientation = 'normal';
 my $no_circos;
+my $no_cticks;
 
 # Barplots
 my $bheight = 10.8;
@@ -193,6 +195,7 @@ GetOptions(
 	'clusters' => \$clusters,
 	'orientation=s' => \$circos_orientation,
 	'no_circos' => \$no_circos,
+	'no_cticks' => \$no_cticks,
 	# Barplots
 	'bh|bheight=s' => \$bheight,
 	'bw|bwidth=s' => \$bwidth,
@@ -1061,6 +1064,11 @@ if ($unit){
 	$unit_size = "--unit $unit";
 }
 
+my $circos_ticks_flag = '';
+if ($no_cticks){
+	$circos_ticks_flag = '--noticks';
+}
+
 my $gap = $gaps[0];
 
 ## Running nucleotide_biases.pl
@@ -1082,6 +1090,7 @@ system("
 	--max_links $max_links \\
 	--max_points_per_track $max_points_per_track \\
 	$cluster_flag \\
+	$circos_ticks_flag \\
 	2>> $log_err
 ") == 0 or checksig();
 
