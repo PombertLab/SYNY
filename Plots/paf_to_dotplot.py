@@ -45,6 +45,7 @@ OPTIONS:
                 of a monochrome plot
 --wdis          Horizontal distance (width) between subplots [Default: 0.05]
 --hdis          Vertical distance (height) between subplots [Default: 0.1]
+--fontsize      Font size [Default: 8]
 --threads       Number of threads to use [Default: 16]
 """
 
@@ -70,6 +71,7 @@ cmd.add_argument("-a", "--palette")
 cmd.add_argument("-n", "--noticks", action='store_true')
 cmd.add_argument("--wdis", default=0.05)
 cmd.add_argument("--hdis", default=0.1)
+cmd.add_argument("--fontsize", default=8)
 cmd.add_argument("--threads", default=16)
 args = cmd.parse_args()
 
@@ -85,6 +87,7 @@ color_palette = args.palette
 noticks = args.noticks
 wdis = args.wdis
 hdis = args.hdis
+fontsize = int(args.fontsize)
 threads = int(args.threads)
 
 ################################################################################
@@ -224,7 +227,7 @@ def dotplot(paf):
 
     # Setting default image to widescreen by default
     plt.rcParams["figure.figsize"] = (width,height)
-    plt.rcParams.update({'font.size': 8})
+    plt.rcParams.update({'font.size': fontsize})
 
     # color palette
     palette = sns.color_palette(color_palette, len(query_len_dict))
