@@ -2,8 +2,8 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.2b';
-my $updated = '2024-04-26';
+my $version = '0.2c';
+my $updated = '2024-04-29';
 
 use strict;
 use warnings;
@@ -165,6 +165,7 @@ print "\nInstalling Circos perl dependencies...\n\n";
 
 system ("
     sudo cpanm \\
+        Roman \\
         Clone \\
         Config::General \\
         Font::TTF::Font \\
