@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.4d';
-my $updated = '2024-04-28';
+my $version = '0.6.4e';
+my $updated = '2024-04-29';
 
 use strict;
 use warnings;
@@ -330,10 +330,11 @@ unless ($no_circos){
 ## Output directory creation and setup
 ###################################################################################################
 
-## Converting $outdir to absolute path: required for Circos files
-if ($outdir !~ /^\//){
-	$outdir = abs_path($outdir);
+## Creating path before running abs_path(); otherwise returns nothing
+unless (-d $outdir){
+	make_path($outdir,{mode=>0755}) or die "Can't create $outdir: $!\n";
 }
+$outdir = abs_path($outdir);
 
 my $minimap2_dir = $outdir.'/ALIGNMENTS';
 my $list_dir = $outdir.'/LISTS';
@@ -361,7 +362,6 @@ my $circos_cat_dir = $circos_data_dir.'/concatenated';
 my $circos_pair_dir = $circos_data_dir.'/pairwise';
 
 my @outdirs = (
-	$outdir,
 	$list_dir,
 	$seq_dir,$prot_dir,
 	$genome_dir,
