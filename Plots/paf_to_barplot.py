@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.3a'
-updated = '2024-04-28b'
+version = '0.3b'
+updated = '2024-04-29'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -42,6 +42,7 @@ OPTIONS:
                 # for a list of color palettes
 -m (--mono)     Use a single specified mochochrome color for all chromosomes instead
                 of a color palette
+--fontsize      Font size [Default: 8]
 --threads       Number of threads to use [Default: 16]
 """
 
@@ -64,6 +65,7 @@ cmd.add_argument("-a", "--affix")
 cmd.add_argument("-c", "--palette", default='Spectral')
 cmd.add_argument("-n", "--noticks", action='store_true')
 cmd.add_argument("-m", "--mono")
+cmd.add_argument("--fontsize", default=8)
 cmd.add_argument("--threads", default=16)
 args = cmd.parse_args()
 
@@ -76,6 +78,7 @@ affix = args.affix
 color_palette = args.palette
 noticks = args.noticks
 monochrome = args.mono
+fontsize = int(args.fontsize)
 threads = int(args.threads)
 
 ################################################################################
@@ -187,7 +190,7 @@ def barplot(paf):
 
     # Setting default image to widescreen by default
     plt.rcParams["figure.figsize"] = (width,height)
-    plt.rcParams.update({'font.size': 8})
+    plt.rcParams.update({'font.size': fontsize})
 
     # Defining Matplotlib figure and axis
     fig, ax = plt.subplots()
@@ -247,6 +250,7 @@ def barplot(paf):
     output = basename
     fig.suptitle(basename)
 
+    lgd = None
     if monochrome:
         next
     else:
@@ -267,12 +271,16 @@ def barplot(paf):
     with counter.get_lock():
         counter.value += 1
     print(f"{counter.value} / {lsize} - plotting {png}...")
-    plt.savefig(png)
+    if monochrome:
+        plt.savefig(png)
+    else:
+        plt.savefig(png, bbox_inches='tight')
 
     with counter.get_lock():
         counter.value += 1
     print(f"{counter.value} / {lsize} - plotting {svg}...")
-    plt.savefig(svg)
+    if monochrome:
+        plt.savefig(svg, bbox_inches='tight')
 
     ## Close fig
     plt.clf()
