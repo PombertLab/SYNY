@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.4e';
+my $version = '0.6.4f';
 my $updated = '2024-04-29';
 
 use strict;
@@ -77,6 +77,7 @@ my $plot_options = <<"PLOT_OPTIONS";
 ### Barplots
 -bh (--bheight)		Barplot figure height in inches [Default: 10.8]
 -bw (--bwidth)		Barplot figure width in inches [Default: 19.2]
+--bfsize		Barplot font size [Default: 8]
 --palette		Barplot color palette [Default: Spectral]
 --monobar		Use a monochrome barplot color instead: e.g. --monobar blue
 --no_barplot		Turn off barplots
@@ -84,6 +85,7 @@ my $plot_options = <<"PLOT_OPTIONS";
 ### Dotplots
 -dh (--dheight)		Dotplot figure height in inches [Default: 10.8]
 -dw (--dwidth)		Dotplot figure width in inches [Default: 19.2]
+--dfsize		Dotplot font size [Default: 8]
 -m (--multi)		Axes units multiplier (for dotplots) [Default: 1e5]
 --color			Dotplot color [Default: blue]
 --dotpalette		Use a color palette instead: e.g. --dotpalette inferno
@@ -141,6 +143,7 @@ my $no_cticks;
 # Barplots
 my $bheight = 10.8;
 my $bwidth = 19.2;
+my $bfsize = 8;
 my $palette = 'Spectral';
 my $monobar;
 my $no_barplot;
@@ -148,6 +151,7 @@ my $no_barplot;
 # Dotplots
 my $dheight = 10.8;
 my $dwidth = 19.2;
+my $dfsize = 8;
 my $multiplier = '1e5';
 my $color = 'blue';
 my $dotpalette;
@@ -199,12 +203,14 @@ GetOptions(
 	# Barplots
 	'bh|bheight=s' => \$bheight,
 	'bw|bwidth=s' => \$bwidth,
+	'bfsize=i' => \$bfsize,
 	'palette=s' => \$palette,
 	'monobar=s' => \$monobar,
 	'no_barplot' => \$no_barplot,
 	# Dotplots
 	'dh|dheight=s' => \$dheight,
 	'dw|dwidth=s' => \$dwidth,
+	'dfsize=i' => \$dfsize,
 	'm|multiplier=s' => \$multiplier, 
 	'color=s' => \$color,
 	'dotpalette=s' => \$dotpalette,
@@ -556,6 +562,7 @@ unless ($no_barplot){
 		--height $bheight \\
 		--width $bwidth \\
 		--palette $palette \\
+		--fontsize $bfsize \\
 		$tick_flag \\
 		$monobar_flag \\
 		2>> $log_err
@@ -582,6 +589,7 @@ unless ($no_dotplot){
 		--height $dheight \\
 		--width $dwidth \\
 		--color $color \\
+		--fontsize $dfsize \\
 		$tick_flag \\
 		$dotpal_flag \\
 		--wdis $wdis \\
@@ -785,6 +793,7 @@ unless ($no_barplot){
 		--height $bheight \\
 		--width $bwidth \\
 		--palette $palette \\
+		--fontsize $bfsize \\
 		$tick_flag \\
 		$monobar_flag \\
 		2>> $log_err
@@ -825,6 +834,7 @@ unless ($no_dotplot){
 		--height $dheight \\
 		--width $dwidth \\
 		--color $color \\
+		--fontsize $dfsize \\
 		$tick_flag \\
 		$dotpal_flag \\
 		--wdis $wdis \\
