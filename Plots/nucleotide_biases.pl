@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.7';
-my $updated = '2024-04-28';
+my $version = '0.7a';
+my $updated = '2024-04-29';
 
 use strict;
 use warnings;
@@ -10,6 +10,7 @@ use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
 use Math::Round;
+use Roman;
 
 my $usage = <<"OPTIONS";
 NAME		$name
@@ -315,9 +316,11 @@ foreach my $fileprefix (keys (%sequences)){
 		my $terminus = $csize - 1;
 		$id++;
 
-		
 		if ($labels eq 'numbers'){
 			$label = $id;
+			if ($fileprefix eq $reference){
+				$label = uc(roman($label));
+			}
 		}
 		elsif ($labels eq 'names'){
 			$label = $sequence;
@@ -343,6 +346,9 @@ foreach my $fileprefix (keys (%sequences)){
 
 		if ($labels eq 'numbers'){
 			$label = $id_rev;
+			if ($fileprefix eq $reference){
+				$label = uc(roman($label));
+			}
 		}
 		elsif ($labels eq 'names'){
 			$label = $sequence;
@@ -409,6 +415,9 @@ foreach my $query (keys (%sequences)){
 
 					if ($labels eq 'numbers'){
 						$label = $id;
+						if ($key eq $pairwise_ref){
+							$label = uc(roman($label));
+						}
 					}
 					elsif ($labels eq 'names'){
 						$label = $sequence;
