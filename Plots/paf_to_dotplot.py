@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.5a'
-updated = '2024-04-20'
+version = '0.5b'
+updated = '2024-04-29'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -226,6 +226,7 @@ def dotplot(paf):
     subplots_total = x_axes_total * y_axes_total
 
     # Setting default image to widescreen by default
+    plt.rcParams['svg.fonttype'] = 'none'
     plt.rcParams["figure.figsize"] = (width,height)
     plt.rcParams.update({'font.size': fontsize})
 

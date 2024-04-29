@@ -2,8 +2,8 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.3a'
-updated = '2024-04-20'
+version = '0.3b'
+updated = '2024-04-29'
 
 import sys
 import os
@@ -88,6 +88,7 @@ counter = Value('i', 0)
 def heatmap(tsv_file):
 
     plt.rcParams["figure.figsize"] = (width,height)
+    plt.rcParams['svg.fonttype'] = 'none'
     global counter
 
     with open (tsv_file) as f:

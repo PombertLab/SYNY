@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1'
-updated = '2024-04-12'
+version = '0.1a'
+updated = '2024-04-29'
 name = 'paf_to_heatmap.py'
 
 import sys
@@ -191,6 +191,7 @@ with open(matrix_file, "w") as file:
 ################################################################################
 
 plt.rcParams["figure.figsize"] = (width,height)
+plt.rcParams['svg.fonttype'] = 'none'
 
 with open (matrix_file) as f:
 

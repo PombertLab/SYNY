@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.3c'
+version = '0.3d'
 updated = '2024-04-29'
 name = 'paf_to_barplot.py'
 
@@ -189,6 +189,7 @@ def barplot(paf):
     palette = sns.color_palette(color_palette, len(query_len_dict))
 
     # Setting default image to widescreen by default
+    plt.rcParams['svg.fonttype'] = 'none'
     plt.rcParams["figure.figsize"] = (width,height)
     plt.rcParams.update({'font.size': fontsize})
 
