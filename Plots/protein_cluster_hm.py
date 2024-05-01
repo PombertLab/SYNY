@@ -120,7 +120,7 @@ def heatmap(tsv_file):
             vmax=100,
         )
 
-        cm.fig.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
+        cm.fig.suptitle(f"% of protein-coding genes in clusters (gap = {gap})", x=0.5, y=0.95)
         with counter.get_lock():
             counter.value += 1
         print(f"{counter.value} / {lsize} - plotting {clustered_png}")
