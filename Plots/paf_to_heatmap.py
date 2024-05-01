@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1a'
-updated = '2024-04-29'
+version = '0.1b'
+updated = '2024-05-01'
 name = 'paf_to_heatmap.py'
 
 import sys
@@ -208,7 +208,9 @@ with open (matrix_file) as f:
         data[0:],
         cmap=color_palette,
         annot=True,
-        fmt='.1f'
+        fmt='.1f',
+        vmin=0,
+        vmax=100
     )
 
     cm.fig.suptitle(f"% of colinear bases in pairwise alignments", x=0.5, y=0.95)
@@ -225,7 +227,9 @@ with open (matrix_file) as f:
         data[0:],
         cmap=color_palette,
         annot=True,
-        fmt='.1f'
+        fmt='.1f',
+        vmin=0,
+        vmax=100
     )
 
     hm.figure.suptitle(f"% of colinear bases in pairwise alignments", x=0.5, y=0.95)

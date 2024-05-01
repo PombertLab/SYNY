@@ -2,8 +2,8 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.3b'
-updated = '2024-04-29'
+version = '0.3c'
+updated = '2024-05-01'
 
 import sys
 import os
@@ -111,7 +111,9 @@ def heatmap(tsv_file):
             data[0:],
             cmap=color_palette,
             annot=True,
-            fmt='.1f'
+            fmt='.1f',
+            vmin=0,
+            vmax=100,
         )
 
         cm.fig.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
@@ -131,7 +133,9 @@ def heatmap(tsv_file):
             data[0:],
             cmap=color_palette,
             annot=True,
-            fmt='.1f'
+            fmt='.1f',
+            vmin=0,
+            vmax=100
         )
 
         hm.figure.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
