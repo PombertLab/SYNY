@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.7b';
-my $updated = '2024-04-29';
+my $version = '0.7c';
+my $updated = '2024-05-01';
 
 use strict;
 use warnings;
@@ -41,7 +41,7 @@ OPTIONS (Circos data files options)
 -r (--reference)	Genome reference for Circos plotting
 -g (--gap)		Default gap links file for Circos plotting [Default: 0]
 -u (--unit)		Size unit (Kb or Mb) [Default: Mb]
--l (--labels)	Contig label type: numbers or names [Defaut: numbers]
+-l (--labels)	Contig label type: mixed (arabic + roman numbers), arabic, roman, or names [Default: mixed]
 -label_size		Contig label size [Default: 36]
 -label_font		Contig label font [Default: bold]
 -custom_file		Load custom colors from file
@@ -69,7 +69,7 @@ my $reference;
 my $ncheck;
 my $gap = 0;
 my $unit = 'Mb';
-my $labels = 'numbers';
+my $labels = 'mixed';
 my $label_size = 36;
 my $label_font = 'bold';
 my $circos_plot;
@@ -322,15 +322,22 @@ foreach my $fileprefix (keys (%sequences)){
 		my $terminus = $csize - 1;
 		$id++;
 
-		if ($labels eq 'numbers'){
+		if ($labels eq 'names'){
+			$label = $sequence;
+		}
+		else {
 			$label = $id;
+		}
+
+		if ($labels eq 'mixed'){
 			if ($fileprefix eq $reference){
 				$label = uc(roman($label));
 			}
 		}
-		elsif ($labels eq 'names'){
-			$label = $sequence;
+		elsif ($labels eq 'roman'){
+			$label = uc(roman($label));
 		}
+
 		print KAR "chr - $sequence $label 0 $terminus black\n";
 		print CONCAT "chr - $sequence $label 0 $terminus black\n";
 
@@ -350,15 +357,22 @@ foreach my $fileprefix (keys (%sequences)){
 
 		my $terminus = $csize - 1;
 
-		if ($labels eq 'numbers'){
+		if ($labels eq 'names'){
+			$label = $sequence;
+		}
+		else {
 			$label = $id_rev;
+		}
+
+		if ($labels eq 'mixed'){
 			if ($fileprefix eq $reference){
 				$label = uc(roman($label));
 			}
 		}
-		elsif ($labels eq 'names'){
-			$label = $sequence;
+		elsif ($labels eq 'roman'){
+			$label = uc(roman($label));
 		}
+
 		print KARINV "chr - $sequence $label 0 $terminus black\n";
 
 		if ($fileprefix ne $reference){
@@ -419,15 +433,22 @@ foreach my $query (keys (%sequences)){
 					my $terminus = $csize - 1;
 					$id++;
 
-					if ($labels eq 'numbers'){
+					if ($labels eq 'names'){
+						$label = $sequence;
+					}
+					else {
 						$label = $id;
+					}
+
+					if ($labels eq 'mixed'){
 						if ($key eq $pairwise_ref){
 							$label = uc(roman($label));
 						}
 					}
-					elsif ($labels eq 'names'){
-						$label = $sequence;
+					elsif ($labels eq 'roman'){
+						$label = uc(roman($label));
 					}
+
 					print PAIR "chr - $sequence $label 0 $terminus black\n";
 
 					if ($key eq $pairwise_ref){
@@ -446,11 +467,20 @@ foreach my $query (keys (%sequences)){
 
 					my $terminus = $csize - 1;
 
-					if ($labels eq 'numbers'){
+					if ($labels eq 'names'){
+						$label = $sequence;
+					}
+					else {
 						$label = $id_rev;
 					}
-					elsif ($labels eq 'names'){
-						$label = $sequence;
+
+					if ($labels eq 'mixed'){
+						if ($key eq $pairwise_ref){
+							$label = uc(roman($label));
+						}
+					}
+					elsif ($labels eq 'roman'){
+						$label = uc(roman($label));
 					}
 
 					if ($key ne $pairwise_ref){

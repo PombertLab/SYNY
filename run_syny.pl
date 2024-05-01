@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.5a';
+my $version = '0.6.5b';
 my $updated = '2024-05-01';
 
 use strict;
@@ -60,7 +60,7 @@ my $plot_options = <<"PLOT_OPTIONS";
 -u (--unit)		Size unit (Kb or Mb) [Default: Mb]
 --winsize		Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize		Sliding windows step (nucleotide biases) [Default: 5000]
---labels		Contig label type: numbers or names [Default: numbers]
+--labels		Contig label type: mixed (arabic + roman numbers), arabic, roman, or names [Default: mixed]
 --label_size		Contig label size [Default: 36]
 --label_font		Contig label font [Default: bold]
 --custom_file		Load custom colors from file
@@ -122,7 +122,7 @@ my $help;
 # Circos
 my $reference;
 my $unit = 'Mb';
-my $labels = 'numbers';
+my $labels = 'mixed';
 my $label_size = 36;
 my $label_font = 'bold';
 my $circos = 'pair';

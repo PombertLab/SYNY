@@ -247,7 +247,7 @@ Options for run_SYNY.pl are:
 -u (--unit)             Size unit (Kb or Mb) [Default: Mb]
 --winsize               Sliding windows size (nucleotide biases) [Default: 10000]
 --stepsize              Sliding windows step (nucleotide biases) [Default: 5000]
---labels                Contig label type: numbers or names [Default: numbers]
+--labels                Contig label type: mixed (arabic + roman numbers), arabic, roman, or names [Default: mixed]
 --label_size            Contig label size [Default: 36]
 --label_font            Contig label font [Default: bold]
 --custom_file           Load custom colors from file
@@ -560,7 +560,7 @@ In this figure, nucleotides biases are plotted in the concentric rings. These su
 
 Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. If desired, color coding can be set by cluster instead with `--clusters`. This option is useful when working with prokaryotes featuring a single chromosome, so that the ribbons are not all of the same color.
 
-By default, contigs will be labelled by arabic and roman numerals in the Circos plots. Contigs from the reference (query) are labelled by roman numerals; others are labelled by arabic numerals. If desired, contigs can instead be labelled by their names with the `--labels names` command line option. Label sizes (default: 36) and fonts can be further adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
+By default, contigs will be labelled by mixed numerals (roman + arabic) in the Circos plots. Contigs from the reference (query) will be labelled by `roman` numerals, others by `arabic` numerals. This behavior can be changed with the `--labels` command line option. Possible values are `mixed`, `roman`, `arabic` and `names`. Using `--labels roman` or `--labels arabic` will set all label numbers to the corresponding format, whereas using `--labels names` will label contigs by their names instead. Label sizes (default: 36) and fonts can be further adjusted with the `--label_size` and `--label_font` command line options. Possible fonts are: `light`, 
 `normal`, `default`, `semibold`, `bold`, `italic`, `bolditalic`, `italicbold` (see this Circos [tutorial](https://circos.ca/documentation/tutorials/ideograms/labels/) for details).
 
 ```Bash
