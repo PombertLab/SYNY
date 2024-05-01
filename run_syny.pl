@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.5';
-my $updated = '2024-04-29';
+my $version = '0.6.5a';
+my $updated = '2024-05-01';
 
 use strict;
 use warnings;
@@ -98,6 +98,7 @@ my $plot_options = <<"PLOT_OPTIONS";
 ### Heatmaps
 -hh (--hheight)		Heatmap figure height in inches [Default: 10]
 -hw (--hwidth)		Heatmap figure width in inches [Default: 10]
+--hfsize		Heatmap font size [Default: 8]
 --hmpalette		Heatmap color palette [Default: winter_r]
 --no_heatmap		Turn off heatmaps
 PLOT_OPTIONS
@@ -165,6 +166,7 @@ my $no_dotplot;
 # Heatmaps
 my $hheight = 10;
 my $hwidth = 10;
+my $hfsize = 8;
 my $hmpalette = 'winter_r';
 my $no_heatmap;
 
@@ -224,6 +226,7 @@ GetOptions(
 	# Heatmaps
 	'hh|hheight=s' => \$hheight,
 	'hw|hwidth=s' => \$hwidth,
+	'hfsize=i' => \$hfsize,
 	'hmpalette=s' => \$hmpalette,
 	'no_heatmap' => \$no_heatmap,
 );
@@ -619,6 +622,7 @@ unless ($no_heatmap){
 		--width $hwidth \\
 		--palette $hmpalette \\
 		--matrix $minimap2_dir/paf_matrix.tsv \\
+		--fontsize $hfsize \\
 		2>> $log_err
 	") == 0 or checksig();
 
@@ -1001,6 +1005,7 @@ unless ($no_heatmap){
 		--height $hheight \\
 		--width $hwidth \\
 		--palette $hmpalette \\
+		--fontsize $hfsize \\
 		2>> $log_err
 	") == 0 or checksig();
 

@@ -38,6 +38,7 @@ OPTIONS:
 -c (--palette)  Seaborn color palette [Default: winter_r]
                 # See https://www.practicalpythonfordatascience.com/ap_seaborn_palette
                 # for a list of color palettes
+--fontsize      Font size [Default: 8]
 -x (--matrix)   Matrix output file [Default: matrix.tsv]
 """
 
@@ -58,6 +59,7 @@ cmd.add_argument("-h", "--height", default=10)
 cmd.add_argument("-w", "--width", default=10)
 cmd.add_argument("-c", "--palette", default='winter_r')
 cmd.add_argument("-x", "--matrix", default='matrix.tsv')
+cmd.add_argument("--fontsize", default=8)
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -66,6 +68,7 @@ outdir = args.outdir
 height = args.height
 width = args.width
 color_palette = args.palette
+fontsize = int(args.fontsize)
 matrix_file = args.matrix
 
 ################################################################################
@@ -192,6 +195,7 @@ with open(matrix_file, "w") as file:
 
 plt.rcParams["figure.figsize"] = (width,height)
 plt.rcParams['svg.fonttype'] = 'none'
+plt.rcParams.update({'font.size': fontsize})
 
 with open (matrix_file) as f:
 

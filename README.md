@@ -283,6 +283,7 @@ Options for run_SYNY.pl are:
 ### Heatmaps
 -hh (--hheight)         Heatmap figure height in inches [Default: 10]
 -hw (--hwidth)          Heatmap figure width in inches [Default: 10]
+--hfsize                Heatmap font size [Default: 8]
 --hmpalette             Heatmap color palette [Default: winter_r]
 --no_heatmap            Turn off heatmaps
 ```

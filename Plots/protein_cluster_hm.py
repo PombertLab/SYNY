@@ -36,6 +36,7 @@ OPTIONS:
 -p (--palette)  Color palette [Default: winter_r]
 -h (--height)   Figure height in inches [Default: 10]
 -w (--width)    Figure width in inches [Default: 10]
+--fontsize      Font size [Default: 8]
 --threads       Number of threads to use [Default: 16]
 """
 
@@ -54,6 +55,7 @@ cmd.add_argument("-o", "--outdir", default='./HEATMAPS')
 cmd.add_argument("-h", "--height", default=10)
 cmd.add_argument("-w", "--width", default=10)
 cmd.add_argument("-p", "--palette", default='winter_r')
+cmd.add_argument("--fontsize", default=8)
 cmd.add_argument("--threads", default=16)
 args = cmd.parse_args()
 
@@ -62,6 +64,7 @@ outdir = args.outdir
 height = args.height
 width = args.width
 color_palette = args.palette
+fontsize = int(args.fontsize)
 threads = int(args.threads)
 
 ################################################################################
@@ -89,6 +92,7 @@ def heatmap(tsv_file):
 
     plt.rcParams["figure.figsize"] = (width,height)
     plt.rcParams['svg.fonttype'] = 'none'
+    plt.rcParams.update({'font.size': fontsize})
     global counter
 
     with open (tsv_file) as f:
