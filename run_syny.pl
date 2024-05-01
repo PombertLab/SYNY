@@ -68,7 +68,7 @@ my $plot_options = <<"PLOT_OPTIONS";
 --custom_preset		Use a custom color preset, e.g.: --custom_preset chloropicon
 --max_ticks		Set max number of ticks [Default: 5000]
 --max_ideograms		Set max number of ideograms [Default: 200]
---max_links		Set max number of links [Default: 25000]
+--max_links		Set max number of links [Default: 75000]
 --max_points_per_track	Set max number of points per track [Default: 75000]
 --clusters		Color by cluster instead of contig/chromosome [Default: off]
 --no_ntbiases		Turn off nucleotide biases subplots
@@ -135,7 +135,7 @@ my $list_preset;
 my @formats;
 my $max_ticks = 5000;
 my $max_ideograms = 200;
-my $max_links = 25000;
+my $max_links = 75000;
 my $max_points_per_track = 75000;
 my $clusters;
 my $circos_orientation = 'normal';

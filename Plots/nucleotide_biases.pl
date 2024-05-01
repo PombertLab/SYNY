@@ -53,7 +53,7 @@ OPTIONS (Circos data files options)
 -noticks		Comment out ticks.conf in Circos configuration file
 -max_ticks		Set max number of ticks [Default: 5000]
 -max_ideograms		Set max number of ideograms [Default: 200]
--max_links		Set max number of links [Default: 25000]
+-max_links		Set max number of links [Default: 75000]
 -max_points_per_track	Set max number of points per track [Default: 75000]
 -zdepth			Set links zdepth in ruleset [Default: 50]
 -clusters		Color by clusters [Default: off]
@@ -80,7 +80,7 @@ my $tsv;
 my $noticks;
 my $max_ticks = 5000;
 my $max_ideograms = 200;
-my $max_links = 25000;
+my $max_links = 75000;
 my $max_points_per_track = 75000;
 my $zdepth = 50;
 my $clusters;
