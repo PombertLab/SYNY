@@ -217,7 +217,7 @@ with open (matrix_file) as f:
         vmax=100
     )
 
-    cm.fig.suptitle(f"% of collinear bases in pairwise alignments", x=0.5, y=0.95)
+    cm.fig.suptitle(f"% of total bases in pairwise alignments", x=0.5, y=0.95)
     print(f"1 / 4 - Plotting {clustered_png}")
     plt.savefig(clustered_png)
 
