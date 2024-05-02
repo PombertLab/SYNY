@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2a'
-updated = '2024-04-20'
+version = '0.2b'
+updated = '2024-05-02'
 name = 'paf_metrics.py'
 
 import os
@@ -34,6 +34,7 @@ I/O OPTIONS:
               # https://matplotlib.org/stable/gallery/color/named_colors.html
 -h (--height) Figure height in inches [Default: 10.8]
 -w (--width)  Figure width in inches [Default: 19.2]
+--fontsize    Figure font size [Default: 12]
 --threads     Number of threads to use [Default: 16]
 """
 
@@ -52,6 +53,7 @@ cmd.add_argument("-d", "--outdir", default='./')
 cmd.add_argument("-c", "--color", default='steelblue')
 cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
+cmd.add_argument("--fontsize", default=12)
 cmd.add_argument("--threads", default=16)
 args = cmd.parse_args()
 
@@ -60,6 +62,7 @@ outdir = args.outdir
 height = args.height
 width = args.width
 rgb = args.color
+fontsize = int(args.fontsize)
 threads = int(args.threads)
 
 ################################################################################
@@ -86,8 +89,9 @@ def n_metric(list, n):
 
 txtdir = outdir + '/TXT'
 pngdir = outdir + '/PNG'
+svgdir = outdir + '/SVG'
 
-for dir in [outdir,txtdir,pngdir]:
+for dir in [outdir,txtdir,pngdir,svgdir]:
     if os.path.isdir(dir) == False:
         try:
             os.makedirs(dir)
@@ -215,6 +219,8 @@ def scatterplot(paf):
 
     # Setting default image to widescreen by default
     plt.rcParams["figure.figsize"] = (width,height)
+    plt.rcParams['svg.fonttype'] = 'none'
+    plt.rcParams.update({'font.size': fontsize})
 
     # Setting labels
     xlabel = 'Alignment length (in Kb)'
@@ -226,7 +232,7 @@ def scatterplot(paf):
     plt.title(
         title,
         loc='center',
-        fontsize = 12,
+        fontsize = fontsize,
         y = 0.2,
         pad=-50,
         fontweight=title_font
@@ -237,7 +243,7 @@ def scatterplot(paf):
         xmax,
         50,
         metrics,
-        fontsize=10,
+        fontsize=fontsize,
         family='monospace',
         va='top',
         ha='right'
@@ -259,9 +265,12 @@ def scatterplot(paf):
     # Creating outfile
     with counter.get_lock():
         counter.value += 1
-    filename = pngdir + '/' + metrics_file + '.png' 
-    print(f"{counter.value} / {lsize} - plotting {filename}...")
-    plt.savefig(filename)
+    pngfile = pngdir + '/' + metrics_file + '.png' 
+    svgfile = svgdir + '/' + metrics_file + '.svg' 
+    print(f"{counter.value} / {lsize} - plotting {pngfile}...")
+    plt.savefig(pngfile)
+    print(f"{counter.value} / {lsize} - plotting {svgfile}...")
+    plt.savefig(svgfile)
 
     ## Close fig
     plt.clf()
