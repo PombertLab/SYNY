@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2b'
+version = '0.2c'
 updated = '2024-05-02'
 name = 'paf_metrics.py'
 
@@ -262,14 +262,17 @@ def scatterplot(paf):
         alpha=0.75
     )
 
-    # Creating outfile
+    # Creating outfiles
     with counter.get_lock():
         counter.value += 1
     pngfile = pngdir + '/' + metrics_file + '.png' 
-    svgfile = svgdir + '/' + metrics_file + '.svg' 
-    print(f"{counter.value} / {lsize} - plotting {pngfile}...")
+    print(f"{counter.value} / {lsize*2} - plotting {pngfile}...")
     plt.savefig(pngfile)
-    print(f"{counter.value} / {lsize} - plotting {svgfile}...")
+
+    with counter.get_lock():
+        counter.value += 1
+    svgfile = svgdir + '/' + metrics_file + '.svg' 
+    print(f"{counter.value} / {lsize*2} - plotting {svgfile}...")
     plt.savefig(svgfile)
 
     ## Close fig
