@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.5b';
-my $updated = '2024-05-01';
+my $version = '0.6.5c';
+my $updated = '2024-05-02';
 
 use strict;
 use warnings;
@@ -41,6 +41,7 @@ USAGE		${name} \\
 OPTIONS:
 -h (--help)		Display all command line options
 -t (--threads)		Number of threads to use [Default: 16]
+-p (--pthreads)		Number of graphs to plot in parralel; defaults to --threads if unspecified
 -a (--annot)		GenBank GBF/GBFF Annotation files (GZIP files are supported)
 -o (--outdir)		Output directory [Default = SYNY]
 -e (--evalue)		DIAMOND BLASTP evalue cutoff [Default = 1e-10]
@@ -113,6 +114,7 @@ my $evalue = '1e-10';
 my @gaps;
 my $outdir = 'SYNY';
 my $threads = 16;
+my $max_pthreads = $threads;
 my $nomap;
 my $noclus;
 my $resume;
@@ -173,6 +175,7 @@ my $no_heatmap;
 GetOptions(
 	# Main
 	't|threads=i' => \$threads,
+	'p|pthreads=i' => \$max_pthreads,
 	'a|annot=s@{1,}' => \@annot_files,
 	'o|outdir=s' => \$outdir,
 	'e|evalue=s' => \$evalue,
@@ -249,6 +252,12 @@ my $align_path = $path.'/Alignments';
 my $cluster_path = $path.'/Clusters';
 my $plot_path = $path.'/Plots';
 my $util_path = $path.'/Utils';
+
+# plot threads
+my $pthreads = $threads;
+if ($max_pthreads){
+	$pthreads = $max_pthreads;
+}
 
 ###################################################################################################
 ## Precheck Circos options
@@ -414,7 +423,7 @@ print LOG "COMMAND: $0 @commands\n\n";
 ## Run list_maker.pl
 ###################################################################################################
 
-my @threads = initThreads();
+my @threads = initThreads($threads);
 
 print ERROR "\n### list_maker.pl ###\n";
 print "\n##### Extracting data from GenBank files\n";
@@ -564,7 +573,7 @@ unless ($no_barplot){
 		--paf $paf_dir/*.paf \\
 		--fasta $genome_dir/*.fasta \\
 		--outdir $barplot_dir \\
-		--threads $threads \\
+		--threads $pthreads \\
 		--height $bheight \\
 		--width $bwidth \\
 		--palette $palette \\
@@ -589,7 +598,7 @@ unless ($no_dotplot){
 		$plot_path/paf_to_dotplot.py \\
 		--paf $paf_dir/*.paf \\
 		--fasta $genome_dir/*.fasta \\
-		--threads $threads \\
+		--threads $pthreads \\
 		--outdir $dotplot_dir \\
 		--unit $multiplier \\
 		--height $dheight \\
@@ -795,7 +804,7 @@ unless ($no_barplot){
 		$plot_path/paf_to_barplot.py \\
 		--paf @barplot_files \\
 		--fasta $genome_dir/*.fasta \\
-		--threads $threads \\
+		--threads $pthreads \\
 		--outdir $barplot_dir \\
 		--height $bheight \\
 		--width $bwidth \\
@@ -835,7 +844,7 @@ unless ($no_dotplot){
 		$plot_path/paf_to_dotplot.py \\
 		--paf @dotplot_files \\
 		--fasta $genome_dir/*.fasta \\
-		--threads $threads \\
+		--threads $pthreads \\
 		--outdir $dotplot_dir \\
 		--unit $multiplier \\
 		--height $dheight \\
@@ -1001,7 +1010,7 @@ unless ($no_heatmap){
 		$plot_path/protein_cluster_hm.py \\
 		--tsv @hm_files \\
 		--outdir $paf_hm_dir \\
-		--threads $threads \\
+		--threads $pthreads \\
 		--height $hheight \\
 		--width $hwidth \\
 		--palette $hmpalette \\
@@ -1176,10 +1185,12 @@ my $circos_num = scalar(@circos_files);
 
 unless ($no_circos){
 
-	for my $thread (@threads){
+	my @cthreads = initThreads($pthreads);
+
+	for my $thread (@cthreads){
 		$thread = threads->create(\&run_circos);
 	}
-	for my $thread (@threads){
+	for my $thread (@cthreads){
 		$thread ->join();
 	}
 
@@ -1217,11 +1228,16 @@ close LOG;
 ###################################################################################################
 
 sub initThreads {
+
+	my $thread_count = $_[0];
 	my @initThreads;
-	for (my $i = 1; $i <= $threads; $i++){
+
+	for (my $i = 1; $i <= $thread_count; $i++){
 		push(@initThreads,$i);
 	}
+
 	return @initThreads;
+
 }
 
 sub checksig {

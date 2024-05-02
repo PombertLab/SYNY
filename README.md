@@ -230,6 +230,7 @@ Options for run_SYNY.pl are:
 ```
 -h (--help)             Display all command line options
 -t (--threads)          Number of threads to use [Default: 16]
+-p (--pthreads)         Number of graphs to plot in parralel; defaults to --threads if unspecified
 -a (--annot)            GenBank GBF/GBFF Annotation files (GZIP files are supported)
 -o (--outdir)           Output directory [Default = SYNY]
 -e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
