@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.5c';
+my $version = '0.6.6';
 my $updated = '2024-05-02';
 
 use strict;
@@ -39,69 +39,72 @@ USAGE		${name} \\
 		  --circos pair
 
 OPTIONS:
--h (--help)		Display all command line options
--t (--threads)		Number of threads to use [Default: 16]
--p (--pthreads)		Number of graphs to plot in parralel; defaults to --threads if unspecified
--a (--annot)		GenBank GBF/GBFF Annotation files (GZIP files are supported)
--o (--outdir)		Output directory [Default = SYNY]
--e (--evalue)		DIAMOND BLASTP evalue cutoff [Default = 1e-10]
--g (--gaps)		Allowable number of gaps between gene pairs [Default = 0]
---asm			Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
---resume		Resume minimap2 computations (skip completed alignments)
---no_map		Skip minimap2 pairwise genome alignments
---no_clus		Skip gene cluster reconstructions
+-h (--help)             Display all command line options
+-t (--threads)          Number of threads to use [Default: 16]
+-p (--pthreads)         Number of graphs to plot in parralel; defaults to --threads if unspecified
+-a (--annot)            GenBank GBF/GBFF Annotation files (GZIP files are supported)
+-o (--outdir)           Output directory [Default = SYNY]
+-e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
+-g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
+--asm                   Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
+--resume                Resume minimap2 computations (skip completed alignments)
+--no_map                Skip minimap2 pairwise genome alignments
+--no_clus               Skip gene cluster reconstructions
 EXIT
 
 my $plot_options = <<"PLOT_OPTIONS";
 ### Circos plots
--c (--circos)		Circos plot mode: pair (pairwise), cat (concatenated), all (cat + pair) [Default: pair]
---orientation		Karyotype orientation: normal, inverted or both [Default: normal]
---circos_prefix		Prefix for concatenated plots [Default: circos]
--r (--ref)		Reference to use for concatenated plots; uses first genome (alphabetically) if ommitted
--u (--unit)		Size unit (Kb or Mb) [Default: Mb]
---winsize		Sliding windows size (nucleotide biases) [Default: 10000]
---stepsize		Sliding windows step (nucleotide biases) [Default: 5000]
---labels		Contig label type: mixed (arabic + roman numbers), arabic, roman, or names [Default: mixed]
---label_size		Contig label size [Default: 36]
---label_font		Contig label font [Default: bold]
---custom_file		Load custom colors from file
---list_preset		List available custom color presets
---custom_preset		Use a custom color preset, e.g.: --custom_preset chloropicon
---max_ticks		Set max number of ticks [Default: 5000]
---max_ideograms		Set max number of ideograms [Default: 200]
---max_links		Set max number of links [Default: 75000]
---max_points_per_track	Set max number of points per track [Default: 75000]
---clusters		Color by cluster instead of contig/chromosome [Default: off]
---no_ntbiases		Turn off nucleotide biases subplots
---no_cticks		Turn off ticks in Circos plots
---no_circos		Turn off Circos plots
+-c (--circos)           Circos plot mode: pair (pairwise), cat (concatenated), all (cat + pair) [Default: pair]
+--orientation           Karyotype orientation: normal, inverted or both [Default: normal]
+--circos_prefix         Prefix for concatenated plots [Default: circos]
+-r (--ref)              Reference to use for concatenated plots; uses first genome (alphabetically) if ommitted
+-u (--unit)             Size unit (Kb or Mb) [Default: Mb]
+--winsize               Sliding windows size (nucleotide biases) [Default: 10000]
+--stepsize              Sliding windows step (nucleotide biases) [Default: 5000]
+--labels                Contig label type: mixed (arabic + roman numbers), arabic, roman, or names [Default: mixed]
+--label_size            Contig label size [Default: 36]
+--label_font            Contig label font [Default: bold]
+--custom_file           Load custom colors from file
+--list_preset           List available custom color presets
+--custom_preset         Use a custom color preset, e.g.: --custom_preset chloropicon
+--max_ticks             Set max number of ticks [Default: 5000]
+--max_ideograms         Set max number of ideograms [Default: 200]
+--max_links             Set max number of links [Default: 75000]
+--max_points_per_track  Set max number of points per track [Default: 75000]
+--clusters              Color by cluster instead of contig/chromosome [Default: off]
+--no_ntbiases           Turn off nucleotide biases subplots
+--no_cticks             Turn off ticks in Circos plots
+--no_circos             Turn off Circos plots
 
 ### Barplots
--bh (--bheight)		Barplot figure height in inches [Default: 10.8]
--bw (--bwidth)		Barplot figure width in inches [Default: 19.2]
---bfsize		Barplot font size [Default: 8]
---palette		Barplot color palette [Default: Spectral]
---monobar		Use a monochrome barplot color instead: e.g. --monobar blue
---no_barplot		Turn off barplots
+-bh (--bheight)         Barplot figure height in inches [Default: 10.8]
+-bw (--bwidth)          Barplot figure width in inches [Default: 19.2]
+--bfsize                Barplot font size [Default: 8]
+--palette               Barplot color palette [Default: Spectral]
+--monobar               Use a monochrome barplot color instead: e.g. --monobar blue
+--no_barplot            Turn off barplots
 
 ### Dotplots
--dh (--dheight)		Dotplot figure height in inches [Default: 10.8]
--dw (--dwidth)		Dotplot figure width in inches [Default: 19.2]
---dfsize		Dotplot font size [Default: 8]
--m (--multi)		Axes units multiplier (for dotplots) [Default: 1e5]
---color			Dotplot color [Default: blue]
---dotpalette		Use a color palette instead: e.g. --dotpalette inferno
---noticks		Turn off ticks on x and y axes
---wdis			Horizontal distance (width) between subplots [Default: 0.05]
---hdis			Vertical distance (height) between subplots [Default: 0.1]
---no_dotplot		Turn off dotplots
+-dh (--dheight)         Dotplot figure height in inches [Default: 10.8]
+-dw (--dwidth)          Dotplot figure width in inches [Default: 19.2]
+--dfsize                Dotplot font size [Default: 8]
+-m (--multi)            Axes units multiplier (for dotplots) [Default: 1e5]
+--color                 Dotplot color [Default: blue]
+--dotpalette            Use a color palette instead: e.g. --dotpalette inferno
+--noticks               Turn off ticks on x and y axes
+--wdis                  Horizontal distance (width) between subplots [Default: 0.05]
+--hdis                  Vertical distance (height) between subplots [Default: 0.1]
+--no_dotplot            Turn off dotplots
 
 ### Heatmaps
--hh (--hheight)		Heatmap figure height in inches [Default: 10]
--hw (--hwidth)		Heatmap figure width in inches [Default: 10]
---hfsize		Heatmap font size [Default: 8]
---hmpalette		Heatmap color palette [Default: winter_r]
---no_heatmap		Turn off heatmaps
+-hh (--hheight)         Heatmap figure height in inches [Default: 10]
+-hw (--hwidth)          Heatmap figure width in inches [Default: 10]
+--hfsize                Heatmap font size [Default: 8]
+--hmpalette             Heatmap color palette [Default: winter_r]
+--hmax                  Set maximum color bar value [Default: 100]
+--hmin                  Set minimum color bar value [Default: 0]
+--hauto                 Set color bar values automatically instead
+--no_heatmap            Turn off heatmaps
 PLOT_OPTIONS
 
 die ("\n$usage\n") unless (@ARGV);
@@ -170,6 +173,9 @@ my $hheight = 10;
 my $hwidth = 10;
 my $hfsize = 8;
 my $hmpalette = 'winter_r';
+my $hmax = 100;
+my $hmin = 0;
+my $hauto;
 my $no_heatmap;
 
 GetOptions(
@@ -231,6 +237,9 @@ GetOptions(
 	'hw|hwidth=s' => \$hwidth,
 	'hfsize=i' => \$hfsize,
 	'hmpalette=s' => \$hmpalette,
+	'hmax=i' => \$hmax,
+	'hmin=i' => \$hmin,
+	'hauto' => \$hauto,
 	'no_heatmap' => \$no_heatmap,
 );
 
@@ -485,6 +494,11 @@ if ($resume){
 	$resume_flag = '--resume';
 }
 
+my $hm_vauto_flag = '';
+if ($hauto){
+	$hm_vauto_flag = '--vauto';
+}
+
 ###################################################################################################
 ## Get PAF files with minimap2
 ###################################################################################################
@@ -632,6 +646,9 @@ unless ($no_heatmap){
 		--palette $hmpalette \\
 		--matrix $minimap2_dir/paf_matrix.tsv \\
 		--fontsize $hfsize \\
+		--vmax $hmax \\
+		--vmin $hmin \\
+		$hm_vauto_flag \\
 		2>> $log_err
 	") == 0 or checksig();
 
@@ -1015,6 +1032,9 @@ unless ($no_heatmap){
 		--width $hwidth \\
 		--palette $hmpalette \\
 		--fontsize $hfsize \\
+		--vmax $hmax \\
+		--vmin $hmin \\
+		$hm_vauto_flag \\
 		2>> $log_err
 	") == 0 or checksig();
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1b'
-updated = '2024-05-01'
+version = '0.2'
+updated = '2024-05-03'
 name = 'paf_to_heatmap.py'
 
 import sys
@@ -35,11 +35,14 @@ OPTIONS:
 -o (--outdir)   Output directory [Default: ./]
 -h (--height)   Figure height in inches [Default: 10]
 -w (--width)    Figure width in inches [Default: 10]
+-x (--matrix)   Matrix output file [Default: matrix.tsv]
 -c (--palette)  Seaborn color palette [Default: winter_r]
                 # See https://www.practicalpythonfordatascience.com/ap_seaborn_palette
                 # for a list of color palettes
 --fontsize      Font size [Default: 8]
--x (--matrix)   Matrix output file [Default: matrix.tsv]
+--vmax          Set maximum color bar value [Default: 100]
+--vmin          Set minimum color bar value [Default: 0]
+--vauto         Set color bar values automatically instead
 """
 
 # Print custom message if argv is empty
@@ -60,6 +63,9 @@ cmd.add_argument("-w", "--width", default=10)
 cmd.add_argument("-c", "--palette", default='winter_r')
 cmd.add_argument("-x", "--matrix", default='matrix.tsv')
 cmd.add_argument("--fontsize", default=8)
+cmd.add_argument("--vmin", default=0)
+cmd.add_argument("--vmax", default=100)
+cmd.add_argument("--vauto", action='store_true')
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -67,9 +73,12 @@ fasta_files = args.fasta
 outdir = args.outdir
 height = args.height
 width = args.width
+matrix_file = args.matrix
 color_palette = args.palette
 fontsize = int(args.fontsize)
-matrix_file = args.matrix
+vmin = int(args.vmin)
+vmax = int(args.vmax)
+vauto = args.vauto
 
 ################################################################################
 ## Working on output directory
@@ -208,14 +217,25 @@ with open (matrix_file) as f:
     heatmap_svg = svgdir + '/' + 'colinear_bases.mmap.heatmap.svg'
 
     ## Clustered heatmaps
-    cm = sns.clustermap(
-        data[0:],
-        cmap=color_palette,
-        annot=True,
-        fmt='.1f',
-        vmin=0,
-        vmax=100
-    )
+    cm = None
+
+    if vauto:
+        cm = sns.clustermap(
+            data[0:],
+            cmap=color_palette,
+            annot=True,
+            fmt='.1f'
+        )
+
+    else:
+        cm = sns.clustermap(
+            data[0:],
+            cmap=color_palette,
+            annot=True,
+            fmt='.1f',
+            vmin=vmin,
+            vmax=vmax
+        )
 
     cm.fig.suptitle(f"% of total bases in pairwise alignments", x=0.5, y=0.95)
     print(f"1 / 4 - Plotting {clustered_png}")
@@ -227,14 +247,25 @@ with open (matrix_file) as f:
     plt.close('all')
 
     ## Normal heatmaps
-    hm = sns.heatmap(
-        data[0:],
-        cmap=color_palette,
-        annot=True,
-        fmt='.1f',
-        vmin=0,
-        vmax=100
-    )
+    hm = None
+
+    if vauto:
+        hm = sns.heatmap(
+            data[0:],
+            cmap=color_palette,
+            annot=True,
+            fmt='.1f'
+        )
+
+    else:
+        hm = sns.heatmap(
+            data[0:],
+            cmap=color_palette,
+            annot=True,
+            fmt='.1f',
+            vmin=vmin,
+            vmax=vmax
+        )
 
     hm.figure.suptitle(f"% of colinear bases in pairwise alignments", x=0.5, y=0.95)
     print(f"3 / 4 - Plotting {heatmap_png}")

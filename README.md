@@ -286,6 +286,9 @@ Options for run_SYNY.pl are:
 -hw (--hwidth)          Heatmap figure width in inches [Default: 10]
 --hfsize                Heatmap font size [Default: 8]
 --hmpalette             Heatmap color palette [Default: winter_r]
+--hmax                  Set maximum color bar value [Default: 100]
+--hmin                  Set minimum color bar value [Default: 0]
+--hauto                 Set color bar values automatically instead
 --no_heatmap            Turn off heatmaps
 ```
 The output directory will be structured as follows: 
@@ -535,7 +538,7 @@ In the above example, small heatmaps with 25 datapoints (5 * 5 genomes) will be 
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/proteins_in_clusters.gap_0.heatmap.png">
 </p>
 
-Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. The color palette (default: winter_r) can be modified with the `--hmpalette` command line switch (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a list of color palettes). Color palettes available on the operating system can be listed and/or plotted with [check_mp_colors.py](https://github.com/PombertLab/SYNY/blob/main/Utils/check_mp_colors.py).
+Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `--hwidth` command line switches. Color bar min/max values (defaults: 0/100) can be changed with the `--hmin` and `--hmax` command line switches or calculated automatically with `--hauto`. The heatmap color palette (default: winter_r) can be changed with the `--hmpalette` command line switch (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a list of color palettes). Color palettes available on the operating system can be listed and/or plotted with [check_mp_colors.py](https://github.com/PombertLab/SYNY/blob/main/Utils/check_mp_colors.py).
 
 #### Circos plots
 

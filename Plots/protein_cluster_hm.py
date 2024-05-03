@@ -2,8 +2,8 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.3c'
-updated = '2024-05-01'
+version = '0.3d'
+updated = '2024-05-03'
 
 import sys
 import os
@@ -37,6 +37,9 @@ OPTIONS:
 -h (--height)   Figure height in inches [Default: 10]
 -w (--width)    Figure width in inches [Default: 10]
 --fontsize      Font size [Default: 8]
+--vmax          Set maximum color bar value [Default: 100]
+--vmin          Set minimum color bar value [Default: 0]
+--vauto         Set color bar values automatically instead
 --threads       Number of threads to use [Default: 16]
 """
 
@@ -56,6 +59,9 @@ cmd.add_argument("-h", "--height", default=10)
 cmd.add_argument("-w", "--width", default=10)
 cmd.add_argument("-p", "--palette", default='winter_r')
 cmd.add_argument("--fontsize", default=8)
+cmd.add_argument("--vmin", default=0)
+cmd.add_argument("--vmax", default=100)
+cmd.add_argument("--vauto", action='store_true')
 cmd.add_argument("--threads", default=16)
 args = cmd.parse_args()
 
@@ -65,6 +71,9 @@ height = args.height
 width = args.width
 color_palette = args.palette
 fontsize = int(args.fontsize)
+vmin = int(args.vmin)
+vmax = int(args.vmax)
+vauto = args.vauto
 threads = int(args.threads)
 
 ################################################################################
@@ -111,14 +120,25 @@ def heatmap(tsv_file):
         heatmap_svg = svgdir + '/' + 'proteins_in_clusters.gap_' + gap + '.heatmap.svg'
 
         ## Clustered heatmaps
-        cm = sns.clustermap(
-            data[0:],
-            cmap=color_palette,
-            annot=True,
-            fmt='.1f',
-            vmin=0,
-            vmax=100,
-        )
+        cm = None
+
+        if vauto:
+            cm = sns.clustermap(
+                data[0:],
+                cmap=color_palette,
+                annot=True,
+                fmt='.1f'
+            )
+
+        else:
+            cm = sns.clustermap(
+                data[0:],
+                cmap=color_palette,
+                annot=True,
+                fmt='.1f',
+                vmin=vmin,
+                vmax=vmax
+            )
 
         cm.fig.suptitle(f"% of protein-coding genes in clusters (gap = {gap})", x=0.5, y=0.95)
         with counter.get_lock():
@@ -133,14 +153,25 @@ def heatmap(tsv_file):
         plt.close('all')
 
         ## Normal heatmaps
-        hm = sns.heatmap(
-            data[0:],
-            cmap=color_palette,
-            annot=True,
-            fmt='.1f',
-            vmin=0,
-            vmax=100
-        )
+        hm = None
+
+        if vauto:
+            hm = sns.heatmap(
+                data[0:],
+                cmap=color_palette,
+                annot=True,
+                fmt='.1f'
+            )
+
+        else:
+            hm = sns.heatmap(
+                data[0:],
+                cmap=color_palette,
+                annot=True,
+                fmt='.1f',
+                vmin=vmin,
+                vmax=vmax
+            )
 
         hm.figure.suptitle(f"% of proteins found in clusters (gap = {gap})", x=0.5, y=0.95)
         with counter.get_lock():
