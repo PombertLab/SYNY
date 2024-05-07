@@ -228,7 +228,7 @@ run_SYNY.pl \
   -o SYNY
 ```
 
-Command line options for run_syny.pl can be entered directly from the command line and/or provided from one or more configuration file(s) containing one command line switch per line (see [commands.conf](https://github.com/PombertLab/SYNY/blob/main/commands.conf) for an example). For example:
+The `run_syny.pl` command line options for can be entered directly from the command line and/or provided from one or more configuration file(s) containing one command line switch per line (see [commands.conf](https://github.com/PombertLab/SYNY/blob/main/commands.conf) for an example). For example:
 ```Bash
 run_SYNY.pl \
   -a *.gbff \
