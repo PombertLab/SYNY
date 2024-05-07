@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.2'
+version = '0.2a'
 updated = '2024-05-07'
 name = 'check_mp_colors.py'
 
@@ -92,6 +92,9 @@ if colorlist:
 
 if check:
 
+    import seaborn as sns
+    mcolors = list(sorted(colormaps))
+
     false_colors = []
     dcolors = {}
 
@@ -113,6 +116,8 @@ if check:
 ################################################################################
 ## Plot available color palettes
 ################################################################################
+
+import seaborn as sns
 
 plt.rcParams["figure.figsize"] = (width,height)
 
