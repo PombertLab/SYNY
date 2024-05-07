@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.1'
-updated = '2024-04-28'
+version = '0.2'
+updated = '2024-05-07'
 name = 'check_mp_colors.py'
 
 import argparse
@@ -33,6 +33,7 @@ OPTIONS:
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
 -f (--font)     Font size [Default: 6]
+-c (--check)    Check if colors entered exists
 """
 
 # Print custom message if argv is empty
@@ -51,6 +52,7 @@ cmd.add_argument("-o", "--outfile", default='color_palettes.png')
 cmd.add_argument("-w", "--width", default=60)
 cmd.add_argument("-h", "--height", default=6)
 cmd.add_argument("-f", "--font", default=12)
+cmd.add_argument("-c", "--check", nargs='*')
 args = cmd.parse_args()
 
 colorlist = args.list
@@ -59,6 +61,7 @@ outfile = args.outfile
 height = args.height
 width = args.width
 fontsize = args.font
+check = args.check
 
 ################################################################################
 ## Check for available color palettes
@@ -82,6 +85,30 @@ if colorlist:
     numcol = len(mcolors)
     print(f"matplotlib + seaborn ({numcol}):\n")
     print(', '.join(mcolors), "\n")
+
+################################################################################
+## Perform check for colors then exit
+################################################################################
+
+if check:
+
+    false_colors = []
+    dcolors = {}
+
+    for palette in mcolors:
+        dcolors[palette] = 1
+
+    for palette in check:
+        if palette in dcolors:
+            next
+        else:
+            false_colors.append(palette)
+
+    if len(false_colors) >= 1:
+        print("\n[E] The following color palettes are not available:", *false_colors)
+        print(f"\nAvailable matplotlib + seaborn color palettes ({len(mcolors)}):\n")
+        print(', '.join(mcolors), "\n")
+        exit()
 
 ################################################################################
 ## Plot available color palettes

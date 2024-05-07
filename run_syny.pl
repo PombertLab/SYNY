@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.6';
-my $updated = '2024-05-02';
+my $version = '0.6.7';
+my $updated = '2024-05-07';
 
 use strict;
 use warnings;
@@ -324,6 +324,19 @@ if ($label_font){
 		print "\n";
 		exit;
 	}
+}
+
+###################################################################################################
+## Precheck matplotlib colors
+###################################################################################################
+
+my @matp_colors = ($palette, $hmpalette, $dotpalette);
+
+my $matp_check = `$util_path/check_mp_colors.py --check @matp_colors`;
+
+if ($matp_check =~ /\[E\]/){
+	print $matp_check;
+	exit();
 }
 
 ###################################################################################################
