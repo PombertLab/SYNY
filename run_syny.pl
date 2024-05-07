@@ -2,12 +2,13 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.7';
+my $version = '0.6.7a';
 my $updated = '2024-05-07';
 
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
+use Getopt::ArgvFile home=>1;
 use File::Basename;
 use Cwd qw(abs_path);
 use File::Path qw(make_path);
@@ -330,7 +331,11 @@ if ($label_font){
 ## Precheck matplotlib colors
 ###################################################################################################
 
-my @matp_colors = ($palette, $hmpalette, $dotpalette);
+my @matp_colors = ($palette, $hmpalette);
+
+if ($dotpalette){
+	push (@matp_colors, $dotpalette);
+}
 
 my $matp_check = `$util_path/check_mp_colors.py --check @matp_colors`;
 
