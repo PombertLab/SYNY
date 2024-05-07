@@ -2,8 +2,8 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.2c';
-my $updated = '2024-04-29';
+my $version = '0.3';
+my $updated = '2024-05-07';
 
 use strict;
 use warnings;
@@ -169,6 +169,7 @@ system ("
         Clone \\
         Config::General \\
         Font::TTF::Font \\
+        Getopt::ArgvFile \\
         List::MoreUtils \\
         Math::Bezier \\
         Math::Round \\
