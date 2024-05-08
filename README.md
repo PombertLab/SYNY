@@ -244,6 +244,7 @@ Options for run_SYNY.pl are:
 -o (--outdir)           Output directory [Default = SYNY]
 -e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
 -g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
+--minsize               Minimum contig size (in bp) [Default: 1]
 --asm                   Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume                Resume minimap2 computations (skip completed alignments)
 --no_map                Skip minimap2 pairwise genome alignments

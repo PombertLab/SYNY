@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.4b';
-my $updated = '2024-04-24';
+my $version = '0.5.5';
+my $updated = '2024-05-08';
 
 use strict;
 use warnings;
@@ -29,6 +29,7 @@ $usage .= <<'REGEX';
 OPTIONS:
 -i (--input)	Input file(s) (GZIP supported; File type determined by file extension)
 -o (--outdir)	Output directory [Default: LIST_MAKER]
+-m (--minsize)	Keep only contigs larger or equal to specified size (in bp) [Default: 1]
 -v (--verbose)	Add verbosity
 REGEX
 die "$usage\n" unless @ARGV;
@@ -42,10 +43,12 @@ my %filetypes = (
 
 my @input_files;
 my $outdir = 'LIST_MAKER';
+my $minsize = 1;
 my $verbose;
 GetOptions(
 	'i|input=s@{1,}' => \@input_files,
 	'o|outdir=s' => \$outdir,
+	'm|minsize=i' => \$minsize,
 	'v|verbose' => \$verbose
 );
 
@@ -89,7 +92,7 @@ foreach my $input_file (@input_files){
 	}
 
 	if ($verbose){
-		print "Creating .list file for $file_name\n";
+		print "\nCreating .list file for $file_name\n";
 	}
 
 	my $annotation_list = "$list_dir/$file_prefix.list";
@@ -112,6 +115,13 @@ foreach my $input_file (@input_files){
 
 		my $seq_flag;
 		my $contig;
+		my $contig_size;
+		my $contig_sum = 0;
+		my $contig_kept_counter = 0;
+		my $contig_kept_sum = 0;
+		my $contig_discarded_counter = 0;
+		my $contig_discarded_sum = 0;
+
 		my $gene;
 		my $CDS;
 		my $translate;
@@ -129,13 +139,31 @@ foreach my $input_file (@input_files){
 			
 			chomp $line;
 
-			if ($line =~ /^LOCUS\s+(\S+)/ ){
+			if ($line =~ /^LOCUS\s+(\S+).*?(\d+) bp/ ){
+
 				$contig = $1;
+				$contig_size = $2;
+				$contig_sum += $contig_size;
+
+				if ($verbose){
+					if ($contig_size >= $minsize){
+						$contig_kept_counter++;
+						$contig_kept_sum += $contig_size;
+						print ' '.$contig."\t".$contig_size."\t". ">= $minsize"."\t"."kept\n";
+					}
+					else {
+						$contig_discarded_counter++;
+						$contig_discarded_sum += $contig_size;
+						print ' '.$contig."\t".$contig_size."\t"."< $minsize"."\t"."discarded\n";
+					}
+				}
+
 				## if the contig is not named with a unique LOCUS
 				## add the file_prefix in front to prevent naming clashes 
 				if ($contig =~ /chromosome|contig/i){
 					$contig = $file_prefix.'_'.$contig;
 				}
+
 			}
 
 			if ($line =~ /^ORIGIN/){
@@ -202,27 +230,31 @@ foreach my $input_file (@input_files){
 
 						unless (exists $isoform{$locus}){ ## Keeping only the first isoform
 
-							$isoform{$locus} = '';
-							print OUT $locus."\t";
-							print OUT $contig."\t";
-							print OUT $start."\t";
-							print OUT $end."\t";
-							print OUT $strand."\t";
-							print OUT $gene_num."\t";
+							if ($contig_size >= $minsize){
+								$isoform{$locus} = '';
+								print OUT $locus."\t";
+								print OUT $contig."\t";
+								print OUT $start."\t";
+								print OUT $end."\t";
+								print OUT $strand."\t";
+								print OUT $gene_num."\t";
 
-							if (!defined $features{$locus}{'product'}){
-								$features{$locus}{'product'} = 'undefined product in accession';
-							}
-							print OUT $features{$locus}{'product'}."\n";
+								if (!defined $features{$locus}{'product'}){
+									$features{$locus}{'product'} = 'undefined product in accession';
+								}
+								print OUT $features{$locus}{'product'}."\n";
 
-							print PROT ">$locus \[$features{$locus}{'product'}\]\n"; #\t$contig\t$start\t$end\t$strand\n";
-							foreach my $line (unpack("(A60)*",$sequence)){
-								print PROT "$line\n";
+								print PROT ">$locus \[$features{$locus}{'product'}\]\n"; #\t$contig\t$start\t$end\t$strand\n";
+								foreach my $line (unpack("(A60)*",$sequence)){
+									print PROT "$line\n";
+								}
+
 							}
 
 							undef $translate;
 							undef $sequence;
 							$gene_num ++;
+
 						}
 
 					}
@@ -289,13 +321,26 @@ foreach my $input_file (@input_files){
 
 		}
 
+		if ($verbose){
+			my $total_contigs = $contig_kept_counter + $contig_discarded_counter;
+			print "\n".'Total contigs: '."\t\t\t".$total_contigs."\t".$contig_sum." bp\n";
+			print "Contigs kept (>= $minsize): "."\t".$contig_kept_counter."\t".$contig_kept_sum." bp\n";
+			print "Contigs discarded (< $minsize): "."\t".$contig_discarded_counter."\t".$contig_discarded_sum." bp\n";
+		}
+
 		### Creating genome FASTA from GBFF
 		for my $sequence (sort(keys %genome)){
-			print GEN ">$sequence\n";
-			my @data = unpack ("(A60)*", $genome{$sequence});
-			while (my $tmp = shift@data){
-				print GEN "$tmp\n";
+
+			my $contig_len = length($genome{$sequence});
+
+			if ($contig_len >= $minsize){
+				print GEN ">$sequence\n";
+				my @data = unpack ("(A60)*", $genome{$sequence});
+				while (my $tmp = shift@data){
+					print GEN "$tmp\n";
+				}
 			}
+
 		}
 
 	}
@@ -307,4 +352,8 @@ foreach my $input_file (@input_files){
 		}
 		exit;
 	}
+}
+
+if ($verbose){
+	print "\n";
 }

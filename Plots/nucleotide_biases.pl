@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.7c';
-my $updated = '2024-05-01';
+my $version = '0.7d';
+my $updated = '2024-05-08';
 
 use strict;
 use warnings;
@@ -25,6 +25,7 @@ COMMAND		$name \\
 		  -outdir output_directory \\
 		  -winsize 1000 \\
 		  -step 500 \\
+		  -minsize 1 \\
 		  -reference CCMP1205 \\
 		  -gap 0 \\
 		  -custom_preset chloropicon
@@ -34,6 +35,7 @@ OPTIONS (Main)
 -o (--outdir)		Output directory [Default: ntBiases]
 -w (--winsize)		Sliding window size [Default: 10000]
 -s (--step)		Sliding window step [Default: 5000]
+-m (--minsize)	Minimum contig size (in bp) [Default: 1]
 -n (--ncheck)		Check for ambiguous/masked (Nn) nucleotides
 -t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
 
@@ -63,6 +65,7 @@ die "\n$usage\n" unless @ARGV;
 
 my @fasta;
 my $outdir = 'ntBiases';
+my $minsize = 1;
 my $winsize = 10000;
 my $step = 5000;
 my $reference;
@@ -88,6 +91,7 @@ my $no_biases;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
 	'o|outdir=s' => \$outdir,
+	'minsize=i' => \$minsize,
 	'w|winsize=i' => \$winsize,
 	's|step=i' => \$step,
 	'n|ncheck' => \$ncheck,
@@ -163,6 +167,7 @@ while (my $fasta = shift@fasta){
 
 	open FASTA, "<", $fasta or die "Can't open $fasta: $!\n";
 
+	## Database of sequences
 	while (my $line = <FASTA>){
 		chomp $line;
 		if ($line =~ /^>(\S+)/){
@@ -170,6 +175,14 @@ while (my $fasta = shift@fasta){
 		}
 		else {
 			$sequences{$fileprefix}{$seqname} .= $line;
+		}
+	}
+
+	## Delete sequence if smaller than minsize
+	foreach my $seq (keys %{$sequences{$fileprefix}}){
+		my $seq_len = length($sequences{$fileprefix}{$seq});
+		if ($seq_len < $minsize){
+			delete $sequences{$fileprefix};
 		}
 	}
 

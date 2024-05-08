@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.7a';
-my $updated = '2024-05-07';
+my $version = '0.6.7b';
+my $updated = '2024-05-08';
 
 use strict;
 use warnings;
@@ -47,6 +47,7 @@ OPTIONS:
 -o (--outdir)           Output directory [Default = SYNY]
 -e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
 -g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
+--minsize               Minimum contig size (in bp) [Default: 1]
 --asm                   Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
 --resume                Resume minimap2 computations (skip completed alignments)
 --no_map                Skip minimap2 pairwise genome alignments
@@ -119,6 +120,7 @@ my @gaps;
 my $outdir = 'SYNY';
 my $threads = 16;
 my $max_pthreads = $threads;
+my $minsize = 1;
 my $nomap;
 my $noclus;
 my $resume;
@@ -187,6 +189,7 @@ GetOptions(
 	'o|outdir=s' => \$outdir,
 	'e|evalue=s' => \$evalue,
 	'g|gaps=i{0,}' => \@gaps,
+	'minsize=i' => \$minsize,
 	'no_map' => \$nomap,
 	'no_clus' => \$noclus,
 	'resume' => \$resume,
@@ -447,31 +450,9 @@ print LOG "SYNY started on: ".$time."\n";
 print LOG "COMMAND: $0 @commands\n\n";
 
 ###################################################################################################
-## Run list_maker.pl
-###################################################################################################
-
-my @threads = initThreads($threads);
-
-print ERROR "\n### list_maker.pl ###\n";
-print "\n##### Extracting data from GenBank files\n";
-
-my @annotations :shared = @annot_files;
-my $annot_num = scalar(@annot_files);
-
-for my $thread (@threads){
-	$thread = threads->create(\&list_maker);
-}
-for my $thread (@threads){
-	$thread ->join();
-}
-
-logs(\*LOG, 'Parsing data - list_maker.pl');
-
-###################################################################################################
 ## Shared options flags
 ###################################################################################################
 
-# Option flags
 my $cluster_flag = '';
 if ($clusters){
 	$cluster_flag = '--clusters';
@@ -516,6 +497,28 @@ my $hm_vauto_flag = '';
 if ($hauto){
 	$hm_vauto_flag = '--vauto';
 }
+
+###################################################################################################
+## Run list_maker.pl
+###################################################################################################
+
+my @threads = initThreads($threads);
+
+print ERROR "\n### list_maker.pl ###\n";
+print "\n##### Extracting data from GenBank files\n";
+
+my @annotations :shared = @annot_files;
+my $annot_num = scalar(@annot_files);
+
+for my $thread (@threads){
+	$thread = threads->create(\&list_maker);
+}
+for my $thread (@threads){
+	$thread ->join();
+}
+
+logs(\*LOG, 'Parsing data - list_maker.pl');
+
 
 ###################################################################################################
 ## Get PAF files with minimap2
@@ -1146,6 +1149,7 @@ system("
 	$plot_path/nucleotide_biases.pl \\
 	--outdir $circos_data_dir \\
 	--fasta $genome_dir/*.fasta \\
+	--minsize $minsize \\
 	--winsize $winsize \\
 	--step $stepsize \\
 	--gap $gap \\
@@ -1323,6 +1327,7 @@ sub list_maker {
 			$util_path/list_maker.pl \\
 			--input $annotation \\
 			--outdir $outdir \\
+			--minsize $minsize \\
 			2>> $log_err
 		") == 0 or checksig();
 
