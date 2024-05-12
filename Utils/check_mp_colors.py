@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.2a'
-updated = '2024-05-07'
+version = '0.2b'
+updated = '2024-05-12'
 name = 'check_mp_colors.py'
 
 import argparse
@@ -67,24 +67,35 @@ check = args.check
 ## Check for available color palettes
 ################################################################################
 
-mcolors = list(sorted(colormaps))
-
 if colorlist:
 
-    print(f"\n### Available color palettes\n")
+    print(f"\n##### Available color palettes #####\n")
 
     ## matplotlib
     mcolors = list(sorted(colormaps))
     numcol = len(mcolors)
-    print(f"matplotlib only ({numcol}):\n")
-    print(', '.join(mcolors), "\n")
 
     ## matplotlib + seaborn
     import seaborn as sns
-    mcolors = list(sorted(colormaps))
-    numcol = len(mcolors)
-    print(f"matplotlib + seaborn ({numcol}):\n")
+    matsea = list(sorted(colormaps))
+    catcol = len(matsea)
+
+    ## seaborn only
+    seaborn = []
+    for x in matsea:
+        if x not in mcolors:
+            seaborn.append(x)
+    seacol = len(seaborn)
+
+    ## print color info
+    print(f"# matplotlib + seaborn ({catcol}):\n")
+    print(', '.join(matsea), "\n")
+
+    print(f"# matplotlib only ({numcol}):\n")
     print(', '.join(mcolors), "\n")
+
+    print(f"# seaborn only ({seacol}):\n")
+    print(', '.join(seaborn), "\n")
 
 ################################################################################
 ## Perform check for colors then exit
@@ -112,12 +123,18 @@ if check:
         print(f"\nAvailable matplotlib + seaborn color palettes ({len(mcolors)}):\n")
         print(', '.join(mcolors), "\n")
         exit()
+    
+    if len(false_colors) == 0:
+        print("\n[OK] All requested color palettes are available:", *check, "\n")
+        exit()
 
 ################################################################################
 ## Plot available color palettes
 ################################################################################
 
 import seaborn as sns
+
+mcolors = list(sorted(colormaps))
 
 plt.rcParams["figure.figsize"] = (width,height)
 
