@@ -18,7 +18,7 @@ usage = f"""
 NAME        {name}
 VERSION     {version}
 UPDATED     {updated}
-SYNOPSIS    Checks available matplotlib + seaborn colors on the system
+SYNOPSIS    Checks available matplotlib + seaborn color palettes on the system
 
 REQS        matplotlib, seaborn
 
@@ -27,13 +27,13 @@ COMMAND    {name} \\
              --plot \\
              --outfile palettes.png
 OPTIONS:
--l (--list)     Lists available colors
--p (--plot)     Plots available colors
+-l (--list)     Lists available color palettes
+-p (--plot)     Plots available color palettes
 -o (--outfile)  Output file [Default: color_palettes.png]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
 -f (--font)     Font size [Default: 6]
--c (--check)    Check if colors entered exists
+-c (--check)    Check if color palettes entered exists
 """
 
 # Print custom message if argv is empty
