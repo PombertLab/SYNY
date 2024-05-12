@@ -27,8 +27,8 @@ COMMAND    {name} \\
              --plot \\
              --outfile palettes.png
 OPTIONS:
--l (--list)     Lists available color palettes
--p (--plot)     Plots available color palettes
+-l (--list)     List available color palettes
+-p (--plot)     Plot available color palettes
 -o (--outfile)  Output file [Default: color_palettes.png]
 -h (--height)   Figure height in inches [Default: 10.8]
 -w (--width)    Figure width in inches [Default: 19.2]
