@@ -25,6 +25,8 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
     * [Example 2: Encephalitozoonidae](#Example-2---Encephalitozoonidae)
       * [Custom Circos colors](#Custom-Circos-colors)
   * [File conversion](#File-conversion)
+* [Funding and acknowledgments](#Funding-and-acknowledgments)
+* [How to cite](#how-to-cite)
 * [References](#References)
 </details>
 
@@ -954,6 +956,28 @@ Options for `fasta_to_gbff.pl` are:
 -v (--verbose)  Add verbosity
 ```
 When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
+</details>
+
+<details open>
+  <summary><b><i>Show/hide section: Funding and acknowledgments</i></b></summary>
+
+## Funding and acknowledgments
+This work was supported in part by the National Institute of Allergy and Infectious Diseases of the National Institutes of Health (award number R15AI128627) to Jean-Francois Pombert. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
+</details>
+
+<details open>
+  <summary><b><i>Show/hide section: How to cite</i></b></summary>
+
+## How to cite
+##### A short paper describing the SYNY pipeline is available as a preprint on bioRxiv:
+
+[3DFI: a pipeline to infer protein function using structural homology](https://www.biorxiv.org/content/10.1101/2024.05.09.593317v1). Julian AT, Pombert JF. <b>bioRxiv</b>, 2024.05.09.593317. DOI: [10.1101/2024.05.09.593317](https://doi.org/10.1101/2024.05.09.593317).
+
+##### If you use SYNY, please also cite the tool(s) used for genome alignments and/or protein sequence homology, as needed:
+
+[Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi: 10.1038/s41592-021-01101-x
+
+[Minimap2: pairwise alignment for nucleotide sequences](https://pubmed.ncbi.nlm.nih.gov/29750242/). Li H. <b>Bioinformatics.</b> 2018 Sep 15;34(18):3094-3100. doi: 10.1093/bioinformatics/bty191.
 </details>
 
 
