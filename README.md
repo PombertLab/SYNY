@@ -300,6 +300,15 @@ Options for run_SYNY.pl are:
 --hmin                  Set minimum color bar value [Default: 0]
 --hauto                 Set color bar values automatically instead
 --no_heatmap            Turn off heatmaps
+
+### Linear maps
+-lh (--lheight)         Linear map figure height in inches [Default: 5]
+-lw (--lwidth)          Heatmap figure width in inches [Default: 20]
+--lm_rpalette           Reference genome color palette [Default: Spectral]
+--lm_xpalette           Target genome color palette [Default: Blues]
+--lmrotation            Contig name rotation [Default: 90]
+--lfsize                Font size [Default: 8]
+--no_linemap            Turn off linemaps
 ```
 The output directory will be structured as follows: 
 ```Bash
@@ -361,6 +370,9 @@ The contents of the subdirectories are:
   - HEATMAPS:
     - Heatmaps (in PNG/SVG format) summarizing the percentages of collinear bases in pairwise alignments (.mmap.)
     - Heatmaps (in PNG/SVG format) summarizing the percentages of proteins found in clusters (.gap_0., .gap_1., ...)
+  - LINEMAPS:
+    - Linear maps (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+    - Linear maps (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
 - SEQUENCES:
   - GENOMES:
   	- FASTA files containing the sequences of the investigated genomes

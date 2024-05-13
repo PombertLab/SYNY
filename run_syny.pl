@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.6.7b';
-my $updated = '2024-05-08';
+my $version = '0.7';
+my $updated = '2024-05-13';
 
 use strict;
 use warnings;
@@ -107,6 +107,15 @@ my $plot_options = <<"PLOT_OPTIONS";
 --hmin                  Set minimum color bar value [Default: 0]
 --hauto                 Set color bar values automatically instead
 --no_heatmap            Turn off heatmaps
+
+### Linear maps
+-lh (--lheight)         Linear map figure height in inches [Default: 5]
+-lw (--lwidth)          Heatmap figure width in inches [Default: 20]
+--lm_rpalette           Reference genome color palette [Default: Spectral]
+--lm_xpalette           Target genome color palette [Default: Blues]
+--lmrotation            Contig name rotation [Default: 90]
+--lfsize                Font size [Default: 8]
+--no_linemap            Turn off linemaps
 PLOT_OPTIONS
 
 die ("\n$usage\n") unless (@ARGV);
@@ -181,6 +190,15 @@ my $hmin = 0;
 my $hauto;
 my $no_heatmap;
 
+# Linemaps
+my $lheight = 5;
+my $lwidth = 20;
+my $lm_rpalette = 'Spectral';
+my $lm_xpalette = 'Blues';
+my $lmrotation = 90;
+my $lfsize = 8;
+my $no_linemap;
+
 GetOptions(
 	# Main
 	't|threads=i' => \$threads,
@@ -245,6 +263,14 @@ GetOptions(
 	'hmin=i' => \$hmin,
 	'hauto' => \$hauto,
 	'no_heatmap' => \$no_heatmap,
+	# Linemaps
+	'lh|lheight=s' => \$lheight,
+	'lw|lwidth=s' => \$lwidth,
+	'lm_rpalette=s' => \$lm_rpalette,
+	'lm_xpalette=s' => \$lm_xpalette,
+	'lmrotation=i' => \$lmrotation,
+	'lfsize=i' => \$lfsize,
+	'no_linemap' => \$no_linemap
 );
 
 # Displaying the full list of options
@@ -334,7 +360,7 @@ if ($label_font){
 ## Precheck matplotlib colors
 ###################################################################################################
 
-my @matp_colors = ($palette, $hmpalette);
+my @matp_colors = ($palette, $hmpalette, $lm_rpalette, $lm_xpalette);
 
 if ($dotpalette){
 	push (@matp_colors, $dotpalette);
@@ -407,6 +433,7 @@ my $plots_dir = $outdir.'/PLOTS';
 my $paf_hm_dir = $plots_dir.'/HEATMAPS';
 my $barplot_dir = $plots_dir.'/BARPLOTS';
 my $dotplot_dir = $plots_dir.'/DOTPLOTS';
+my $linemap_dir = $plots_dir.'/LINEMAPS';
 my $circos_plot_dir = $plots_dir.'/CIRCOS';
 my $circos_data_dir = $plots_dir.'/CIRCOS_DATA';
 my $circos_cat_dir = $circos_data_dir.'/concatenated';
@@ -593,7 +620,7 @@ system ("
 logs(\*LOG, 'Genome alignments - paf_metrics.py');
 
 ###################################################################################################
-## Creating barplots/dotplots/heatmaps from minimap2 PAF files
+## Creating barplots / dotplots / linemaps / heatmaps from minimap2 PAF files
 ###################################################################################################
 
 # Barplots
@@ -651,6 +678,33 @@ unless ($no_dotplot){
 
 }
 
+# Linemaps
+unless ($no_linemap){
+
+	$tstart = time();
+	print ERROR "\n### linear_maps.py (genome alignments) ###\n";
+	print "\n# Linemaps (genome alignments):\n";
+
+	system("
+		$plot_path/linear_maps.py \\
+		--paf $paf_dir/*.paf \\
+		--fasta $genome_dir/*.fasta \\
+		--outdir $linemap_dir \\
+		--threads $pthreads \\
+		--height $lheight \\
+		--width $lwidth \\
+		--rpalette $lm_rpalette \\
+		--xpalette $lm_xpalette \\
+		--fontsize $lfsize \\
+		--rotation $lmrotation \\
+		2>> $log_err
+	") == 0 or checksig();
+
+	logs(\*LOG, 'Genome alignments - linear_maps.py');
+
+}
+
+# Heatmaps
 unless ($no_heatmap){
 
 	$tstart = time();
@@ -792,7 +846,7 @@ while (my $file = readdir(LISTS)){
 }
 
 ###################################################################################################
-## Creating barplots/dotplots from SYNY PAF files
+## Creating barplots / dotplots / linemaps from SYNY PAF files
 ###################################################################################################
 
 ### Create pseudo PAF files from clusters found
@@ -823,20 +877,7 @@ unless ($no_barplot){
 	print ERROR "\n### paf_to_barplot.py (gene clusters) ###\n";
 	print "\n# Barplots (gene clusters):\n";
 
-	my @barplot_files;
-
-	foreach my $gap (@gaps){
-
-		my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
-		opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
-
-		while (my $file = readdir(PAFDIR)){
-			if ($file =~ /\.paf$/){
-				push (@barplot_files, "$ppafdir/$file");
-			}
-		}
-
-	}
+	my @barplot_files = getpaf_files();
 
 	system("
 		$plot_path/paf_to_barplot.py \\
@@ -864,19 +905,7 @@ unless ($no_dotplot){
 	print ERROR "\n### paf_to_dotplot.py (gene clusters) ###\n";
 	print "\n# Dotplots (gene clusters):\n";
 
-	my @dotplot_files;
-	foreach my $gap (@gaps){
-
-		my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
-		opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
-
-		while (my $file = readdir(PAFDIR)){
-			if ($file =~ /\.paf$/){
-				push (@dotplot_files, "$ppafdir/$file");
-			}
-		}
-
-	}
+	my @dotplot_files = getpaf_files();
 
 	system("
 		$plot_path/paf_to_dotplot.py \\
@@ -897,6 +926,34 @@ unless ($no_dotplot){
 	") == 0 or checksig();
 
 	logs(\*LOG, 'Gene clusters - paf_to_dotplot.py');
+
+}
+
+### Create linemaps from PAF files
+unless ($no_linemap){
+
+	$tstart = time();
+	print ERROR "\n### linear_maps.py (gene clusters) ###\n";
+	print "\n# Linemaps (gene clusters):\n";
+
+	my @linemap_files = getpaf_files();
+
+	system("
+		$plot_path/linear_maps.py \\
+		--paf @linemap_files \\
+		--fasta $genome_dir/*.fasta \\
+		--outdir $linemap_dir \\
+		--threads $pthreads \\
+		--height $lheight \\
+		--width $lwidth \\
+		--rpalette $lm_rpalette \\
+		--xpalette $lm_xpalette \\
+		--fontsize $lfsize \\
+		--rotation $lmrotation \\
+		2>> $log_err
+	") == 0 or checksig();
+
+	logs(\*LOG, 'Gene clusters - linear_maps.py');
 
 }
 
@@ -1359,6 +1416,27 @@ sub link_files {
 			print("[W]  No matching protein file was found for $annot_file. It will be skipped as a consequence.\n");
 		}
 	}
+
+}
+
+sub getpaf_files {
+
+	my @paf_files;
+
+	foreach my $gap (@gaps){
+
+		my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
+		opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
+
+		while (my $file = readdir(PAFDIR)){
+			if ($file =~ /\.paf$/){
+				push (@paf_files, "$ppafdir/$file");
+			}
+		}
+
+	}
+
+	return @paf_files;
 
 }
 
