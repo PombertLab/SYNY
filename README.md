@@ -305,7 +305,7 @@ Options for run_SYNY.pl are:
 -lh (--lheight)         Linear map figure height in inches [Default: 5]
 -lw (--lwidth)          Heatmap figure width in inches [Default: 20]
 --lm_rpalette           Reference genome color palette [Default: Spectral]
---lm_xpalette           Target genome color palette [Default: Blues]
+--lm_xpalette           Target genome color palette [Default: tab20]
 --lmrotation            Contig name rotation [Default: 90]
 --lfsize                Font size [Default: 8]
 --no_linemap            Turn off linemaps

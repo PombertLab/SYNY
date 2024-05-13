@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.7';
+my $version = '0.7a';
 my $updated = '2024-05-13';
 
 use strict;
@@ -111,7 +111,7 @@ my $plot_options = <<"PLOT_OPTIONS";
 ### Linear maps
 -lh (--lheight)         Linear map figure height in inches [Default: 5]
 -lw (--lwidth)          Heatmap figure width in inches [Default: 20]
---lm_rpalette           Reference genome color palette [Default: Spectral]
+--lm_rpalette           Reference genome color palette [Default: tab20]
 --lm_xpalette           Target genome color palette [Default: Blues]
 --lmrotation            Contig name rotation [Default: 90]
 --lfsize                Font size [Default: 8]
@@ -193,7 +193,7 @@ my $no_heatmap;
 # Linemaps
 my $lheight = 5;
 my $lwidth = 20;
-my $lm_rpalette = 'Spectral';
+my $lm_rpalette = 'tab20';
 my $lm_xpalette = 'Blues';
 my $lmrotation = 90;
 my $lfsize = 8;
