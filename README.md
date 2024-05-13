@@ -1,4 +1,4 @@
-<p align="left"><img src="https://github.com/PombertLab/SYNY/blob/master/Images/SYNY.logo.png" alt="SYNY - Genome collineariy inferences" width="800"></p>
+<p align="left"><img src="https://github.com/PombertLab/SYNY/blob/main/Images/SYNY.logo.png" alt="SYNY - Genome collineariy inferences" width="800"></p>
 
 ## <b>Synopsis</b>
 
