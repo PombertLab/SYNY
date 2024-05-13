@@ -4,6 +4,9 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
 
 [![DOI](https://zenodo.org/badge/491274225.svg)](https://zenodo.org/doi/10.5281/zenodo.10790180)
 
+<details open>
+  <summary><b><i>Show/hide section: TOC</i></b></summary>
+
 ## <b>Table of contents</b>
 * [Introduction](#Introduction)
 * [Requirements](#Requirements)
@@ -23,6 +26,10 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
       * [Custom Circos colors](#Custom-Circos-colors)
   * [File conversion](#File-conversion)
 * [References](#References)
+</details>
+
+<details open>
+  <summary><b><i>Show/hide section: Introduction</i></b></summary>
 
 ## <b>Introduction</b>
 #### <b>What is synteny?</b>
@@ -33,6 +40,10 @@ Synteny inferences can be used to:
 - Improve genome annotation (by helping to identify mispredicted and/or missing genes)
 - Help differentiate between orthologous and paralogous genes (by leveraging positional information)
 - Perform evolutionary distance analyses (<i>e.g.</i> species sharing similar/identical genome reorganization events are likely more closely related than species that do not share these events).
+</details>
+
+<details open>
+  <summary><b><i>Show/hide section: Installation</i></b></summary>
 
 ## <b>Requirements</b>
 - [DIAMOND](https://github.com/bbuchfink/diamond)
@@ -201,9 +212,12 @@ cd circos-0.69-9/bin
 printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.profile      ## Ubuntu
 printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ```
+</details>
+
+<details open>
+  <summary><b><i>Show/hide section: Using SYNY</i></b></summary>
 
 ## <b>Using SYNY</b>
-
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
 1. Extracts genome/protein sequences and annotation data from GenBank (.gbf/.gbff) flat files.
 2. Performs round-robin pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
@@ -212,7 +226,6 @@ The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SY
 5. Generates heatmaps summarizing the percentages of collinear bases found in pairwise genome alignments and the percentages of proteins found in collinear clusters between all genomes.
 
 #### Why use two distinct approaches?
-
 When working with well-annotated, closely related genomes, collinear regions inferred from pairwise genome alignments and shared protein cluster reconstructions should yield similar results.
 
 However, when working with genomes featuring high levels of sequence divergence, pairwise genome alignments may struggle. In those instances, collinear regions inferred from protein cluster reconstructions should outperform those from genome alignments; hypervariable intergenic regions are not considered in protein cluster reconstructions and silent mutations/codon usage biases do not affect amino acid sequences. Amino acids also have a larger character state and lower back-mutation probabilities than nucleotide sequences, allowing for searches across wider evolutionary distances.
@@ -220,7 +233,6 @@ However, when working with genomes featuring high levels of sequence divergence,
 Conversely, when working with poorly annotated or unannotated genomes, collinear regions inferred from genome alignments should outperform those inferred from protein cluster reconstructions (if there is sufficient sequence similarity to perform pairwise alignments).
 
 ### Command line options
-
 SYNY can be run from the master script as follows:<br>
 ```Bash
 run_SYNY.pl \
@@ -378,8 +390,12 @@ The contents of the subdirectories are:
   	- FASTA files containing the sequences of the investigated genomes
   - PROTEINS:
     - Protein sequences for each species (.faa) in FASTA format
+</details>
 
 ### <b>Step by step examples</b>
+
+<details open>
+  <summary><b><i>Show/hide section: Example 1</i></b></summary>
 
 ### Example 1 - <i>Cryptococcus</i>
 Below is a quick example describing how to compare a few select <i>Cryptococcus</i> genomes (<i>C. neoformans</i> var. <i>neoformans</i> strain [JEC21](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13856/), <i>C. gattii</i> strain [WM276](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13692/), <i>C. gattii</i> VGV strain [MF34](hhttps://www.ncbi.nlm.nih.gov/bioproject/PRJNA487802/), <i>C. decagattii</i> strain [7685027](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA660466/), <i>C. deuterogattii</i> strain [R265](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395628/)) using annotation data available from the public NCBI [Genome](https://www.ncbi.nlm.nih.gov/genome/database) database.
@@ -734,6 +750,10 @@ $(\\#\ of\ residue\ matches / Alignment\ block\ length) * 100$
 Likewise, the total average sequence identity percentage listed in the PAF metrics insert is calculated by dividing the sum of all residue matches by the sum of all aligned block lengths.
 
 As a rule of thumb, pairwise alignments featuring lower sequence identity percentages will produce fewer and/or more fragmented collinear segments.
+</details>
+
+<details open>
+  <summary><b><i>Show/hide section: Example 2</i></b></summary>
 
 ### Example 2 - Encephalitozoonidae
 Below is a quick example describing how to compare a few select genomes from the Encephalitozoonidae (<i>Encephalitozoon/Ordospora</i> species <i>E. intestinalis</i> strain [ATCC 50506](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. hellem</i> strain [ATCC 50604](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. cuniculi</i> strain [ATCC 50602](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA705735/), <i>O. colligata</i> strain [OC4](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA210314/) and <i>O. pajunii</i> strain [FI-F-10](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA630072/)) using annotation data from NCBI.
@@ -934,6 +954,11 @@ Options for `fasta_to_gbff.pl` are:
 -v (--verbose)  Add verbosity
 ```
 When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
+</details>
+
+
+<details open>
+  <summary><b><i>Show/hide section: References</i></b></summary>
 
 ## <b>References</b>
 [Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi: 10.1038/s41592-021-01101-x
@@ -961,3 +986,4 @@ When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if av
 [A new microsporidian parasite, Ordospora pajunii sp. nov (Ordosporidae), of Daphnia longispina highlights the value of genomic data for delineating species boundaries](https://pubmed.ncbi.nlm.nih.gov/35279911/). de Albuquerque NRM, Haag KL, Fields PD, Cabalzar A, Ben-Ami F, Pombert JF, Ebert D. <b>J Eukaryot Microbiol</b>. 2022 May;69(3):e12902. doi: 10.1111/jeu.12902. Epub 2022 Mar 28. PMID: 35279911.
 
 [The Ordospora colligata genome: Evolution of extreme reduction in microsporidia and host-to-parasite horizontal gene transfer](https://pubmed.ncbi.nlm.nih.gov/25587016/). Pombert JF, Haag KL, Beidas S, Ebert D, Keeling PJ. <b>mBio</b>. 2015 Jan 13;6(1):e02400-14. doi: 10.1128/mBio.02400-14. PMID: 25587016; PMCID: PMC4313915.
+</details>
