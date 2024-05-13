@@ -1,3 +1,5 @@
+<p align="left"><img src="https://github.com/PombertLab/SYNY/blob/master/Images/SYNY.logo.png" alt="SYNY - Genome collineariy inferences" width="800"></p>
+
 ## <b>Synopsis</b>
 
 The SYNY pipeline investigates gene collinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches. It also infers collinearity from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
