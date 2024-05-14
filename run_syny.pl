@@ -620,32 +620,36 @@ system("
 logs(\*LOG, 'Genome alignments - paf2links.pl');
 
 #### Calculate/plot PAF metrics
-$tstart = time();
-print ERROR "\n### paf_metrics.py ###\n";
-print "\n# Calculating metrics (genome alignments):\n";
+if ($aligner =~ /minimap/){
 
-my $aln_length_dir = $mmap_dir.'/METRICS';
-my @paf_files;
-opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
+	$tstart = time();
+	print ERROR "\n### paf_metrics.py ###\n";
+	print "\n# Calculating metrics (genome alignments):\n";
 
-while (my $file = readdir(PAFDIR)){
-	if ($file =~ /\.paf$/){
-		push (@paf_files, "$paf_dir/$file");
+	my $aln_length_dir = $mmap_dir.'/METRICS';
+	my @paf_files;
+	opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
+
+	while (my $file = readdir(PAFDIR)){
+		if ($file =~ /\.paf$/){
+			push (@paf_files, "$paf_dir/$file");
+		}
 	}
+
+	system ("
+		$align_path/paf_metrics.py \\
+		--paf @paf_files \\
+		--outdir $aln_length_dir \\
+		--threads $threads \\
+		--height 10.8 \\
+		--width 19.2 \\
+		--color steelblue \\
+		2>> $log_err
+	") == 0 or checksig();
+
+	logs(\*LOG, 'Genome alignments - paf_metrics.py');
+
 }
-
-system ("
-	$align_path/paf_metrics.py \\
-	--paf @paf_files \\
-	--outdir $aln_length_dir \\
-	--threads $threads \\
-	--height 10.8 \\
-	--width 19.2 \\
-	--color steelblue \\
-	2>> $log_err
-") == 0 or checksig();
-
-logs(\*LOG, 'Genome alignments - paf_metrics.py');
 
 ###################################################################################################
 ## Creating barplots / dotplots / linemaps / heatmaps from minimap2 PAF files
