@@ -51,7 +51,7 @@ OPTIONS:
 --exclude               Exclude contigs with names matching the regular expression(s); e.g. --exclude '^AUX'
 --aligner               Specify genome alignment tool: minimap or mashmap [Default: minimap]
 --asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
---mpid                  Specify mashmap3 percentage identity [Default: 70]
+--mpid                  Specify mashmap3 percentage identity [Default: 85]
 --resume                Resume minimap/mashmap computations (skip completed alignments)
 --no_map                Skip minimap/mashmap pairwise genome alignments
 --no_clus               Skip gene cluster reconstructions
@@ -139,7 +139,7 @@ my $nomap;
 my $noclus;
 my $resume;
 my $asm;
-my $mashmap_pid = 70;
+my $mashmap_pid = 85;
 my $help;
 
 # Circos
