@@ -133,6 +133,7 @@ elsif ($package_manager eq 'dnf'){
         curl \\
         zlib-devel \\
         cmake \\
+        gcc-c++ \\
         python3-matplotlib \\
         python3-seaborn \\
         python3-pandas \\
