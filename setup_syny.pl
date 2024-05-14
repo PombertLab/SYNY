@@ -158,6 +158,7 @@ elsif ($package_manager eq 'zypper'){
         gsl \\
         gsl-devel \\
         cmake \\
+        gcc-c++ \\
         python3-matplotlib \\
         python3-seaborn \\
         python3-pandas \\
