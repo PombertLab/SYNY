@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.7b';
+my $version = '0.7c';
 my $updated = '2024-05-13';
 
 use strict;
@@ -773,12 +773,27 @@ my @prot_files;
 opendir (FAA, $prot_dir) or die "\n\n[ERROR]\tCan't open $prot_dir: $!\n\n";
 while (my $file = readdir(FAA)){
 	if ($file =~ /\.faa$/){
-		push (@prot_files, "$prot_dir/$file");
+		if (-s $file){
+			push (@prot_files, "$prot_dir/$file");
+		}
 	}
 }
 
-link_files();
+## Checking if all protein files are blank, if so no point in searching for shared clusters
+unless (@prot_files){
+	print "\n[E] All protein files are blank. Skipping cluster detection...\n\n";
+	$noclus = 1;
+	goto CIRCOS;
+}
 
+## If only one is not blank, skip as well (no point in searching for shared clusters)
+if ((scalar @prot_files) == 1){
+	print "\n[E] Only one protein file contain data. Skipping cluster detection...\n\n";
+	$noclus = 1;
+	goto CIRCOS;
+}
+
+## Otherwize, proceed
 system("
 	$cluster_path/get_homology.pl \\
 	--input @prot_files \\
@@ -804,17 +819,16 @@ if (-f $clu_sum_file){
 	system("rm $clu_sum_file") == 0 or checksig();
 }
 
-foreach my $annot_file_1 (sort(@annot_files)){
+foreach my $prot_file_1 (sort(@prot_files)){
 
-	my ($file_name_1,$dir,$ext) = fileparse($annot_file_1,'\..*');
-	my $linked_file_1 = $linked_files{$annot_file_1};
+	my ($file_name_1, $dir, $ext) = fileparse($prot_file_1, '\..*');
 	print "\nIdentifying synteny between $file_name_1\n"; 
 
-	foreach my $annot_file_2 (sort(@annot_files)){
-		if($annot_file_1 ne $annot_file_2){
+	foreach my $prot_file_2 (sort(@prot_files)){
 
-			my ($file_name_2,$dir,$ext) = fileparse($annot_file_2,'\..*');
-			my $linked_file_2 = $linked_files{$annot_file_2};
+		if($prot_file_1 ne $prot_file_2){
+
+			my ($file_name_2, $dir, $ext) = fileparse($prot_file_2, '\..*');
 			print "\t$file_name_2\n";
 
 			foreach my $gap (@gaps){
@@ -1411,31 +1425,6 @@ sub list_maker {
 	}
 
 	threads->exit();
-
-}
-
-sub link_files {
-
-	if(scalar(@annot_files) != scalar(@prot_files)){
-		die("The number of annotation files (".scalar(@annot_files).") does not equal the number of protein files (".scalar(@prot_files).")\n");
-	}
-
-	foreach my $annot_file (@annot_files){
-		my ($annot_name,$dir,$ext) = fileparse($annot_file,"\..*");
-		INNER: foreach my $prot_file (@prot_files){
-			my ($prot_name,$dir,$ext) = fileparse($prot_file,"\..*");
-			if ($prot_name eq $annot_name){
-				$linked_files{$annot_file} = $prot_file;
-				last INNER;
-			}
-		}
-	}
-
-	foreach my $annot_file (@annot_files){
-		unless($linked_files{$annot_file}){
-			print("[W]  No matching protein file was found for $annot_file. It will be skipped as a consequence.\n");
-		}
-	}
 
 }
 
