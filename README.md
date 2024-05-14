@@ -1005,7 +1005,7 @@ This work was supported in part by the National Institute of Allergy and Infecti
 ## How to cite
 ##### A short paper describing the SYNY pipeline is available as a preprint on bioRxiv:
 
-[3DFI: a pipeline to infer protein function using structural homology](https://www.biorxiv.org/content/10.1101/2024.05.09.593317v1). Julian AT, Pombert JF. <b>bioRxiv</b>, 2024.05.09.593317. DOI: [10.1101/2024.05.09.593317](https://doi.org/10.1101/2024.05.09.593317).
+[3DFI: a pipeline to infer protein function using structural homology](https://www.biorxiv.org/content/10.1101/2024.05.09.593317v1). Julian AT, Pombert JF. <b>bioRxiv</b>, 2024.05.09.593317. DOI: 10.1101/2024.05.09.593317.
 
 ##### If you use SYNY, please also cite the tool(s) used for genome alignments and/or protein sequence homology, as needed:
 
