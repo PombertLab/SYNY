@@ -691,14 +691,12 @@ If desired, the barplots can instead be generated using a single monochromatic c
 By default, the barplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--bheight` and `--bwidth` command line switches.
 
 #### Linemaps
-Linear chromosome maps (aka linemaps) highlighting collinear genome segments will be generated with [linear_maps.py](https://github.com/PombertLab/SYNY/blob/main/Plots/linear_maps.py) and [matplotlib](https://matplotlib.org/) from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`).
+Linear chromosome maps (aka linemaps) highlighting collinear genome segments will be generated with [linear_maps.py](https://github.com/PombertLab/SYNY/blob/main/Plots/linear_maps.py) and [matplotlib](https://matplotlib.org/) from pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`). In these plots, collinear regions found between the compared genomes are highlighted by colored polygons. By default, these polygons are color-coded based on the contigs/chromosomes of the reference. The above linemap image was generated using the tab20 and the Blues color palettes for the reference and the target genomes, respectively (both set as defaults in SYNY). These palettes can be replaced using the `--lm_rpalette` and `--lm_xpalette` command line switches; <i>e.g.</i> `--lm_xpalette Grays` (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a list of color palettes). By default, the linesmaps are formatted using a 20/5 width/height ratio. This ratio can be adjusted with the `--lheight` and `--lwidth` command line switches.
 
-##### Example of a linemap generated from minimap2 PAF files using defaults settings:
+##### Example of a linemap generated from gene clusters (no gaps allowed) using defaults settings:
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.mmap.linemap.20x5.tab20.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.gap_0.linemap.20x5.tab20.png">
 </p>
-
-In these plots, collinear regions found between the compared genomes are highlighted by colored polygons. By default, these polygons are color-coded based on the contigs/chromosomes of the reference. The above linemap image was generated using the tab20 and the Blues color palettes for the reference and the target genomes, respectively (both set as defaults in SYNY). These palettes can be replaced using the `--lm_rpalette` and `--lm_xpalette` command line switches; <i>e.g.</i> `--lm_xpalette Grays` (see this [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a list of color palettes). By default, the linesmaps are formatted using a 20/5 width/height ratio. This ratio can be adjusted with the `--lheight` and `--lwidth` command line switches.
 
 #### Dotplots
 
