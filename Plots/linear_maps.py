@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1'
-updated = '2024-05-13'
+version = '0.1a'
+updated = '2024-05-14'
 name = 'linear_maps.py'
 
 import sys
@@ -329,8 +329,8 @@ def linemap(paf):
     if m:
         prefix = m.group(1)
 
-    pngfile = pngdir + '/' + prefix + f".{width}x{height}" + f".{rpalette}" + '.png'
-    svgfile = svgdir + '/' + prefix + f".{width}x{height}" + f".{rpalette}" + '.svg'
+    pngfile = pngdir + '/' + prefix + f".linemap" + f".{width}x{height}" + f".{rpalette}" + '.png'
+    svgfile = svgdir + '/' + prefix + f".linemap" + f".{width}x{height}" + f".{rpalette}" + '.svg'
 
     with counter.get_lock():
         counter.value += 1
