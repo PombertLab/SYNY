@@ -2,7 +2,7 @@
 
 ## <b>Synopsis</b>
 
-The SYNY pipeline investigates gene collinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches. It also infers collinearity from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
+The SYNY pipeline investigates gene collinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches. It also infers collinearity from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2) or [MashMap3](https://github.com/marbl/MashMap).
 
 [![DOI](https://zenodo.org/badge/491274225.svg)](https://zenodo.org/doi/10.5281/zenodo.10790180)
 
@@ -53,6 +53,7 @@ Synteny inferences can be used to:
 ## <b>Requirements</b>
 - [DIAMOND](https://github.com/bbuchfink/diamond)
 - [minimap2](https://github.com/lh3/minimap2)
+- [MashMap3](https://github.com/marbl/MashMap)
 - [Perl5](https://www.perl.org/)
 - [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip)
 - [Python3](https://www.python.org/)
@@ -72,7 +73,7 @@ export PATH=$PATH:$(pwd)
 #### <b>Installing dependencies</b>
 ##### <b>Installing dependencies automatically with setup_syny.pl</b>
 
-Dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
+Dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [MashMap3](https://github.com/marbl/MashMap), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
 
 ```Bash
 ## Listing supported Linux distributions:
@@ -177,6 +178,29 @@ export PATH=$PATH:$(pwd)      ## minimap2 install directory
 export PATH=$PATH:$(pwd)/misc ## minimap2 subdir containing paftools.js
 ```
 
+##### To install MashMap3:
+```Bash
+## On Ubuntu
+sudo apt install build-essential
+sudo apt install gsl-bin
+sudo apt install libgsl-dev
+
+## On Fedora
+sudo dnf group install "C Development Tools and Libraries"
+sudo dnf install cmake
+sudo dnf install gsl gsl-devel
+
+git clone https://github.com/marbl/MashMap.git
+cd MashMap
+
+cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+
+mv ./build/bin ./bin
+
+export PATH=$PATH:$(pwd)/bin ## MashMap3 install directory
+```
+
 ##### To install Circos:
 ```Bash
 ## Dependencies (Ubuntu)
@@ -225,9 +249,9 @@ printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ## <b>Using SYNY</b>
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
 1. Extracts genome/protein sequences and annotation data from GenBank (.gbf/.gbff) flat files.
-2. Performs round-robin pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2).
+2. Performs round-robin pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2) or [MashMap3](https://github.com/marbl/MashMap).
 3. Performs round-robin [DIAMOND](https://github.com/bbuchfink/diamond) BLASTP homology searches, identifies conserved protein gene pairs, and reconstructs collinear clusters from these searches.
-4. Generates dotplots, barplots and [Circos](https://circos.ca/) plots highlighting collinear regions inferred from pairwise genome alignments and from shared protein cluster reconstructions.
+4. Generates dotplots, barplots, linemaps and [Circos](https://circos.ca/) plots highlighting collinear regions inferred from pairwise genome alignments and from shared protein cluster reconstructions.
 5. Generates heatmaps summarizing the percentages of collinear bases found in pairwise genome alignments and the percentages of proteins found in collinear clusters between all genomes.
 
 #### Why use two distinct approaches?
@@ -265,7 +289,7 @@ Options for run_SYNY.pl are:
 --exclude               Exclude contigs with names matching the regular expression(s); e.g. --exclude '^AUX'
 --aligner               Specify genome alignment tool: minimap or mashmap [Default: minimap]
 --asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
---mpid                  Specify mashmap3 percentage identity [Default: 70]
+--mpid                  Specify mashmap percentage identity [Default: 85]
 --resume                Resume minimap/mashmap computations (skip completed alignments)
 --no_map                Skip minimap/mashmap pairwise genome alignments
 --no_clus               Skip gene cluster reconstructions
@@ -351,8 +375,9 @@ Genome/protein sequences and gene lists extracted from GenBank GBFF files are lo
 
 The contents of the subdirectories are:
 - ALIGNMENTS:
-	- MAF, PAF and ALN: pairwise genome alignments in the corresponding formats
-	- METRICS:
+  - PAF: pairwise genome alignments in the corresponding format (minimap2/MashMap3)
+  - MAF, ALN: pairwise genome alignments in the corresponding formats (minimap2)
+  - METRICS (minimap2):
       - Alignment length vs. similarity scatter plots (in PNG format)
       - Alignment metrics summaries (in plain TXT format)
 - CLUSTERS:
@@ -379,21 +404,21 @@ The contents of the subdirectories are:
 	- Lists of protein coding genes with location details (.list)
 - PLOTS:
   - BARPLOTS
-	  - Barplots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+	  - Barplots (in PNG/SVG format) from minimap2/mashmap3 alignments (.mmap.)
 	  - Barplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
   - CIRCOS:
-	  - Circos plots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+	  - Circos plots (in PNG/SVG format) from minimap2/mashmap3 alignments (.mmap.)
 	  - Circos plots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
   - CIRCOS_DATA:
 	  - Configuration files for Circos plots
   - DOTPLOTS:
-  	- Dotplots (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+  	- Dotplots (in PNG/SVG format) from minimap2/mashmap3 alignments (.mmap.)
   	- Dotplots (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
   - HEATMAPS:
     - Heatmaps (in PNG/SVG format) summarizing the percentages of collinear bases in pairwise alignments (.mmap.)
     - Heatmaps (in PNG/SVG format) summarizing the percentages of proteins found in clusters (.gap_0., .gap_1., ...)
   - LINEMAPS:
-    - Linear maps (in PNG/SVG format) from minimap2 PAF alignments (.mmap.)
+    - Linear maps (in PNG/SVG format) from minimap2/mashmap3 alignments (.mmap.)
     - Linear maps (in PNG/SVG format) from protein clusters found with SYNY (.gap_0., .gap_1., ...)
 - SEQUENCES:
   - GENOMES:
@@ -587,7 +612,7 @@ Heatmap dimensions (default: 10 x 10) can be modified with the `--hheight` and `
 
 #### Circos plots
 
-Unless the `--no_circos` command line switch is invoked, [Circos](https://circos.ca/) (pairwise and/or concatenated) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and/or from the genome alignments computed with minimap2 (`.mmap.`).
+Unless the `--no_circos` command line switch is invoked, [Circos](https://circos.ca/) (pairwise and/or concatenated) will be generated from the protein clusters identified with SYNY (e.g. `.gap_0.`) and/or from the genome alignments computed with minimap2 or MashMap3 (`.mmap.`).
 
 In the pairwise plots (`--circos pair`), genomes are plotted in pairs (query <i>vs.</i> subject) using the query as the reference. In the concatenated plots (`--circos cat`), all genomes are plotted together in a single figure, using the reference genome specified with the `--ref` command line switch. If omitted, the first genome encountered alphabetically will be used as the default reference. Both concatenated and pairwise plots can be generated with the `--circos all` command line switch.
 
@@ -677,7 +702,7 @@ In the inverted karyotype image, the order of the karyotype(s) to be compared to
 In pairwise genome alignments, repetitive regions (such as telomeres/subtelomeres) can produce more than one alignment for a given locus. In the above figure, a bit of extra noise is added to the figure (as thin criss-crossing lines) due to these repetitive segments. As a rule of thumb, repetitive segments are easier to spot in dotplot-like figures (see [Dotplots](https://github.com/PombertLab/SYNY?tab=readme-ov-file#Dotplots) section below).
 
 #### Barplots
-Chromosome maps (aka barplots) highlighting collinear genome segments will be generated with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/Plots/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/)  from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`).
+Chromosome maps (aka barplots) highlighting collinear genome segments will be generated with [paf_to_barplot.py](https://github.com/PombertLab/SYNY/blob/main/Plots/paf_to_barplot.py) and [matplotlib](https://matplotlib.org/) from minimap2/mashmap3 pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`).
 
 ##### Example of a barplot generated from minimap2 PAF files using defaults settings:
 <p align="left">
@@ -700,7 +725,7 @@ Linear chromosome maps (aka linemaps) highlighting collinear genome segments wil
 
 #### Dotplots
 
-Unless the `--no_dotplot` command line switch is invoked, dotplots will be generated with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/Plots/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/) from [minimap2](https://github.com/lh3/minimap2) pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY, (e.g. `.gap_0.`).
+Unless the `--no_dotplot` command line switch is invoked, dotplots will be generated with [paf_to_dotplot.py](https://github.com/PombertLab/SYNY/blob/main/Plots/paf_to_dotplot.py) and [matplotlib](https://matplotlib.org/) from pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY, (e.g. `.gap_0.`).
 
 ##### Example of a dotplot generated from minimap2 PAF files using defaults settings:
 
@@ -750,7 +775,7 @@ run_syny.pl \
 
 #### PAF metrics
 
-When computing pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2), PAF metrics will also be calculated independently to help assess the outcome of these alignments. These metrics are available in the `ALIGNMENTS/METRICS/` subdirectory, with alignment length <i>vs.</i> sequence similarity (%) scatter plots available in PNG format.
+When computing pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2), PAF metrics will also be calculated independently to help assess the outcome of these alignments. These metrics are available in the `ALIGNMENTS/METRICS/` subdirectory, with alignment length <i>vs.</i> sequence similarity (%) scatter plots available in PNG format. 
 
 ##### Example of a scatter plot summarizing metrics from minimap2 PAF files:
 
@@ -765,6 +790,8 @@ $(\\#\ of\ residue\ matches / Alignment\ block\ length) * 100$
 Likewise, the total average sequence identity percentage listed in the PAF metrics insert is calculated by dividing the sum of all residue matches by the sum of all aligned block lengths.
 
 As a rule of thumb, pairwise alignments featuring lower sequence identity percentages will produce fewer and/or more fragmented collinear segments.
+
+PAF metrics cannot be calculated for [MashMap3](https://github.com/marbl/MashMap) aligments since the data required is missing from its PAF output files. MashMap3 does not calculate alignments explicitly (as per its intructional manual) but runs in a much smaller memory footprint than minimap2 when using its default percentage identity (`--mpid 85`). As such, it constitutes an interesting alternative when running into memory constraints. However, note that lowering the MashMap3 default threshold will significantly increase its memory usage.
 
 ### Example 2 - Encephalitozoonidae
 Below is a quick example describing how to compare a few select genomes from the Encephalitozoonidae (<i>Encephalitozoon/Ordospora</i> species <i>E. intestinalis</i> strain [ATCC 50506](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. hellem</i> strain [ATCC 50604](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. cuniculi</i> strain [ATCC 50602](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA705735/), <i>O. colligata</i> strain [OC4](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA210314/) and <i>O. pajunii</i> strain [FI-F-10](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA630072/)) using annotation data from NCBI.
@@ -982,11 +1009,12 @@ This work was supported in part by the National Institute of Allergy and Infecti
 
 ##### If you use SYNY, please also cite the tool(s) used for genome alignments and/or protein sequence homology, as needed:
 
-[Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi: 10.1038/s41592-021-01101-x
-
 [Minimap2: pairwise alignment for nucleotide sequences](https://pubmed.ncbi.nlm.nih.gov/29750242/). Li H. <b>Bioinformatics.</b> 2018 Sep 15;34(18):3094-3100. doi: 10.1093/bioinformatics/bty191.
-</details>
 
+[Minmers are a generalization of minimizers that enable unbiased local Jaccard estimation](https://www.biorxiv.org/content/10.1101/2023.05.16.540882v1). Kille B, Garrison E, Treangen TJ, Phillippy AM. <b>Bioinformatics</b>. 2023 Sep 2;39(9):btad512. PMID: 37603771 PMCID: PMC10505501. doi: 10.1093/bioinformatics/btad512.
+
+[Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi: 10.1038/s41592-021-01101-x
+</details>
 
 <details open>
   <summary><b><i>Show/hide section: References</i></b></summary>
@@ -995,6 +1023,8 @@ This work was supported in part by the National Institute of Allergy and Infecti
 [Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi: 10.1038/s41592-021-01101-x
 
 [Minimap2: pairwise alignment for nucleotide sequences](https://pubmed.ncbi.nlm.nih.gov/29750242/). Li H. <b>Bioinformatics.</b> 2018 Sep 15;34(18):3094-3100. doi: 10.1093/bioinformatics/bty191.
+
+[Minmers are a generalization of minimizers that enable unbiased local Jaccard estimation](https://www.biorxiv.org/content/10.1101/2023.05.16.540882v1). Kille B, Garrison E, Treangen TJ, Phillippy AM. <b>Bioinformatics</b>. 2023 Sep 2;39(9):btad512. PMID: 37603771 PMCID: PMC10505501. doi: 10.1093/bioinformatics/btad512.
 
 [Circos: an information aesthetic for comparative genomics](https://pubmed.ncbi.nlm.nih.gov/19541911/). Krzywinski M, Schein J, Birol I, Connors J, Gascoyne R, Horsman D, Jones SJ, Marra MA. <b>Genome Res.</b> 2009 Sep;19(9):1639-45. doi: 10.1101/gr.092759.109.
 
