@@ -261,9 +261,11 @@ Options for run_SYNY.pl are:
 -e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
 -g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
 --minsize               Minimum contig size (in bp) [Default: 1]
---asm                   Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
---resume                Resume minimap2 computations (skip completed alignments)
---no_map                Skip minimap2 pairwise genome alignments
+--aligner               Specify genome alignment tool: minimap or mashmap [Default: minimap]
+--asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
+--mpid                  Specify mashmap3 percentage identity [Default: 70]
+--resume                Resume minimap/mashmap computations (skip completed alignments)
+--no_map                Skip minimap/mashmap pairwise genome alignments
 --no_clus               Skip gene cluster reconstructions
 
 ### Circos plots
@@ -292,6 +294,7 @@ Options for run_SYNY.pl are:
 ### Barplots
 -bh (--bheight)         Barplot figure height in inches [Default: 10.8]
 -bw (--bwidth)          Barplot figure width in inches [Default: 19.2]
+--bfsize                Barplot font size [Default: 8]
 --palette               Barplot color palette [Default: Spectral]
 --monobar               Use a monochrome barplot color instead: e.g. --monobar blue
 --no_barplot            Turn off barplots
@@ -299,6 +302,7 @@ Options for run_SYNY.pl are:
 ### Dotplots
 -dh (--dheight)         Dotplot figure height in inches [Default: 10.8]
 -dw (--dwidth)          Dotplot figure width in inches [Default: 19.2]
+--dfsize                Dotplot font size [Default: 8]
 -m (--multi)            Axes units multiplier (for dotplots) [Default: 1e5]
 --color                 Dotplot color [Default: blue]
 --dotpalette            Use a color palette instead: e.g. --dotpalette inferno
@@ -320,8 +324,8 @@ Options for run_SYNY.pl are:
 ### Linear maps
 -lh (--lheight)         Linear map figure height in inches [Default: 5]
 -lw (--lwidth)          Heatmap figure width in inches [Default: 20]
---lm_rpalette           Reference genome color palette [Default: Spectral]
---lm_xpalette           Target genome color palette [Default: tab20]
+--lm_rpalette           Reference genome color palette [Default: tab20]
+--lm_xpalette           Target genome color palette [Default: Blues]
 --lmrotation            Contig name rotation [Default: 90]
 --lfsize                Font size [Default: 8]
 --no_linemap            Turn off linemaps

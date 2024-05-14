@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.7a';
+my $version = '0.7b';
 my $updated = '2024-05-13';
 
 use strict;
@@ -48,9 +48,11 @@ OPTIONS:
 -e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
 -g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
 --minsize               Minimum contig size (in bp) [Default: 1]
---asm                   Specify minimap2 max divergence preset (--asm 5, 10 or 20) [Default: off]
---resume                Resume minimap2 computations (skip completed alignments)
---no_map                Skip minimap2 pairwise genome alignments
+--aligner               Specify genome alignment tool: minimap or mashmap [Default: minimap]
+--asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
+--mpid                  Specify mashmap3 percentage identity [Default: 70]
+--resume                Resume minimap/mashmap computations (skip completed alignments)
+--no_map                Skip minimap/mashmap pairwise genome alignments
 --no_clus               Skip gene cluster reconstructions
 EXIT
 
@@ -130,10 +132,12 @@ my $outdir = 'SYNY';
 my $threads = 16;
 my $max_pthreads = $threads;
 my $minsize = 1;
+my $aligner = 'minimap';
 my $nomap;
 my $noclus;
 my $resume;
 my $asm;
+my $mashmap_pid = 70;
 my $help;
 
 # Circos
@@ -208,10 +212,12 @@ GetOptions(
 	'e|evalue=s' => \$evalue,
 	'g|gaps=i{0,}' => \@gaps,
 	'minsize=i' => \$minsize,
+	'aligner=s' => \$aligner,
 	'no_map' => \$nomap,
 	'no_clus' => \$noclus,
 	'resume' => \$resume,
 	'asm=i' => \$asm,
+	'mpid=s' => \$mashmap_pid,
 	'h|help' => \$help,
 	# Circos
 	'c|circos=s' => \$circos,
@@ -386,11 +392,23 @@ if ($diamond_check eq ''){
 }
 
 # minimap2
-my $minimap2_check = `echo \$(command -v minimap2)`;
-chomp $minimap2_check;
-if ($minimap2_check eq ''){
-	print STDERR "\n[E]: Cannot find minimap2. Please install minimap2 in your \$PATH. Exiting..\n\n";
-	exit;
+if ($aligner =~ /minimap/i){
+	my $minimap2_check = `echo \$(command -v minimap2)`;
+	chomp $minimap2_check;
+	if ($minimap2_check eq ''){
+		print STDERR "\n[E]: Cannot find minimap2. Please install minimap2 in your \$PATH. Exiting..\n\n";
+		exit;
+	}
+}
+
+# mashmap3
+if ($aligner =~ /mashmap/i){
+	my $mashmap_check = `echo \$(command -v mashmap)`;
+	chomp $mashmap_check;
+	if ($mashmap_check eq ''){
+		print STDERR "\n[E]: Cannot find mashmap. Please install mashmap in your \$PATH. Exiting..\n\n";
+		exit;
+	}
 }
 
 # Circos
@@ -413,7 +431,7 @@ unless (-d $outdir){
 }
 $outdir = abs_path($outdir);
 
-my $minimap2_dir = $outdir.'/ALIGNMENTS';
+my $mmap_dir = $outdir.'/ALIGNMENTS';
 my $list_dir = $outdir.'/LISTS';
 
 ## Sequence subdirs
@@ -556,7 +574,7 @@ if ($nomap){
 	goto HOMOLOGY;
 }
 
-## Running minimap2 with get_paf.pl
+## Running minimap2/mashmap3 with get_paf.pl
 $tstart = time();
 print "\n##### Infering colinearity from pairwise genome alignments\n";
 print ERROR "\n### get_paf.pl ###\n";
@@ -564,8 +582,10 @@ print ERROR "\n### get_paf.pl ###\n";
 system("
 	$align_path/get_paf.pl \\
 	  --fasta $genome_dir/*.fasta \\
-	  --outdir $minimap2_dir \\
+	  --outdir $mmap_dir \\
+	  --aligner $aligner \\
 	  --threads $threads \\
+	  --percent $mashmap_pid \\
 	  $resume_flag \\
 	  $asm_flag
 ") == 0 or checksig();
@@ -576,7 +596,7 @@ logs(\*LOG, 'Genome alignments - get_paf.pl');
 $tstart = time();
 print ERROR "\n### paf2links.pl ###\n";
 
-my $paf_dir = "$minimap2_dir/PAF";
+my $paf_dir = "$mmap_dir/PAF";
 my $paf_links = "$circos_cat_dir/concatenated.mmap.links";
 
 system("
@@ -596,7 +616,7 @@ $tstart = time();
 print ERROR "\n### paf_metrics.py ###\n";
 print "\n# Calculating metrics (genome alignments):\n";
 
-my $aln_length_dir = $minimap2_dir.'/METRICS';
+my $aln_length_dir = $mmap_dir.'/METRICS';
 my @paf_files;
 opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
 
@@ -719,7 +739,7 @@ unless ($no_heatmap){
 		--height $hheight \\
 		--width $hwidth \\
 		--palette $hmpalette \\
-		--matrix $minimap2_dir/paf_matrix.tsv \\
+		--matrix $mmap_dir/paf_matrix.tsv \\
 		--fontsize $hfsize \\
 		--vmax $hmax \\
 		--vmin $hmin \\

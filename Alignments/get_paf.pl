@@ -8,8 +8,8 @@ use Cwd qw(abs_path);
 use Getopt::Long qw(GetOptions);
 
 my $name = 'get_paf.pl';
-my $version = '0.3f';
-my $updated = '2024-04-12';
+my $version = '0.4';
+my $updated = '2024-05-13';
 
 my $usage =<<"USAGE";
 NAME        ${name}
@@ -20,6 +20,7 @@ SYNOPSIS    Performs pairwize genome colinearity (paf,maf,aln) comparisons using
 EXAMPLE     ${name} \\
               -f *.fasta \\
               -o PAFR_5 \\
+              -a minimap \\
               -threads 8 \\
               -resume \\
               -asm 5
@@ -29,9 +30,11 @@ PREREQS     Minimap2:     https://github.com/lh3/minimap2
 OPTIONS:
 -f (--fasta)    FASTA files to compare
 -o (--outdir)   Output directory [Default: ./PAF]
+-a (--aligner)  Genome alignment tool, minimap2 or mashmap3 [Default: minimap2]
 -r (--resume)   Resume computation (skip completed alignments)
 -t (--threads)  Number of threads for minimap2 [Default: 8]
 -a (--asm)      Specify minimap2 max divergence preset (asm 5, 10 or 20) [Default: off]
+-p (--percent)  Specify mashmap3 percentage identity [Default: 75] 
 USAGE
 
 die "\n$usage\n" unless @ARGV;
@@ -39,15 +42,19 @@ my @commands = @ARGV;
 
 my @fasta;
 my $outdir = './PAF';
+my $aligner = 'minimap2';
 my $resume;
 my $threads = 8;
 my $asm;
+my $mashmap_pid = 75;
 GetOptions(
     'f|fasta=s@{1,}' => \@fasta,
     'o|outdir=s' => \$outdir,
+    'a|aligner=s' => \$aligner,
     't|threads=i' => \$threads,
     'r|resume' => \$resume,
-    'asm=i' => \$asm
+    'asm=i' => \$asm,
+    'p|percent=s' => \$mashmap_pid
 );
 
 #########################################################################
@@ -113,35 +120,52 @@ foreach my $query (@fasta){
 
             # $current_iteration++;
 
-            print STDOUT "\n".'Minimap2: '.++$current_iteration.'/'.$to_do.' --- '.$bquery.' vs. '.$btarget."\n\n";
-            print LOG 'Minimap2: '.$bquery.' vs. '.$btarget;
+            print STDOUT "\n"."$aligner: ".++$current_iteration.'/'.$to_do.' --- '.$bquery.' vs. '.$btarget."\n\n";
+            print LOG "$aligner: ".$bquery.' vs. '.$btarget;
+
+            my $affix = 'mmap';
 
             # Minimap2 PAF, MAF and ALN (BLAST-like) output files
             my $tmp_paf_outfile = $paf_dir.'/'.$bquery.'_vs_'.$btarget.'.tmp.paf';
-            my $paf_outfile = $paf_dir.'/'.$bquery.'_vs_'.$btarget.'.mmap.paf';
-            my $maf_outfile = $maf_dir.'/'.$bquery.'_vs_'.$btarget.'.mmap.maf';
-            my $blast_outfile = $blast_dir.'/'.$bquery.'_vs_'.$btarget.'.mmap.aln';
+            my $paf_outfile = $paf_dir.'/'.$bquery.'_vs_'.$btarget.".$affix.paf";
+            my $maf_outfile = $maf_dir.'/'.$bquery.'_vs_'.$btarget.".$affix.maf";
+            my $blast_outfile = $blast_dir.'/'.$bquery.'_vs_'.$btarget.".$affix.aln";
 
             my $map_time_start = time;
 
             # Skip alignment if paf file is found
             if ((-e $paf_outfile) && ($resume)){
-                print "Found $paf_outfile, skipping minimap2 alignment ...\n";
+                print "Found $paf_outfile, skipping $aligner alignment ...\n";
                 goto GETMAF;
             }
 
-            # Running minimap2 (PAF output)
-            system(
-                "minimap2 \\
-                    -t $threads \\
-                    $asm_flag \\
-                    -c \\
-                    --cs=long \\
-                    $query \\
-                    $target \\
-                    > $tmp_paf_outfile
-                "
-            ) == 0 or checksig();
+            if ($aligner =~ /minimap/i){
+                # Running minimap2 (PAF output)
+                system(
+                    "minimap2 \\
+                        -t $threads \\
+                        $asm_flag \\
+                        -c \\
+                        --cs=long \\
+                        $query \\
+                        $target \\
+                        > $tmp_paf_outfile
+                    "
+                ) == 0 or checksig();
+            }
+
+            elsif ($aligner =~ /mashmap/i){
+                # Running mashmap3 (PAF output)
+                system(
+                    "mashmap \\
+                        -t $threads \\
+                        -q $target \\
+                        -r $query \\
+                        --perc_identity $mashmap_pid \\
+                        -o $tmp_paf_outfile
+                    "
+                ) == 0 or checksig();
+            }
 
             ## Sorting PAF output by genomic coordinates
             ## PAF files can be large, so keeping only the sorted version
@@ -180,33 +204,37 @@ foreach my $query (@fasta){
 
             ## Creating MAF file
             GETMAF:
-            if ((-e $maf_outfile) && ($resume)){
-                print "Found $maf_outfile, skipping paftools.js conversion ...\n";
-                goto GETALN;
+
+            if ($aligner =~ /minimap/i){
+
+                if ((-e $maf_outfile) && ($resume)){
+                    print "Found $maf_outfile, skipping paftools.js conversion ...\n";
+                    goto GETALN;
+                }
+
+                system (
+                    "paftools.js view \\
+                    -f maf \\
+                    $paf_outfile \\
+                    > $maf_outfile
+                    "
+                ) == 0 or checksig();
+
+                ## Creating BLAST file
+                GETALN:
+                if ((-e $blast_outfile) && ($resume)){
+                    print "Found $blast_outfile, skipping paftools.js conversion ...\n";
+                    goto ENDLOG;
+                }
+
+                system (
+                    "paftools.js view \\
+                    -f aln \\
+                    $paf_outfile \\
+                    > $blast_outfile
+                    "
+                ) == 0 or checksig();
             }
-
-            system (
-                "paftools.js view \\
-                  -f maf \\
-                  $paf_outfile \\
-                  > $maf_outfile
-                "
-            ) == 0 or checksig();
-
-            ## Creating BLAST file
-            GETALN:
-            if ((-e $blast_outfile) && ($resume)){
-                print "Found $blast_outfile, skipping paftools.js conversion ...\n";
-                goto ENDLOG;
-            }
-
-            system (
-                "paftools.js view \\
-                  -f aln \\
-                  $paf_outfile \\
-                  > $blast_outfile
-                "
-            ) == 0 or checksig();
 
             ENDLOG:
             my $map_time_end = time;

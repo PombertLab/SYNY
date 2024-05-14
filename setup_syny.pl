@@ -2,8 +2,8 @@
 # Pombert Lab, 2024
 
 my $name = 'setup_syny.pl';
-my $version = '0.3';
-my $updated = '2024-05-07';
+my $version = '0.3a';
+my $updated = '2024-05-13';
 
 use strict;
 use warnings;
@@ -109,6 +109,8 @@ if ($package_manager eq 'apt'){
         git \\
         curl \\
         build-essential \\
+        gsl-bin \\
+        libgsl-dev \\
         zlib1g-dev \\
         python3-matplotlib \\
         python3-seaborn \\
@@ -130,13 +132,16 @@ elsif ($package_manager eq 'dnf'){
         git \\
         curl \\
         zlib-devel \\
+        cmake \\
         python3-matplotlib \\
         python3-seaborn \\
         python3-pandas \\
         python3-scipy \\
         perl-PerlIO-gzip \\
         perl-App-cpanminus \\
-        perl-GD
+        perl-GD \\
+        gsl \\
+        gsl-devel
     ") == 0 or checksig();
 
 }
@@ -150,6 +155,9 @@ elsif ($package_manager eq 'zypper'){
         curl \\
         patterns-devel-base-devel_basis \\
         zlib-devel \\
+        gsl \\
+        gsl-devel \\
+        cmake \\
         python3-matplotlib \\
         python3-seaborn \\
         python3-pandas \\
@@ -289,6 +297,28 @@ system("rm $install_dir/k8-0.2.4.tar.bz2");
 
 print CFG 'PATH=$PATH:'.$minimap_dir.'                  ## Minimap2'."\n";
 print CFG 'PATH=$PATH:'.$minimap_dir.'/misc             ## Minimap2 paftools.js'."\n";
+
+###################################################################################################
+## Installing MashMap3
+###################################################################################################
+
+print "\nInstalling MashMap3...\n\n";
+
+chdir $install_dir;
+my $mashmap_dir = $install_dir.'/mashmap3';
+
+if (-d $mashmap_dir){
+    system("rm -R -f $mashmap_dir");
+}
+
+system("git clone https://github.com/marbl/MashMap.git $mashmap_dir");
+chdir $mashmap_dir;
+system("cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release") == 0 or checksig();
+system("cmake --build build") == 0 or checksig();
+system("mv $mashmap_dir/build/bin $mashmap_dir/bin");
+
+print CFG 'PATH=$PATH:'.$mashmap_dir.'/bin              ## MashMap3'."\n";
+
 
 ###################################################################################################
 ## Completion
