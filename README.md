@@ -402,10 +402,10 @@ The contents of the subdirectories are:
     - Protein sequences for each species (.faa) in FASTA format
 </details>
 
-### <b>Step by step examples</b>
-
 <details open>
-  <summary><b><i>Show/hide section: Example 1</i></b></summary>
+  <summary><b><i>Show/hide section: Examples </i></b></summary>
+
+### <b>Step by step examples</b>
 
 ### Example 1 - <i>Cryptococcus</i>
 Below is a quick example describing how to compare a few select <i>Cryptococcus</i> genomes (<i>C. neoformans</i> var. <i>neoformans</i> strain [JEC21](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13856/), <i>C. gattii</i> strain [WM276](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13692/), <i>C. gattii</i> VGV strain [MF34](hhttps://www.ncbi.nlm.nih.gov/bioproject/PRJNA487802/), <i>C. decagattii</i> strain [7685027](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA660466/), <i>C. deuterogattii</i> strain [R265](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395628/)) using annotation data available from the public NCBI [Genome](https://www.ncbi.nlm.nih.gov/genome/database) database.
@@ -770,10 +770,6 @@ $(\\#\ of\ residue\ matches / Alignment\ block\ length) * 100$
 Likewise, the total average sequence identity percentage listed in the PAF metrics insert is calculated by dividing the sum of all residue matches by the sum of all aligned block lengths.
 
 As a rule of thumb, pairwise alignments featuring lower sequence identity percentages will produce fewer and/or more fragmented collinear segments.
-</details>
-
-<details open>
-  <summary><b><i>Show/hide section: Example 2</i></b></summary>
 
 ### Example 2 - Encephalitozoonidae
 Below is a quick example describing how to compare a few select genomes from the Encephalitozoonidae (<i>Encephalitozoon/Ordospora</i> species <i>E. intestinalis</i> strain [ATCC 50506](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. hellem</i> strain [ATCC 50604](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. cuniculi</i> strain [ATCC 50602](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA705735/), <i>O. colligata</i> strain [OC4](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA210314/) and <i>O. pajunii</i> strain [FI-F-10](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA630072/)) using annotation data from NCBI.
@@ -883,7 +879,6 @@ run_syny.pl \
   --circos_prefix encephalitozoon
 ```
 
-
 ##### Example of a concatenated Circos plot comparing a total of 3 genomes (using defaults settings):
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/encephalitozoon.gap_0.normal.png">
@@ -974,6 +969,7 @@ Options for `fasta_to_gbff.pl` are:
 -v (--verbose)  Add verbosity
 ```
 When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
+
 </details>
 
 <details open>
