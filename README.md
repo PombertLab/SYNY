@@ -402,8 +402,8 @@ The contents of the subdirectories are:
     - Protein sequences for each species (.faa) in FASTA format
 </details>
 
-<details open>
-  <summary><b><i>Show/hide section: Examples </i></b></summary>
+<!-- <details open>
+  <summary><b><i>Show/hide section: Examples </i></b></summary> -->
 
 ### <b>Step by step examples</b>
 
@@ -970,7 +970,7 @@ Options for `fasta_to_gbff.pl` are:
 ```
 When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
 
-</details>
+<!-- </details> -->
 
 <details open>
   <summary><b><i>Show/hide section: Funding and acknowledgments</i></b></summary>
