@@ -764,7 +764,7 @@ if ($noclus){
 HOMOLOGY:
 
 $tstart = time();
-print "\n##### Infering colinearity from protein-coding gene clusters\n";
+print "\n##### Infering colinearity from protein-coding gene clusters\n\n";
 print ERROR "\n### get_homology.pl ###\n";
 
 my %linked_files;
@@ -774,12 +774,16 @@ opendir (FAA, $prot_dir) or die "\n\n[ERROR]\tCan't open $prot_dir: $!\n\n";
 while (my $file = readdir(FAA)){
 
 	if ($file =~ /\.faa$/){
+
+		my $prot_file = $prot_dir.'/'.$file;
+
 		## Skipping blank files
-		if (-z $file){
+		if (-z $prot_file){
+			print "Protein file $prot_file is blank\n";
 			next;
 		}
 		else{
-			push (@prot_files, "$prot_dir/$file");
+			push (@prot_files, $prot_file);
 		}
 	}
 
