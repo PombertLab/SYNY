@@ -8,8 +8,8 @@ use Cwd qw(abs_path);
 use Getopt::Long qw(GetOptions);
 
 my $name = 'get_paf.pl';
-my $version = '0.4';
-my $updated = '2024-05-13';
+my $version = '0.4a';
+my $updated = '2024-05-14';
 
 my $usage =<<"USAGE";
 NAME        ${name}
@@ -70,7 +70,11 @@ my $paf_dir = $outdir.'/'.'PAF';
 my $maf_dir = $outdir.'/'.'MAF';
 my $blast_dir = $outdir.'/'.'ALN';
 
-push (@subdirs, ($paf_dir,$maf_dir,$blast_dir));
+push (@subdirs, $paf_dir);
+
+if ($aligner =~ /minimap/){
+    push (@subdirs, ($maf_dir,$blast_dir));
+}
 
 for my $dir (@subdirs){
     unless (-d $dir){
