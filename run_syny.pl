@@ -48,6 +48,7 @@ OPTIONS:
 -e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
 -g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
 --minsize               Minimum contig size (in bp) [Default: 1]
+--exclude               Exclude contigs with names matching the provided regular expression(s)
 --aligner               Specify genome alignment tool: minimap or mashmap [Default: minimap]
 --asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
 --mpid                  Specify mashmap3 percentage identity [Default: 70]
@@ -132,6 +133,7 @@ my $outdir = 'SYNY';
 my $threads = 16;
 my $max_pthreads = $threads;
 my $minsize = 1;
+my @excluded;
 my $aligner = 'minimap';
 my $nomap;
 my $noclus;
@@ -212,6 +214,7 @@ GetOptions(
 	'e|evalue=s' => \$evalue,
 	'g|gaps=i{0,}' => \@gaps,
 	'minsize=i' => \$minsize,
+	'excluded=s{0,}' => \@excluded,
 	'aligner=s' => \$aligner,
 	'no_map' => \$nomap,
 	'no_clus' => \$noclus,
@@ -495,8 +498,13 @@ print LOG "SYNY started on: ".$time."\n";
 print LOG "COMMAND: $0 @commands\n\n";
 
 ###################################################################################################
-## Shared options flags
+## Options flags
 ###################################################################################################
+
+my $excluded_flag = '';
+if (@excluded){
+	$excluded_flag = "--exclude @excluded";
+}
 
 my $cluster_flag = '';
 if ($clusters){
@@ -1429,6 +1437,7 @@ sub list_maker {
 			--input $annotation \\
 			--outdir $outdir \\
 			--minsize $minsize \\
+			$excluded_flag \\
 			2>> $log_err
 		") == 0 or checksig();
 

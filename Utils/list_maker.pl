@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.5';
-my $updated = '2024-05-08';
+my $version = '0.5.6';
+my $updated = '2024-05-13';
 
 use strict;
 use warnings;
@@ -22,6 +22,7 @@ SYNOPSIS	Creates a list containing all protein-coding genes with their genomic p
 USAGE		${name}
 		  -i *.gbff \\
 		  -o LISTS \\
+		  -x CATOPV '^CAJUZD'
 		  -verbose
 OPTIONS
 
@@ -30,6 +31,7 @@ OPTIONS:
 -i (--input)	Input file(s) (GZIP supported; File type determined by file extension)
 -o (--outdir)	Output directory [Default: LIST_MAKER]
 -m (--minsize)	Keep only contigs larger or equal to specified size (in bp) [Default: 1]
+-x (--exclude)	Exclude contigs with names matching the provided regular expression(s)
 -v (--verbose)	Add verbosity
 REGEX
 die "$usage\n" unless @ARGV;
@@ -44,14 +46,15 @@ my %filetypes = (
 my @input_files;
 my $outdir = 'LIST_MAKER';
 my $minsize = 1;
+my @regexes;
 my $verbose;
 GetOptions(
 	'i|input=s@{1,}' => \@input_files,
 	'o|outdir=s' => \$outdir,
 	'm|minsize=i' => \$minsize,
+	'x|exclude=s@{0,}' => \@regexes,
 	'v|verbose' => \$verbose
 );
-
 
 ###################################################################################################
 ## Output dir/subdir creation and setup
@@ -82,7 +85,7 @@ foreach my $input_file (@input_files){
 
 	my $file_name = basename($input_file);
 	my @file_data = split('\.',$file_name);
-	my $file_prefix = $file_data[0];
+	my ($file_prefix) = $file_data[0] =~ /^(\w+)/;
 	my $diamond = "<";
 	my $ext = $file_data[-1];
 
@@ -134,6 +137,7 @@ foreach my $input_file (@input_files){
 		my $gene_num = 1;
 		my $sequence;
 		my $incomplete_product_name;
+		my %excluded_seq = ();
 
 		while (my $line = <GBK>){
 			
@@ -145,16 +149,37 @@ foreach my $input_file (@input_files){
 				$contig_size = $2;
 				$contig_sum += $contig_size;
 
+				if (@regexes){
+					for my $regex (@regexes){
+						if ($contig =~ /$regex/){
+							$excluded_seq{$contig} = $contig_size;
+						}
+					}
+				}
+
 				if ($verbose){
 					if ($contig_size >= $minsize){
-						$contig_kept_counter++;
-						$contig_kept_sum += $contig_size;
-						print ' '.$contig."\t".$contig_size."\t". ">= $minsize"."\t"."kept\n";
+						unless (exists $excluded_seq{$contig}){
+							$contig_kept_counter++;
+							$contig_kept_sum += $contig_size;
+							print ' '.$contig."\t".$contig_size."\t". ">= $minsize bp"."\t"."kept\n";
+						}
+						else {
+							$contig_discarded_counter++;
+							$contig_discarded_sum += $contig_size;
+							print ' '.$contig."\t".$contig_size."\t"."regex match"."\t"."discarded\n";
+						}
+
 					}
 					else {
 						$contig_discarded_counter++;
 						$contig_discarded_sum += $contig_size;
-						print ' '.$contig."\t".$contig_size."\t"."< $minsize"."\t"."discarded\n";
+						unless (exists $excluded_seq{$contig}){
+							print ' '.$contig."\t".$contig_size."\t"."< $minsize bp"."\t"."discarded\n";
+						}
+						else {
+							print ' '.$contig."\t".$contig_size."\t"."< $minsize bp and regex match"."\t"."discarded\n";
+						}
 					}
 				}
 
@@ -230,23 +255,36 @@ foreach my $input_file (@input_files){
 
 						unless (exists $isoform{$locus}){ ## Keeping only the first isoform
 
-							if ($contig_size >= $minsize){
-								$isoform{$locus} = '';
-								print OUT $locus."\t";
-								print OUT $contig."\t";
-								print OUT $start."\t";
-								print OUT $end."\t";
-								print OUT $strand."\t";
-								print OUT $gene_num."\t";
-
-								if (!defined $features{$locus}{'product'}){
-									$features{$locus}{'product'} = 'undefined product in accession';
+							if (@regexes){
+								for my $regex (@regexes){
+									if ($contig =~ /$regex/){
+										next;
+									}
 								}
-								print OUT $features{$locus}{'product'}."\n";
+							}
 
-								print PROT ">$locus \[$features{$locus}{'product'}\]\n"; #\t$contig\t$start\t$end\t$strand\n";
-								foreach my $line (unpack("(A60)*",$sequence)){
-									print PROT "$line\n";
+							if ($contig_size >= $minsize){
+
+								unless (exists $excluded_seq{$contig}){
+
+									$isoform{$locus} = '';
+									print OUT $locus."\t";
+									print OUT $contig."\t";
+									print OUT $start."\t";
+									print OUT $end."\t";
+									print OUT $strand."\t";
+									print OUT $gene_num."\t";
+
+									if (!defined $features{$locus}{'product'}){
+										$features{$locus}{'product'} = 'undefined product in accession';
+									}
+									print OUT $features{$locus}{'product'}."\n";
+
+									print PROT ">$locus \[$features{$locus}{'product'}\]\n"; #\t$contig\t$start\t$end\t$strand\n";
+									foreach my $line (unpack("(A60)*",$sequence)){
+										print PROT "$line\n";
+									}
+
 								}
 
 							}
@@ -324,8 +362,8 @@ foreach my $input_file (@input_files){
 		if ($verbose){
 			my $total_contigs = $contig_kept_counter + $contig_discarded_counter;
 			print "\n".'Total contigs: '."\t\t\t".$total_contigs."\t".$contig_sum." bp\n";
-			print "Contigs kept (>= $minsize): "."\t".$contig_kept_counter."\t".$contig_kept_sum." bp\n";
-			print "Contigs discarded (< $minsize): "."\t".$contig_discarded_counter."\t".$contig_discarded_sum." bp\n";
+			print "Contigs kept (>= $minsize bp): "."\t".$contig_kept_counter."\t".$contig_kept_sum." bp\n";
+			print "Contigs discarded (< $minsize bp and/or regex): "."\t".$contig_discarded_counter."\t".$contig_discarded_sum." bp\n";
 		}
 
 		### Creating genome FASTA from GBFF
@@ -333,11 +371,18 @@ foreach my $input_file (@input_files){
 
 			my $contig_len = length($genome{$sequence});
 
+			## Keeping only contig larger than minsize
 			if ($contig_len >= $minsize){
-				print GEN ">$sequence\n";
-				my @data = unpack ("(A60)*", $genome{$sequence});
-				while (my $tmp = shift@data){
-					print GEN "$tmp\n";
+
+				## Excluding sequences matching requested regexes
+				unless (exists $excluded_seq{$sequence}){
+
+					print GEN ">$sequence\n";
+					my @data = unpack ("(A60)*", $genome{$sequence});
+					while (my $tmp = shift@data){
+						print GEN "$tmp\n";
+					}
+
 				}
 			}
 
