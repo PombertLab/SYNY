@@ -768,19 +768,25 @@ print "\n##### Infering colinearity from protein-coding gene clusters\n";
 print ERROR "\n### get_homology.pl ###\n";
 
 my %linked_files;
-my @prot_files;
+my @prot_files = ();
 
 opendir (FAA, $prot_dir) or die "\n\n[ERROR]\tCan't open $prot_dir: $!\n\n";
 while (my $file = readdir(FAA)){
+
 	if ($file =~ /\.faa$/){
-		if (-s $file){
+		## Skipping blank files
+		if (-z $file){
+			next;
+		}
+		else{
 			push (@prot_files, "$prot_dir/$file");
 		}
 	}
+
 }
 
 ## Checking if all protein files are blank, if so no point in searching for shared clusters
-unless (@prot_files){
+if ((scalar @prot_files) == 0){
 	print "\n[E] All protein files are blank. Skipping cluster detection...\n\n";
 	$noclus = 1;
 	goto CIRCOS;
