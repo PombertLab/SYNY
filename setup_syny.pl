@@ -175,7 +175,7 @@ print "\nInstalling Circos perl dependencies...\n\n";
 
 system ("
     sudo cpanm \\
-        Roman \\
+        Text::Roman \\
         Clone \\
         Config::General \\
         Font::TTF::Font \\

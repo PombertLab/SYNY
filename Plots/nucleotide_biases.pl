@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.7e';
+my $version = '0.7f';
 my $updated = '2024-05-15';
 
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
-use Roman;
+use Text::Roman qw(:all);
 
 my $usage = <<"OPTIONS";
 NAME		$name
@@ -343,11 +343,11 @@ foreach my $fileprefix (keys (%sequences)){
 
 		if ($labels eq 'mixed'){
 			if ($fileprefix eq $reference){
-				$label = uc(roman($label));
+				$label = uc(int2roman($label));
 			}
 		}
 		elsif ($labels eq 'roman'){
-			$label = uc(roman($label));
+			$label = uc(int2roman($label));
 		}
 
 		print KAR "chr - $sequence $label 0 $terminus black\n";
@@ -378,11 +378,11 @@ foreach my $fileprefix (keys (%sequences)){
 
 		if ($labels eq 'mixed'){
 			if ($fileprefix eq $reference){
-				$label = uc(roman($label));
+				$label = uc(int2roman($label));
 			}
 		}
 		elsif ($labels eq 'roman'){
-			$label = uc(roman($label));
+			$label = uc(int2roman($label));
 		}
 
 		print KARINV "chr - $sequence $label 0 $terminus black\n";
@@ -454,11 +454,11 @@ foreach my $query (keys (%sequences)){
 
 					if ($labels eq 'mixed'){
 						if ($key eq $pairwise_ref){
-							$label = uc(roman($label));
+							$label = uc(int2roman($label));
 						}
 					}
 					elsif ($labels eq 'roman'){
-						$label = uc(roman($label));
+						$label = uc(int2roman($label));
 					}
 
 					print PAIR "chr - $sequence $label 0 $terminus black\n";
@@ -488,11 +488,11 @@ foreach my $query (keys (%sequences)){
 
 					if ($labels eq 'mixed'){
 						if ($key eq $pairwise_ref){
-							$label = uc(roman($label));
+							$label = uc(int2roman($label));
 						}
 					}
 					elsif ($labels eq 'roman'){
-						$label = uc(roman($label));
+						$label = uc(int2roman($label));
 					}
 
 					if ($key ne $pairwise_ref){
