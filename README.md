@@ -213,7 +213,7 @@ sudo dnf install perl-GD
 
 ## Dependencies (Ubuntu/Fedora)
 sudo cpanm \
-  Roman \
+  Text::Roman \
   Clone \
   Config::General \
   Font::TTF::Font \
