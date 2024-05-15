@@ -1,15 +1,14 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.7d';
-my $updated = '2024-05-08';
+my $version = '0.7e';
+my $updated = '2024-05-15';
 
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
-use Math::Round;
 use Roman;
 
 my $usage = <<"OPTIONS";
@@ -836,10 +835,10 @@ sub print_circos_conf {
 				## Creating an increment so that it will use the full range of colors
 				## not just the start of the list
 				my $increment = scalar(@color_set)/$ref_sequence_count;
-				my $rounded_increment = round($increment);
+				my $rounded_increment = int(sprintf("%.0f", $increment));
 
 				## Making sure that the increment is >= 1
-				if ($rounded_increment == 0){
+				if ($rounded_increment <= 1){
 					$rounded_increment = 1;
 				}
 
