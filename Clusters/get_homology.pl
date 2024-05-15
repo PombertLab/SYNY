@@ -2,8 +2,8 @@
 ## Pombert Lab, 2022
 
 my $name = "get_homology.pl";
-my $version = "0.1.7";
-my $updated = "2024-04-12";
+my $version = "0.1.8";
+my $updated = "2024-05-15";
 
 use warnings;
 use strict;
@@ -54,21 +54,23 @@ GetOptions(
 	't|threads=i' => \$threads
 );
 
-my $diamond_version = `which diamond`;
-if($diamond_version eq ''){
-	die("Make sure diamond is installed and in the PATH\n");
+my $diamond_check = `echo \$(command -v diamond)`;
+chomp $diamond_check;
+if ($diamond_check eq ''){
+	print STDERR "\n[E]: Cannot find diamond. Please install diamond in your \$PATH. Exiting..\n\n";
+	exit;
 }
 
-unless(-d $outdir){
+unless (-d $outdir){
 	make_path($outdir,{mode=>0755});
 }
 
 my $db_dir = "$outdir/DB";
-unless(-d $db_dir){
+unless (-d $db_dir){
 	make_path($db_dir,{mode=>0755});
 }
 
-unless(-d $shared_dir){
+unless (-d $shared_dir){
 	make_path($shared_dir,{mode=>0755});
 }
 
