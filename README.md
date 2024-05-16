@@ -13,7 +13,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
 * [Introduction](#Introduction)
 * [Requirements](#Requirements)
   * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
-  * [Installing dependencies](#installing-dependencies)
+  * [Installing dependencies](#installing-SYNY-dependencies)
 * [Using SYNY](#Using-SYNY)
   * [Why use two distinct approaches?](#Why-use-two-distinct-approaches)
   * [Command line options](#Command-line-options)
@@ -63,16 +63,18 @@ Synteny inferences can be used to:
 - [scipy](https://scipy.org/)
 - [Circos](https://circos.ca/)
 
-#### <b>Downloading SYNY from GitHub</b>
+### <b>Downloading SYNY from GitHub</b>
 ```Bash
 git clone https://github.com/PombertLab/SYNY.git
 cd SYNY
 export PATH=$PATH:$(pwd)
 ```
 
-#### <b>Installing dependencies</b>
-##### <b>Installing dependencies automatically with setup_syny.pl</b>
+### <b>Installing SYNY dependencies</b>
 
+SYNY dependencies can be installed automatically with `setup_syny.pl` (requires sudo privileges), in a mostly automatic fashion via conda packages (does not require sudo privileges), or manually.
+
+#### <b>Installing dependencies automatically with setup_syny.pl (requires sudo privileges)</b>
 Dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [MashMap3](https://github.com/marbl/MashMap), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
 
 ```Bash
@@ -103,8 +105,114 @@ setup_syny.pl \
 ## Loading the configuration file:
 source $CONFIG
 ```
+#### <b>Installing dependencies with Conda (does not require sudo privileges)</b>
+Dependencies can be also installed without sudo-elevated privileges by leveraging conda packages. The installation process was tested with Miniconda3 on Ubuntu-22.04.3 LTS and Fedora 40 Linux distributions running as virtual machines on Microsoft Windows Subsytem for Linux (WSL).
 
-##### <b>Installing dependencies manually</b>
+To install Miniconda:
+```Bash
+## Setup variables
+DOWN_DIR=$HOME/Downloads          ## Replace by desired download directory
+TOOLS_DIR=$HOME/Tools             ## Replace by desired directory directory
+CONDA_DIR=$TOOLS_DIR/miniconda3   ## Replace by desired subdirectory
+CONFIG=~/.profile                 ## Desired configuration file
+
+## Downloading miniconda
+mkdir -p $DOWN_DIR $TOOLS_DIR
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -P $DOWN_DIR
+chmod +x $DOWN_DIR/Miniconda3-latest-Linux-x86_64.sh
+
+## Installing miniconda
+$DOWN_DIR/Miniconda3-latest-Linux-x86_64.sh \
+  -p $CONDA_DIR \
+  -b
+
+echo "export PATH=\$PATH:$CONDA_DIR/condabin" >> $CONFIG
+source $CONFIG
+
+## Deleting downloaded file after installation
+rm $CONDA_DIR/Miniconda3-latest-Linux-x86_64.sh
+
+## Initializing conda
+conda init
+bash --login
+
+## Updating conda and installing the libmamba solver
+conda update --yes -n base conda
+conda install --yes -n base conda-libmamba-solver
+conda config --set solver libmamba
+
+## Disabling automatic activation of the base environment at login
+conda config --set auto_activate_base false
+```
+
+To download and install SYNY:
+```Bash
+TOOLS_DIR=$HOME/Tools               ## Replace by desired directory directory
+SYNY=$TOOLS_DIR/SYNY                ## Replace desired SYNY installation directory
+CONFIG=~/.profile                   ## Desired configuration file
+
+mkdir -p $TOOLS_DIR
+git clone https://github.com/PombertLab/SYNY.git $SYNY
+echo "export PATH=\$PATH:$SYNY" >> $CONFIG
+source $CONFIG
+```
+
+
+To create a conda environment for syny:
+```Bash
+SYNY=$TOOLS_DIR/SYNY                ## Replace by SYNY installation directory
+
+## Creating a conda environment + installing syny dependencies from its yaml file
+conda env create -f $SYNY/SYNY.yaml
+conda activate syny
+
+### Installing Text::Roman manually (not found in conda repositories)
+# Setup variables
+DOWN_DIR=$HOME/Downloads            ## Replace by desired download directory
+TOOLS_DIR=$HOME/Tools               ## Replace by desired directory directory
+PERL_LIB=$TOOLS_DIR/Perl5           ## Replace by desired installation directory
+
+# Downloading/setting up Text::Roman
+mkdir -p $DOWN_DIR $TOOLS_DIR $PERL_LIB
+wget https://cpan.metacpan.org/authors/id/S/SY/SYP/Text-Roman-3.5.tar.gz -P $DOWN_DIR
+tar -zxvf $DOWN_DIR/Text-Roman-3.5.tar.gz -C $PERL_LIB
+mv $PERL_LIB/Text-Roman-3.5/lib/* $PERL_LIB
+rm -R $PERL_LIB/Text-Roman-3.5*
+
+# Adding Perl lib location to PERL5LIB environment variable
+conda env config vars set PERL5LIB=$PERL5LIB:$PERL_LIB
+conda activate syny
+```
+
+While there is a conda package for Circos, it dependencies clash vith newer packages. Installing Circos outside conda will prevent dependency issues. To install Circos outside conda:
+
+```Bash 
+##  Setup variables
+DOWN_DIR=$HOME/Downloads            ## Replace by desired download directory
+TOOLS_DIR=$HOME/Tools               ## Replace by desired directory directory
+CIRCOS_DIR=$TOOLS_DIR/CIRCOS        ## Replace by desired installation directory
+CONFIG=~/.profile                   ## Desired configuration file
+
+## Downloading Circos
+mkdir -p $DOWN_DIR $TOOLS_DIR $CIRCOS_DIR
+wget \
+  --no-check-certificate \
+  https://circos.ca/distribution/circos-0.69-9.tgz \
+  -P $DOWN_DIR \
+
+tar -zxvf $DOWN_DIR/circos-0.69-9.tgz -C $CIRCOS_DIR && rm $DOWN_DIR/circos-0.69-9.tgz
+echo "export PATH=\$PATH:$CIRCOS_DIR/circos-0.69-9/bin" >> $CONFIG
+source $CONFIG
+```
+
+To run syny within its conda environment:
+```Bash
+conda activate syny
+(syny) username:~$ run_syny.pl -a *.gbff.gz -o output directory
+```
+
+
+#### <b>Installing dependencies manually</b>
 ##### To install PerlIO::gzip:
 
 ```Bash
