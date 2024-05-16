@@ -10,7 +10,7 @@
 
 ##### Fixes:
 - Fixed the `The number of annotation files (2) does not equal the number of protein files (1)` error => rewrote the corresponding segment and removed the obsoleted subroutine.
-- Fixed unreliable $diamond_check in `get_homology` (i.e. replaced <i>which</i> by <i>command -v</i>).
+- Fixed the unreliable $diamond_check in `get_homology.pl` (i.e. replaced <i>which</i> by <i>command -v</i>).
 - Changed Perl dependency Roman => Text::Roman in `nucleotide_biases.pl`.
 
 ## SYNY-v1.0b
