@@ -74,6 +74,9 @@ export PATH=$PATH:$(pwd)
 
 SYNY dependencies can be installed automatically with `setup_syny.pl` (requires sudo privileges), in a mostly automatic fashion via conda packages (does not require sudo privileges), or manually.
 
+<details open>
+  <summary><b><i>Show/hide section: Installing dependencies with setup_syny.pl </i></b></summary>
+
 #### <b>Installing dependencies automatically with setup_syny.pl (requires sudo privileges)</b>
 Dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [MashMap3](https://github.com/marbl/MashMap), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
 
@@ -105,6 +108,7 @@ setup_syny.pl \
 ## Loading the configuration file:
 source $CONFIG
 ```
+</details>
 
 <details open>
   <summary><b><i>Show/hide section: Installing dependencies with Conda</i></b></summary>
@@ -215,6 +219,9 @@ conda activate syny
 (syny) username:~$ run_syny.pl -a *.gbff.gz -o output directory
 ```
 </details>
+
+<details open>
+  <summary><b><i>Show/hide section: Installing dependencies manually</i></b></summary>
 
 #### <b>Installing dependencies manually</b>
 ##### To install PerlIO::gzip:
@@ -353,6 +360,7 @@ cd circos-0.69-9/bin
 printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.profile      ## Ubuntu
 printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ```
+</details>
 </details>
 
 <details open>
