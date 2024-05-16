@@ -115,7 +115,7 @@ foreach my $file (sort(@input_files)){
 	my $file_prefix = (split('\.',$file_name))[0];
 	push (@prefixes, $file_prefix);
 
-	print "\nRunning BLASTP on $file\n";
+	print "\nRunning DIAMOND BLASTP on $file\n";
 
 	foreach my $db_prefix (keys(%db_files)){
 
