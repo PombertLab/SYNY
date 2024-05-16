@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.7c';
-my $updated = '2024-05-14';
+my $version = '0.7d';
+my $updated = '2024-05-16';
 
 use strict;
 use warnings;
@@ -48,6 +48,7 @@ OPTIONS:
 -e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
 -g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
 --minsize               Minimum contig size (in bp) [Default: 1]
+--include               Select contigs with names from input text file(s) (one name per line); i.e. exclude everything else
 --exclude               Exclude contigs with names matching the regular expression(s); e.g. --exclude '^AUX'
 --aligner               Specify genome alignment tool: minimap or mashmap [Default: minimap]
 --asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
@@ -134,6 +135,7 @@ my $threads = 16;
 my $max_pthreads = $threads;
 my $minsize = 1;
 my @excluded;
+my @included;
 my $aligner = 'minimap';
 my $nomap;
 my $noclus;
@@ -215,6 +217,7 @@ GetOptions(
 	'g|gaps=i{0,}' => \@gaps,
 	'minsize=i' => \$minsize,
 	'excluded=s{0,}' => \@excluded,
+	'included=s{0,}' => \@included,
 	'aligner=s' => \$aligner,
 	'no_map' => \$nomap,
 	'no_clus' => \$noclus,
@@ -504,6 +507,11 @@ print LOG "COMMAND: $0 @commands\n\n";
 my $excluded_flag = '';
 if (@excluded){
 	$excluded_flag = "--exclude @excluded";
+}
+
+my $included_flag = '';
+if (@included){
+	$included_flag = "--include @included";
 }
 
 my $cluster_flag = '';
@@ -1441,6 +1449,7 @@ sub list_maker {
 			--input $annotation \\
 			--outdir $outdir \\
 			--minsize $minsize \\
+			$included_flag \\
 			$excluded_flag \\
 			2>> $log_err
 		") == 0 or checksig();

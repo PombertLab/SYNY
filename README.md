@@ -406,6 +406,7 @@ Options for run_SYNY.pl are:
 -e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
 -g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
 --minsize               Minimum contig size (in bp) [Default: 1]
+--include               Select contigs with names from input text file(s) (one name per line); i.e. exclude everything else
 --exclude               Exclude contigs with names matching the regular expression(s); e.g. --exclude '^AUX'
 --aligner               Specify genome alignment tool: minimap or mashmap [Default: minimap]
 --asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]

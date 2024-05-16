@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.6';
-my $updated = '2024-05-13';
+my $version = '0.5.6a';
+my $updated = '2024-05-16';
 
 use strict;
 use warnings;
@@ -31,6 +31,7 @@ OPTIONS:
 -i (--input)	Input file(s) (GZIP supported; File type determined by file extension)
 -o (--outdir)	Output directory [Default: LIST_MAKER]
 -m (--minsize)	Keep only contigs larger or equal to specified size (in bp) [Default: 1]
+-n (--include)	Select contigs with names from input text file(s) (one name per line); i.e. excludes everything else
 -x (--exclude)	Exclude contigs with names matching the provided regular expression(s)
 -v (--verbose)	Add verbosity
 REGEX
@@ -46,12 +47,14 @@ my %filetypes = (
 my @input_files;
 my $outdir = 'LIST_MAKER';
 my $minsize = 1;
+my @included;
 my @regexes;
 my $verbose;
 GetOptions(
 	'i|input=s@{1,}' => \@input_files,
 	'o|outdir=s' => \$outdir,
 	'm|minsize=i' => \$minsize,
+	'n|included=s@{0,}' => \@included,
 	'x|exclude=s@{0,}' => \@regexes,
 	'v|verbose' => \$verbose
 );
@@ -80,6 +83,24 @@ for my $dir (@outdirs){
 ###################################################################################################
 ## Parsing input files
 ###################################################################################################
+
+my %included;
+if (@included){
+	my @tmp = @included;
+	while (my $inc = shift @tmp){
+		open INC, '<', $inc or die "Can't open $inc: $!\n";
+		while (my $line = <INC>){
+			chomp $line;
+			if ($line =~ /^#/){
+				next;
+			}
+			elsif ($line =~ /^(\w+)/){
+				my $contig_to_keep = $1;
+				$included{$contig_to_keep} = 1;
+			}
+		}
+	}
+}
 
 foreach my $input_file (@input_files){
 
@@ -251,7 +272,15 @@ foreach my $input_file (@input_files){
 					}
 					else{
 
-						my ($start,$end,$strand) = @{$location_data{$locus}};
+						my $start,
+						my $end;
+						my $strand;
+						if (exists $location_data{$locus}){
+							($start,$end,$strand) = @{$location_data{$locus}};
+						}
+						else{
+							next;
+						}
 
 						unless (exists $isoform{$locus}){ ## Keeping only the first isoform
 
@@ -260,6 +289,12 @@ foreach my $input_file (@input_files){
 									if ($contig =~ /$regex/){
 										next;
 									}
+								}
+							}
+
+							if (@included){
+								if (!exists $included{$contig}){
+									next;
 								}
 							}
 
@@ -373,6 +408,13 @@ foreach my $input_file (@input_files){
 
 			## Keeping only contig larger than minsize
 			if ($contig_len >= $minsize){
+
+				## Keeping only contigs from provided list
+				if (%included){
+					if (!exists $included{$sequence}){
+						next;
+					}
+				}
 
 				## Excluding sequences matching requested regexes
 				unless (exists $excluded_seq{$sequence}){
