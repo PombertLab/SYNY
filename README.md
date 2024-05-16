@@ -184,7 +184,7 @@ conda env config vars set PERL5LIB=$PERL5LIB:$PERL_LIB
 conda activate syny
 ```
 
-While there is a conda package for Circos, it dependencies clash vith newer packages. Installing Circos outside conda will prevent dependency issues. To install Circos outside conda:
+While there is a conda package for Circos, its dependencies clash vith newer packages. Installing Circos outside conda will prevent dependency issues. To install Circos outside conda:
 
 ```Bash 
 ##  Setup variables
