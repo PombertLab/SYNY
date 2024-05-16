@@ -7,7 +7,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
 [![DOI](https://zenodo.org/badge/491274225.svg)](https://zenodo.org/doi/10.5281/zenodo.10790180)
 
 <details open>
-  <summary><b><i>Show/hide section: TOC</i></b></summary>
+  <summary><b><i>Show/hide: TOC</i></b></summary>
 
 ## <b>Table of contents</b>
 * [Introduction](#Introduction)
@@ -34,7 +34,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
 </details>
 
 <details open>
-  <summary><b><i>Show/hide section: Introduction</i></b></summary>
+  <summary><b><i>Show/hide: Introduction</i></b></summary>
 
 ## <b>Introduction</b>
 #### <b>What is synteny?</b>
@@ -48,7 +48,7 @@ Synteny inferences can be used to:
 </details>
 
 <details open>
-  <summary><b><i>Show/hide section: Installation</i></b></summary>
+  <summary><b><i>Show/hide: Installation</i></b></summary>
 
 ## <b>Requirements</b>
 - [DIAMOND](https://github.com/bbuchfink/diamond)
@@ -75,7 +75,7 @@ export PATH=$PATH:$(pwd)
 SYNY dependencies can be installed automatically with `setup_syny.pl` (requires sudo privileges), in a mostly automatic fashion via conda packages (does not require sudo privileges), or manually.
 
 <details open>
-  <summary><b><i>Show/hide section: Installing dependencies with setup_syny.pl </i></b></summary>
+  <summary><b><i>Show/hide: Installing dependencies with setup_syny.pl </i></b></summary>
 
 #### <b>Installing dependencies automatically with setup_syny.pl (requires sudo privileges)</b>
 Dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [MashMap3](https://github.com/marbl/MashMap), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
@@ -111,7 +111,7 @@ source $CONFIG
 </details>
 
 <details open>
-  <summary><b><i>Show/hide section: Installing dependencies with Conda</i></b></summary>
+  <summary><b><i>Show/hide: Installing dependencies with Conda</i></b></summary>
 
 #### <b>Installing dependencies with Conda (does not require sudo privileges)</b>
 Dependencies can also be installed without sudo-elevated privileges by leveraging conda packages. The installation process was tested with Miniconda3 on Ubuntu-22.04.3 LTS and Fedora 40 Linux distributions running as virtual machines on Microsoft Windows Subsystem for Linux (WSL).
@@ -221,7 +221,7 @@ conda activate syny
 </details>
 
 <details open>
-  <summary><b><i>Show/hide section: Installing dependencies manually</i></b></summary>
+  <summary><b><i>Show/hide: Installing dependencies manually</i></b></summary>
 
 #### <b>Installing dependencies manually</b>
 ##### To install PerlIO::gzip:
@@ -364,7 +364,7 @@ printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 </details>
 
 <details open>
-  <summary><b><i>Show/hide section: Using SYNY</i></b></summary>
+  <summary><b><i>Show/hide: Using SYNY</i></b></summary>
 
 ## <b>Using SYNY</b>
 The SYNY pipeline can be run with [run_syny.pl](https://github.com/PombertLab/SYNY/blob/main/run_syny.pl), a master script that:
@@ -1113,14 +1113,14 @@ Options for `fasta_to_gbff.pl` are:
 When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
 
 <details open>
-  <summary><b><i>Show/hide section: Funding and acknowledgments</i></b></summary>
+  <summary><b><i>Show/hide: Funding and acknowledgments</i></b></summary>
 
 ## Funding and acknowledgments
 This work was supported in part by the National Institute of Allergy and Infectious Diseases of the National Institutes of Health (award number R15AI128627) to Jean-Francois Pombert. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
 </details>
 
 <details open>
-  <summary><b><i>Show/hide section: How to cite</i></b></summary>
+  <summary><b><i>Show/hide: How to cite</i></b></summary>
 
 ## How to cite
 ##### A short paper describing the SYNY pipeline is available as a preprint on bioRxiv:
@@ -1137,7 +1137,7 @@ This work was supported in part by the National Institute of Allergy and Infecti
 </details>
 
 <details open>
-  <summary><b><i>Show/hide section: References</i></b></summary>
+  <summary><b><i>Show/hide: References</i></b></summary>
 
 ## <b>References</b>
 [Sensitive protein alignments at tree-of-life scale using DIAMOND](https://www.nature.com/articles/s41592-021-01101-x). Buchfink B, Reuter K, Drost HG. <b>Nature Methods.</b> 18, 366–368 (2021). doi: 10.1038/s41592-021-01101-x
