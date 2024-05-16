@@ -105,6 +105,10 @@ setup_syny.pl \
 ## Loading the configuration file:
 source $CONFIG
 ```
+
+<details open>
+  <summary><b><i>Show/hide section: Installing dependencies with Conda</i></b></summary>
+
 #### <b>Installing dependencies with Conda (does not require sudo privileges)</b>
 Dependencies can also be installed without sudo-elevated privileges by leveraging conda packages. The installation process was tested with Miniconda3 on Ubuntu-22.04.3 LTS and Fedora 40 Linux distributions running as virtual machines on Microsoft Windows Subsystem for Linux (WSL).
 
@@ -210,7 +214,7 @@ To run SYNY within its conda environment:
 conda activate syny
 (syny) username:~$ run_syny.pl -a *.gbff.gz -o output directory
 ```
-
+</details>
 
 #### <b>Installing dependencies manually</b>
 ##### To install PerlIO::gzip:
