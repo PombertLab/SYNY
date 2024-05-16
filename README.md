@@ -158,7 +158,7 @@ source $CONFIG
 ```
 
 
-To create a conda environment for syny:
+To create a conda environment for SYNY:
 ```Bash
 SYNY=$TOOLS_DIR/SYNY                ## Replace by SYNY installation directory
 
@@ -205,7 +205,7 @@ echo "export PATH=\$PATH:$CIRCOS_DIR/circos-0.69-9/bin" >> $CONFIG
 source $CONFIG
 ```
 
-To run syny within its conda environment:
+To run SYNY within its conda environment:
 ```Bash
 conda activate syny
 (syny) username:~$ run_syny.pl -a *.gbff.gz -o output directory
