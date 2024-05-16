@@ -106,13 +106,13 @@ setup_syny.pl \
 source $CONFIG
 ```
 #### <b>Installing dependencies with Conda (does not require sudo privileges)</b>
-Dependencies can be also installed without sudo-elevated privileges by leveraging conda packages. The installation process was tested with Miniconda3 on Ubuntu-22.04.3 LTS and Fedora 40 Linux distributions running as virtual machines on Microsoft Windows Subsytem for Linux (WSL).
+Dependencies can also be installed without sudo-elevated privileges by leveraging conda packages. The installation process was tested with Miniconda3 on Ubuntu-22.04.3 LTS and Fedora 40 Linux distributions running as virtual machines on Microsoft Windows Subsystem for Linux (WSL).
 
 To install Miniconda:
 ```Bash
 ## Setup variables
 DOWN_DIR=$HOME/Downloads          ## Replace by desired download directory
-TOOLS_DIR=$HOME/Tools             ## Replace by desired directory directory
+TOOLS_DIR=$HOME/Tools             ## Replace by desired directory
 CONDA_DIR=$TOOLS_DIR/miniconda3   ## Replace by desired subdirectory
 CONFIG=~/.profile                 ## Desired configuration file
 
@@ -147,8 +147,8 @@ conda config --set auto_activate_base false
 
 To download and install SYNY:
 ```Bash
-TOOLS_DIR=$HOME/Tools               ## Replace by desired directory directory
-SYNY=$TOOLS_DIR/SYNY                ## Replace desired SYNY installation directory
+TOOLS_DIR=$HOME/Tools               ## Replace by desired directory
+SYNY=$TOOLS_DIR/SYNY                ## Replace by desired SYNY installation directory
 CONFIG=~/.profile                   ## Desired configuration file
 
 mkdir -p $TOOLS_DIR
@@ -169,7 +169,7 @@ conda activate syny
 ### Installing Text::Roman manually (not found in conda repositories)
 # Setup variables
 DOWN_DIR=$HOME/Downloads            ## Replace by desired download directory
-TOOLS_DIR=$HOME/Tools               ## Replace by desired directory directory
+TOOLS_DIR=$HOME/Tools               ## Replace by desired directory
 PERL_LIB=$TOOLS_DIR/Perl5           ## Replace by desired installation directory
 
 # Downloading/setting up Text::Roman
@@ -189,7 +189,7 @@ While there is a conda package for Circos, it dependencies clash vith newer pack
 ```Bash 
 ##  Setup variables
 DOWN_DIR=$HOME/Downloads            ## Replace by desired download directory
-TOOLS_DIR=$HOME/Tools               ## Replace by desired directory directory
+TOOLS_DIR=$HOME/Tools               ## Replace by desired directory
 CIRCOS_DIR=$TOOLS_DIR/CIRCOS        ## Replace by desired installation directory
 CONFIG=~/.profile                   ## Desired configuration file
 
