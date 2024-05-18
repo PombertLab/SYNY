@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.7d';
-my $updated = '2024-05-16';
+my $version = '0.7e';
+my $updated = '2024-05-18';
 
 use strict;
 use warnings;
@@ -284,6 +284,33 @@ GetOptions(
 	'lfsize=i' => \$lfsize,
 	'no_linemap' => \$no_linemap
 );
+
+# Quick check for annotations files
+unless (@annot_files){
+	print "\n[E] No annotation file entered with -a/--annot.\n";
+	print "[E] Please enter some annotation files to compare. Exiting...\n\n";
+	exit;
+}
+else {
+	my $gbff_counter = 0;
+	my @files;
+	for my $file (@annot_files){
+		if ($file =~ /\.gbff(\.gz)?$/){
+			$gbff_counter++;
+			push (@files, $file);
+		}
+	}
+	if ($gbff_counter == 0){
+		print "\n[E] No .gbff/.gbff.gz file detected: --annot @annot_files\n";
+		print "[E] Please check the command line. Exiting...\n\n";
+		exit;
+	}
+ 	elsif ($gbff_counter == 1){
+		print "\n[E] Only one annotation file (.gbff/.gbff.gz) detected: $files[0]\n";
+		print "[E] Please enter at least two annotation files to compare. Exiting...\n\n";
+		exit;
+	}
+}
 
 # Displaying the full list of options
 if ($help){
