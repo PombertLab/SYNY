@@ -1,26 +1,26 @@
 #############################################################
 
-SYNY - Version 1.1
+SYNY - Version 1.1a
 
 #############################################################
 
-# Main                              versions
-run_syny.pl                         0.7e
+# Main                              Versions
+run_syny.pl                         0.7f
 setup_syny.pl                       0.3a
 
-# Genome alignment                  versions
+# Genome alignment                  Versions
 get_paf.pl                          0.4a
 paf2links.pl                        0.1c
 paf_metrics.py                      0.2c
 
-# Gene clusters                     versions
+# Gene clusters                     Versions
 clusters2links.pl                   0.2c
 clusters_to_paf.pl                  0.2
 get_homology.pl                     0.1.8
 get_synteny.pl                      0.7.3a
 id_conserved_regions.pl             0.5.3
 
-# Plots                             versions
+# Plots                             Versions
 linear_maps.py                      0.1a
 nucleotide_biases.pl                0.7f
 paf_to_barplot.py                   0.3e
@@ -28,7 +28,7 @@ paf_to_dotplot.py                   0.5b
 paf_to_heatmap.py                   0.2
 protein_cluster_hm.py               0.3d
 
-# Utils                             versions
+# Utils                             Versions
 check_mp_colors.py                  0.2b
 fasta_to_gbff.pl                    0.1
 list_maker.pl                       0.5.6a

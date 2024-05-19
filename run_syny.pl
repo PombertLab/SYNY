@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.7e';
-my $updated = '2024-05-18';
+my $version = '0.7f';
+my $updated = '2024-05-19';
 
 use strict;
 use warnings;
@@ -47,6 +47,7 @@ OPTIONS:
 -o (--outdir)           Output directory [Default = SYNY]
 -e (--evalue)           DIAMOND BLASTP evalue cutoff [Default = 1e-10]
 -g (--gaps)             Allowable number of gaps between gene pairs [Default = 0]
+
 --minsize               Minimum contig size (in bp) [Default: 1]
 --include               Select contigs with names from input text file(s) (one name per line); i.e. exclude everything else
 --exclude               Exclude contigs with names matching the regular expression(s); e.g. --exclude '^AUX'
@@ -56,6 +57,7 @@ OPTIONS:
 --resume                Resume minimap/mashmap computations (skip completed alignments)
 --no_map                Skip minimap/mashmap pairwise genome alignments
 --no_clus               Skip gene cluster reconstructions
+--version               Display SYNY version
 EXIT
 
 my $plot_options = <<"PLOT_OPTIONS";
@@ -143,6 +145,7 @@ my $resume;
 my $asm;
 my $mashmap_pid = 85;
 my $help;
+my $syny_version;
 
 # Circos
 my $reference;
@@ -225,6 +228,7 @@ GetOptions(
 	'asm=i' => \$asm,
 	'mpid=s' => \$mashmap_pid,
 	'h|help' => \$help,
+	'version' => \$syny_version,
 	# Circos
 	'c|circos=s' => \$circos,
 	'r|ref|reference=s' => \$reference,
@@ -285,33 +289,6 @@ GetOptions(
 	'no_linemap' => \$no_linemap
 );
 
-# Quick check for annotations files
-unless (@annot_files){
-	print "\n[E] No annotation file entered with -a/--annot.\n";
-	print "[E] Please enter some annotation files to compare. Exiting...\n\n";
-	exit;
-}
-else {
-	my $gbff_counter = 0;
-	my @files;
-	for my $file (@annot_files){
-		if ($file =~ /\.gbff(\.gz)?$/){
-			$gbff_counter++;
-			push (@files, $file);
-		}
-	}
-	if ($gbff_counter == 0){
-		print "\n[E] No .gbff/.gbff.gz file detected: --annot @annot_files\n";
-		print "[E] Please check the command line. Exiting...\n\n";
-		exit;
-	}
- 	elsif ($gbff_counter == 1){
-		print "\n[E] Only one annotation file (.gbff/.gbff.gz) detected: $files[0]\n";
-		print "[E] Please enter at least two annotation files to compare. Exiting...\n\n";
-		exit;
-	}
-}
-
 # Displaying the full list of options
 if ($help){
 	print "\n".$usage."\n";
@@ -335,6 +312,21 @@ my $util_path = $path.'/Utils';
 my $pthreads = $threads;
 if ($max_pthreads){
 	$pthreads = $max_pthreads;
+}
+
+###################################################################################################
+## Display syny version
+###################################################################################################
+
+if ($syny_version){
+	my $version_file = $path.'./versions.txt';
+	open VER, '<', $version_file or die "Can't read $version_file: $!\n";
+	print "\n";
+	while (my $line = <VER>){
+		print $line;
+	}
+	print "\n\n";
+	exit;
 }
 
 ###################################################################################################
@@ -450,6 +442,39 @@ unless ($no_circos){
 	chomp $circos_check;
 	if ($diamond_check eq ''){
 		print STDERR "\n[E]: Cannot find circos. Please install circos in your \$PATH. Exiting..\n\n";
+		exit;
+	}
+}
+
+###################################################################################################
+## Precheck annotations files
+###################################################################################################
+
+if (!@annot_files){
+	print "\n[E] No annotation file entered with -a/--annot.\n";
+	print "[E] Please enter some annotation files to compare. Exiting...\n\n";
+	exit;
+}
+else {
+
+	my $gbff_counter = 0;
+	my @files;
+
+	for my $file (@annot_files){
+		if ($file =~ /\.gbff(\.gz)?$/){
+			$gbff_counter++;
+			push (@files, $file);
+		}
+	}
+
+	if ($gbff_counter == 0){
+		print "\n[E] No .gbff/.gbff.gz file detected: --annot @annot_files\n";
+		print "[E] Please check the command line. Exiting...\n\n";
+		exit;
+	}
+ 	elsif ($gbff_counter == 1){
+		print "\n[E] Only one annotation file (.gbff/.gbff.gz) detected: $files[0]\n";
+		print "[E] Please enter at least two annotation files to compare. Exiting...\n\n";
 		exit;
 	}
 }
