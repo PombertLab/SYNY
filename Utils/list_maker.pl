@@ -2,7 +2,7 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.7';
+my $version = '0.5.8';
 my $updated = '2024-05-22';
 
 use strict;
@@ -161,7 +161,6 @@ foreach my $input_file (@input_files){
 		open GBK, $diamond, $input_file or die "Can't open input file $input_file: $!\n";
 
 		my %location_data;
-		my %features;
 		my %genome;
 		my %isoform; ## Keeping track of isoforms with identical locus tags
 
@@ -176,6 +175,7 @@ foreach my $input_file (@input_files){
 
 		my $gene;
 		my $CDS;
+		my $product;
 		my $translate;
 		my $section;
 		my $start;
@@ -275,18 +275,18 @@ foreach my $input_file (@input_files){
 
 				## Checking for product names, including accross multiple lines
 				elsif ($line =~ /^\s{21}\/product="(.*)"/){
-					$features{$locus}{'product'} = $1;
+					$product = $1;
 				}
 				elsif ($line =~ /^\s{21}\/product="(.*)/){
-					$features{$locus}{'product'} = $1;
+					$product = $1;
 					$incomplete_product_name = $1;
 				}
 				elsif ((defined $incomplete_product_name) && ($line =~ /^\s{21}(.*)\"$/)){
-					$features{$locus}{'product'} .= " $1";
+					$product .= " $1";
 					$incomplete_product_name = undef;
 				}
 				elsif ((defined $incomplete_product_name) && ($line =~ /^\s{21}(.*)/)){
-					$features{$locus}{'product'} .= " $1";
+					$product .= " $1";
 					$incomplete_product_name .= " $1";
 				}
 
@@ -347,12 +347,10 @@ foreach my $input_file (@input_files){
 									print OUT $strand."\t";
 									print OUT $gene_num."\t";
 
-									if (!defined $features{$locus}{'product'}){
-										$features{$locus}{'product'} = 'undefined product in accession';
-									}
-									print OUT $features{$locus}{'product'}."\n";
+									$product = "undefined product in accession" unless defined $product;
+									print OUT $product."\n";
 
-									print PROT ">$locus \[$features{$locus}{'product'}\]\n"; #\t$contig\t$start\t$end\t$strand\n";
+									print PROT ">$locus \[$product\]\n"; #\t$contig\t$start\t$end\t$strand\n";
 									foreach my $line (unpack("(A60)*",$sequence)){
 										print PROT "$line\n";
 									}
@@ -363,6 +361,7 @@ foreach my $input_file (@input_files){
 
 							undef $translate;
 							undef $sequence;
+							undef $product;
 							$gene_num ++;
 
 						}
@@ -421,10 +420,15 @@ foreach my $input_file (@input_files){
 						$strand = "-";
 					}
 				}
-				## Gather gene metadata
+				## Gather gene metadata from locus tag
 				elsif ($line =~ /^\s{21}\/locus_tag="(.*)"/){
 					$locus = $1;
 					$locus =~ s/\W/\_/g;
+					@{$location_data{$locus}} = ($start,$end,$strand);
+				}
+				## or from gene_id (if no locus_tag)
+				elsif ($line =~ /^\s{21}\/db_xref="GeneID:(\d+)"/){
+					$locus = $1;
 					@{$location_data{$locus}} = ($start,$end,$strand);
 				}
 			}
