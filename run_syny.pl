@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.7f';
-my $updated = '2024-05-19';
+my $version = '0.7g';
+my $updated = '2024-05-22';
 
 use strict;
 use warnings;
@@ -50,6 +50,7 @@ OPTIONS:
 
 --minsize               Minimum contig size (in bp) [Default: 1]
 --include               Select contigs with names from input text file(s) (one name per line); i.e. exclude everything else
+--ranges                Select contigs with subranges from input text file(s): name start end
 --exclude               Exclude contigs with names matching the regular expression(s); e.g. --exclude '^AUX'
 --aligner               Specify genome alignment tool: minimap or mashmap [Default: minimap]
 --asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
@@ -138,6 +139,7 @@ my $max_pthreads = $threads;
 my $minsize = 1;
 my @excluded;
 my @included;
+my @ranges;
 my $aligner = 'minimap';
 my $nomap;
 my $noclus;
@@ -221,6 +223,7 @@ GetOptions(
 	'minsize=i' => \$minsize,
 	'excluded=s{0,}' => \@excluded,
 	'included=s{0,}' => \@included,
+	'ranges=s{0,}' => \@ranges,
 	'aligner=s' => \$aligner,
 	'no_map' => \$nomap,
 	'no_clus' => \$noclus,
@@ -549,8 +552,9 @@ my $time = localtime();
 my $start_time = time();
 my $tstart = time();
 
-print LOG "SYNY started on: ".$time."\n";
-print LOG "COMMAND: $0 @commands\n\n";
+print LOG "SYNY started on: ".$time."\n\n";
+logs(\*LOG, 'Command line', 'header');
+print LOG "$0 @commands\n\n";
 
 ###################################################################################################
 ## Options flags
@@ -565,6 +569,12 @@ my $included_flag = '';
 if (@included){
 	$included_flag = "--include @included";
 }
+
+my $ranges_flag = '';
+if (@ranges){
+	$ranges_flag = "--ranges @ranges";
+}
+
 
 my $cluster_flag = '';
 if ($clusters){
@@ -620,6 +630,9 @@ my @threads = initThreads($threads);
 print ERROR "\n### list_maker.pl ###\n";
 print "\n##### Extracting data from GenBank files\n";
 
+logs(\*LOG, 'Parsing data', 'header');
+logs(\*LOG, 'list_maker.pl', 'start');
+
 my @annotations :shared = @annot_files;
 my $annot_num = scalar(@annot_files);
 
@@ -630,8 +643,7 @@ for my $thread (@threads){
 	$thread ->join();
 }
 
-logs(\*LOG, 'Parsing data - list_maker.pl');
-
+logs(\*LOG, 'list_maker.pl', 'end');
 
 ###################################################################################################
 ## Get PAF files with minimap2
@@ -647,6 +659,11 @@ $tstart = time();
 print "\n##### Infering colinearity from pairwise genome alignments\n";
 print ERROR "\n### get_paf.pl ###\n";
 
+logs(\*LOG, 'Genome alignments', 'header');
+logs(\*LOG, 'get_paf.pl', 'start');
+
+my $paf_dir = "$mmap_dir/PAF";
+
 system("
 	$align_path/get_paf.pl \\
 	  --fasta $genome_dir/*.fasta \\
@@ -658,14 +675,26 @@ system("
 	  $asm_flag
 ") == 0 or checksig();
 
-logs(\*LOG, 'Genome alignments - get_paf.pl');
+opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
+while (my $file = readdir(PAFDIR)){
+	if ($file =~ /\.paf$/){
+		my $paf_file = "$paf_dir/$file";
+		if (-z $paf_file){
+			print LOG "  - $paf_file is empty. No collinearity or process terminated by OOM killer?\n";
+		}
+	}
+}
+closedir PAFDIR;
+
+logs(\*LOG, 'get_paf.pl', 'end');
 
 ## Creating Circos links file
 $tstart = time();
 print ERROR "\n### paf2links.pl ###\n";
 
-my $paf_dir = "$mmap_dir/PAF";
 my $paf_links = "$circos_cat_dir/concatenated.mmap.links";
+
+logs(\*LOG, 'paf2links.pl', 'start');
 
 system("
 	$align_path/paf2links.pl \\
@@ -677,7 +706,7 @@ system("
 	  2>> $log_err
 ") == 0 or checksig();
 
-logs(\*LOG, 'Genome alignments - paf2links.pl');
+logs(\*LOG, 'paf2links.pl', 'end');
 
 #### Calculate/plot PAF metrics
 if ($aligner =~ /minimap/){
@@ -688,13 +717,16 @@ if ($aligner =~ /minimap/){
 
 	my $aln_length_dir = $mmap_dir.'/METRICS';
 	my @paf_files;
-	opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
 
+	opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
 	while (my $file = readdir(PAFDIR)){
 		if ($file =~ /\.paf$/){
 			push (@paf_files, "$paf_dir/$file");
 		}
 	}
+	closedir PAFDIR;
+
+	logs(\*LOG, 'paf_metrics.py', 'start');
 
 	system ("
 		$align_path/paf_metrics.py \\
@@ -707,7 +739,7 @@ if ($aligner =~ /minimap/){
 		2>> $log_err
 	") == 0 or checksig();
 
-	logs(\*LOG, 'Genome alignments - paf_metrics.py');
+	logs(\*LOG, 'paf_metrics.py', 'end');
 
 }
 
@@ -721,6 +753,8 @@ unless ($no_barplot){
 	$tstart = time();
 	print ERROR "\n### paf_to_barplot.py (genome alignments) ###\n";
 	print "\n# Barplots (genome alignments):\n";
+
+	logs(\*LOG, 'paf_to_barplot.py', 'start');
 
 	system("
 		$plot_path/paf_to_barplot.py \\
@@ -737,7 +771,7 @@ unless ($no_barplot){
 		2>> $log_err
 	") == 0 or checksig();
 
-	logs(\*LOG, 'Genome alignments - paf_to_barplot.py');
+	logs(\*LOG, 'paf_to_barplot.py', 'end');
 
 }
 
@@ -747,6 +781,8 @@ unless ($no_dotplot){
 	$tstart = time();
 	print ERROR "\n### paf_to_dotplot.py (genome alignments) ###\n";
 	print "\n# Dotplots (genome alignments):\n";
+
+	logs(\*LOG, 'paf_to_dotplot.py', 'start');
 
 	system("
 		$plot_path/paf_to_dotplot.py \\
@@ -766,7 +802,7 @@ unless ($no_dotplot){
 		2>> $log_err
 	") == 0 or checksig();
 
-	logs(\*LOG, 'Genome alignments - paf_to_dotplot.py');
+	logs(\*LOG, 'paf_to_dotplot.py', 'end');
 
 }
 
@@ -776,6 +812,8 @@ unless ($no_linemap){
 	$tstart = time();
 	print ERROR "\n### linear_maps.py (genome alignments) ###\n";
 	print "\n# Linemaps (genome alignments):\n";
+
+	logs(\*LOG, 'linear_maps.py', 'start');
 
 	system("
 		$plot_path/linear_maps.py \\
@@ -792,7 +830,7 @@ unless ($no_linemap){
 		2>> $log_err
 	") == 0 or checksig();
 
-	logs(\*LOG, 'Genome alignments - linear_maps.py');
+	logs(\*LOG, 'linear_maps.py', 'end');
 
 }
 
@@ -802,6 +840,8 @@ unless ($no_heatmap){
 	$tstart = time();
 	print ERROR "\n### paf_to_hm.py (genome alignments) ###\n";
 	print "\n# Heatmaps (genome alignments):\n";
+
+	logs(\*LOG, 'paf_to_hm.py', 'start');
 
 	system("
 		$plot_path/paf_to_heatmap.py \\
@@ -819,7 +859,7 @@ unless ($no_heatmap){
 		2>> $log_err
 	") == 0 or checksig();
 
-	logs(\*LOG, 'Genome alignments - paf_to_hm.py');
+	logs(\*LOG, 'paf_to_hm.py', 'end');
 
 }
 
@@ -839,7 +879,6 @@ $tstart = time();
 print "\n##### Infering colinearity from protein-coding gene clusters\n\n";
 print ERROR "\n### get_homology.pl ###\n";
 
-my %linked_files;
 my @prot_files = ();
 
 opendir (FAA, $prot_dir) or die "\n\n[ERROR]\tCan't open $prot_dir: $!\n\n";
@@ -860,10 +899,16 @@ while (my $file = readdir(FAA)){
 	}
 
 }
+closedir FAA;
 
 ## Checking if all protein files are blank, if so no point in searching for shared clusters
 if ((scalar @prot_files) == 0){
-	print "\n[E] All protein files are blank. Skipping cluster detection...\n\n";
+	if ($noclus){
+		print "\n[W] All protein files are blank. No annotation detected.\n\n";
+	}
+	else{
+		print "\n[E] All protein files are blank. Skipping cluster detection...\n\n";
+	}
 	$noclus = 1;
 	goto CIRCOS;
 }
@@ -876,6 +921,9 @@ if ((scalar @prot_files) == 1){
 }
 
 ## Otherwize, proceed
+logs(\*LOG, 'Gene clusters', 'header');
+logs(\*LOG, 'get_homology.pl', 'start');
+
 system("
 	$cluster_path/get_homology.pl \\
 	--input @prot_files \\
@@ -887,7 +935,7 @@ system("
 	2>> $log_err
 ") == 0 or checksig();
 
-logs(\*LOG, 'Gene clusters - get_homology.pl');
+logs(\*LOG, 'get_homology.pl', 'end');
 
 ###################################################################################################
 ## Run get_synteny.pl
@@ -895,6 +943,8 @@ logs(\*LOG, 'Gene clusters - get_homology.pl');
 
 $tstart = time();
 print ERROR "\n### get_synteny.pl ###\n";
+
+logs(\*LOG, 'get_synteny.pl', 'start');
 
 my $clu_sum_file = $cluster_synteny.'/'.'clusters_summary.tsv';
 if (-f $clu_sum_file){
@@ -934,9 +984,12 @@ foreach my $prot_file_1 (sort(@prot_files)){
 
 }
 
-logs(\*LOG, 'Gene clusters - get_synteny.pl');
+logs(\*LOG, 'get_synteny.pl', 'end');
 
-### Grabbing total number of entries in .list files
+###################################################################################################
+## Grabbing total number of entries in .list files
+###################################################################################################
+
 my %gene_count;
 opendir (LISTS, $list_dir) or die "\n\n[ERROR]\tCan't open $list_dir: $!\n\n";
 
@@ -961,6 +1014,8 @@ while (my $file = readdir(LISTS)){
 	}
 }
 
+closedir LISTS;
+
 ###################################################################################################
 ## Creating barplots / dotplots / linemaps from SYNY PAF files
 ###################################################################################################
@@ -968,6 +1023,8 @@ while (my $file = readdir(LISTS)){
 ### Create pseudo PAF files from clusters found
 $tstart = time();
 print ERROR "\n### clusters_to_paf.pl ###\n";
+
+logs(\*LOG, 'clusters_to_paf.pl', 'start');
 
 foreach my $gap (@gaps){
 
@@ -984,7 +1041,7 @@ foreach my $gap (@gaps){
 	") == 0 or checksig();
 }
 
-logs(\*LOG, 'Gene clusters - clusters_to_paf.pl');
+logs(\*LOG, 'clusters_to_paf.pl', 'end');
 
 ### Create barplots from PAF files
 unless ($no_barplot){
@@ -994,6 +1051,8 @@ unless ($no_barplot){
 	print "\n# Barplots (gene clusters):\n";
 
 	my @barplot_files = getpaf_files();
+
+	logs(\*LOG, 'paf_to_barplot.py', 'start');
 
 	system("
 		$plot_path/paf_to_barplot.py \\
@@ -1010,7 +1069,7 @@ unless ($no_barplot){
 		2>> $log_err
 	") == 0 or checksig();
 
-	logs(\*LOG, 'Gene clusters - paf_to_barplot.py');
+	logs(\*LOG, 'paf_to_barplot.py', 'end');
 
 }
 
@@ -1022,6 +1081,8 @@ unless ($no_dotplot){
 	print "\n# Dotplots (gene clusters):\n";
 
 	my @dotplot_files = getpaf_files();
+
+	logs(\*LOG, 'paf_to_dotplot.py', 'start');
 
 	system("
 		$plot_path/paf_to_dotplot.py \\
@@ -1041,7 +1102,7 @@ unless ($no_dotplot){
 		2>> $log_err
 	") == 0 or checksig();
 
-	logs(\*LOG, 'Gene clusters - paf_to_dotplot.py');
+	logs(\*LOG, 'paf_to_dotplot.py', 'end');
 
 }
 
@@ -1053,6 +1114,8 @@ unless ($no_linemap){
 	print "\n# Linemaps (gene clusters):\n";
 
 	my @linemap_files = getpaf_files();
+
+	logs(\*LOG, 'linear_maps.py', 'start');
 
 	system("
 		$plot_path/linear_maps.py \\
@@ -1069,7 +1132,7 @@ unless ($no_linemap){
 		2>> $log_err
 	") == 0 or checksig();
 
-	logs(\*LOG, 'Gene clusters - linear_maps.py');
+	logs(\*LOG, 'linear_maps.py', 'end');
 
 }
 
@@ -1217,6 +1280,8 @@ unless ($no_heatmap){
 		push (@hm_files, $matrix_file);
 	}
 
+	logs(\*LOG, 'protein_cluster_hm.py', 'start');
+
 	system("
 		$plot_path/protein_cluster_hm.py \\
 		--tsv @hm_files \\
@@ -1232,7 +1297,7 @@ unless ($no_heatmap){
 		2>> $log_err
 	") == 0 or checksig();
 
-	logs(\*LOG, 'Gene clusters - protein_cluster_hm.py');
+	logs(\*LOG, 'protein_cluster_hm.py', 'end');
 
 }
 
@@ -1251,7 +1316,7 @@ system("
 	2>> $log_err
 ") == 0 or checksig();
 
-logs(\*LOG, 'Gene clusters - id_conserved_regions.pl');
+logs(\*LOG, 'id_conserved_regions.pl', 'end');
 
 ###################################################################################################
 ## Create links files, karyotypes and nucleotide biases for Circos
@@ -1260,6 +1325,8 @@ logs(\*LOG, 'Gene clusters - id_conserved_regions.pl');
 ## Circos links files
 $tstart = time();
 print ERROR "\n### clusters2links.pl ###\n";
+
+logs(\*LOG, 'clusters2links.pl', 'start');
 
 my @cluster_dirs;
 opendir (CDIR, $cluster_synteny) or die "Can't open $cluster_synteny: $!\n";
@@ -1270,6 +1337,7 @@ while (my $dname = readdir(CDIR)) {
 		}
 	}
 }
+closedir CDIR;
 
 foreach my $cluster_subdir (@cluster_dirs){
 	my ($basedir) = fileparse($cluster_subdir);
@@ -1285,7 +1353,7 @@ foreach my $cluster_subdir (@cluster_dirs){
 	") == 0 or checksig();
 }
 
-logs(\*LOG, 'Gene clusters - clusters2links.pl');
+logs(\*LOG, 'clusters2links.pl', 'end');
 
 ###### Circos section
 CIRCOS:
@@ -1362,6 +1430,9 @@ my %circos_todo_list;
 
 unless ($no_circos){
 
+	logs(\*LOG, 'Circos', 'header');
+	logs(\*LOG, 'Plotting', 'start');
+
 	print "\n# Circos plots:\n";
 
 	unless (-d $circos_plot_dir){
@@ -1422,9 +1493,10 @@ unless ($no_circos){
 		system ("mv $tmpdir/*.svg $tmpdir/SVG/");
 	}
 
+	logs(\*LOG, 'Plotting', 'end');
+
 }
 
-logs(\*LOG, 'Circos - configuration + runtime');
 
 ###################################################################################################
 ## Completion
@@ -1433,9 +1505,9 @@ logs(\*LOG, 'Circos - configuration + runtime');
 my $end_time = localtime();
 my $run_time = time - $start_time;
 
-print LOG "\n";
+logs(\*LOG, 'Total runtime', 'header');
 print LOG "SYNY completed on: ".$end_time."\n";
-print LOG "Runtime: ".$run_time." seconds\n";
+print LOG "Total runtime: ".$run_time." seconds\n";
 close LOG;
 
 ###################################################################################################
@@ -1475,17 +1547,32 @@ sub logs {
 
 	my $fh = $_[0];
 	my $analysis = $_[1];
+	my $type = $_[2];
 	my $len = length($analysis);
-	my $pad = 40 - $len;
+	my $pad = 60 - $len;
 	my $spacer = ' ' x $pad;
 
-	my $run_time = time - $tstart;
-	my $mend = localtime();
-	my $tlen = length($run_time);
-	my $tpad = 6 - $tlen;
-	my $tspacer = ' ' x $tpad;
 
-	print $fh "$analysis:".$spacer.$tspacer."$run_time seconds; completed on $mend\n";
+	my $mend = localtime();
+	if ($type eq 'header'){
+		my $barsize = '#' x 96;
+		print $fh $barsize."\n";
+		print LOG "##### $analysis\n";
+		print LOG $barsize."\n\n";
+	}
+	elsif ($type eq 'start'){
+		print $fh "$analysis:".$spacer."started on $mend\n";
+	}
+	elsif ($type eq 'end'){
+
+		my $run_time = time - $tstart;
+		my $tlen = length($run_time);
+		my $tpad = $pad + $len - $tlen - 18;
+		my $tspacer = ' ' x $tpad;
+
+		print $fh "Runtime: $run_time seconds".$tspacer."completed on $mend\n\n";
+
+	}
 
 }
 
@@ -1502,9 +1589,20 @@ sub list_maker {
 			--outdir $outdir \\
 			--minsize $minsize \\
 			$included_flag \\
+			$ranges_flag \\
 			$excluded_flag \\
 			2>> $log_err
 		") == 0 or checksig();
+
+		## Check if annotation file is zero
+		my $fname = basename($annotation);
+		my @file_data = split('\.',$fname);
+		my ($fprefix) = $file_data[0] =~ /^(\w+)/;
+		my $prot_dir = $outdir.'/SEQUENCES/PROTEINS';
+		my $fasta_proteins = "$prot_dir/$fprefix.faa";
+		if (-z $fasta_proteins){
+			print LOG ("  - $fname does not contain protein annotations.\n")
+		}
 
 	}
 
@@ -1526,6 +1624,8 @@ sub getpaf_files {
 				push (@paf_files, "$ppafdir/$file");
 			}
 		}
+
+		closedir PAFDIR;
 
 	}
 
@@ -1586,6 +1686,7 @@ sub pairwise_conf {
 				push(@pairs, $entry);
 			}
 		}
+		closedir PAIRS;
 
 		for my $pair (@pairs){
 

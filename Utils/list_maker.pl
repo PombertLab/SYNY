@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.6a';
-my $updated = '2024-05-16';
+my $version = '0.5.7';
+my $updated = '2024-05-22';
 
 use strict;
 use warnings;
@@ -32,6 +32,7 @@ OPTIONS:
 -o (--outdir)	Output directory [Default: LIST_MAKER]
 -m (--minsize)	Keep only contigs larger or equal to specified size (in bp) [Default: 1]
 -n (--include)	Select contigs with names from input text file(s) (one name per line); i.e. excludes everything else
+-r (--ranges)	Select contigs with subranges from input text file(s): name start end
 -x (--exclude)	Exclude contigs with names matching the provided regular expression(s)
 -v (--verbose)	Add verbosity
 REGEX
@@ -48,6 +49,7 @@ my @input_files;
 my $outdir = 'LIST_MAKER';
 my $minsize = 1;
 my @included;
+my @ranges;
 my @regexes;
 my $verbose;
 GetOptions(
@@ -55,6 +57,7 @@ GetOptions(
 	'o|outdir=s' => \$outdir,
 	'm|minsize=i' => \$minsize,
 	'n|included=s@{0,}' => \@included,
+	'r|ranges=s@{0,}' => \@ranges,
 	'x|exclude=s@{0,}' => \@regexes,
 	'v|verbose' => \$verbose
 );
@@ -99,6 +102,31 @@ if (@included){
 				$included{$contig_to_keep} = 1;
 			}
 		}
+		close INC;
+	}
+}
+
+my %ranges;
+if (@ranges){
+	my @tmp = @ranges;
+	while (my $inc = shift @tmp){
+		open RNG, '<', $inc or die "Can't open $inc: $!\n";
+		while (my $line = <RNG>){
+			chomp $line;
+			if ($line =~ /^#/){
+				next;
+			}
+			else {
+				$line =~ s/^\s+//; ## Getting rid of spaces (if any) as the start of the line
+				my @data = split(/\s+/, $line);
+				my ($cname) = $data[0] =~ /^(\w+)/;
+				my $cstart = $data[1];
+				my $cend = $data[2];
+				$ranges{$cname}{'start'} = $cstart;
+				$ranges{$cname}{'end'} = $cend;
+			}
+		}
+		close RNG;
 	}
 }
 
@@ -298,6 +326,15 @@ foreach my $input_file (@input_files){
 								}
 							}
 
+							if (@ranges){
+								if ($start < $ranges{$contig}{'start'}){
+									next;
+								}
+								elsif ($end > $ranges{$contig}{'end'}){
+									next
+								}
+							}
+
 							if ($contig_size >= $minsize){
 
 								unless (exists $excluded_seq{$contig}){
@@ -416,11 +453,28 @@ foreach my $input_file (@input_files){
 					}
 				}
 
+				if (%ranges){
+					if (!exists $ranges{$sequence}){
+						next;
+					}
+				}
+
 				## Excluding sequences matching requested regexes
 				unless (exists $excluded_seq{$sequence}){
 
+					my $genome_seq = $genome{$sequence};
+
+					if (%ranges){
+						if (exists $ranges{$sequence}){
+							my $cstart = $ranges{$sequence}{'start'} - 1;
+							my $cend = $ranges{$sequence}{'end'} - 1;
+							my $sublen = $cend - $cstart + 1;
+							$genome_seq = substr($genome{$sequence}, $cstart, $sublen);
+						}
+					}
+
 					print GEN ">$sequence\n";
-					my @data = unpack ("(A60)*", $genome{$sequence});
+					my @data = unpack ("(A60)*", $genome_seq);
 					while (my $tmp = shift@data){
 						print GEN "$tmp\n";
 					}
