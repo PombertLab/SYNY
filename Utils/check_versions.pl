@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'check_versions.pl';
-my $version = '0.1a';
-my $updated = '2020-05-20';
+my $version = '0.1b';
+my $updated = '2020-05-22';
 
 use strict;
 use warnings;
@@ -35,7 +35,7 @@ my $git_tag;
 GetOptions(
     'd|dir=s' => \$indir,
     'o|out=s' => \$outfile,
-    't|tag=s' => \$git_tag
+    'g|git=s' => \$git_tag
 );
 
 ## Locating scripts/subscripts
