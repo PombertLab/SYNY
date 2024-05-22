@@ -259,16 +259,18 @@ while (my $fasta = shift@fasta){
 		my $leftover_size = length $subseqleft;
 
 		%percent = ();
-		biases($subseqleft,$x,$leftover_size);
+		unless ($leftover_size == 0){
+			biases($subseqleft,$x,$leftover_size);
 
-		my $end = $csize - 1;
-		foreach my $fh (@filehandles){
-			my ($lfh) = $fh =~ /(\w+)$/;
-			print $fh "$sequence $x $end $percent{$lfh}\n";
-		}
-		foreach my $cfh (@cathandles){
-			my ($lfh) = $cfh =~ /C(\w+)$/;
-			print $cfh "$sequence $x $end $percent{$lfh}\n";
+			my $end = $csize - 1;
+			foreach my $fh (@filehandles){
+				my ($lfh) = $fh =~ /(\w+)$/;
+				print $fh "$sequence $x $end $percent{$lfh}\n";
+			}
+			foreach my $cfh (@cathandles){
+				my ($lfh) = $cfh =~ /C(\w+)$/;
+				print $cfh "$sequence $x $end $percent{$lfh}\n";
+			}
 		}
 
 		close BIAS;
@@ -906,10 +908,6 @@ sub biases {
 		my $curseq = $_[0];
 		my $pos = $_[1];
 		my $divider = $_[2];
-
-		if ($divider == 0){
-			next;
-		}
 
 		my $gc = $curseq =~ tr/GgCc//;
 		my $at = $curseq =~ tr/AaTt//;
