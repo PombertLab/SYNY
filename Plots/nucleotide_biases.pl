@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
-my $version = '0.7f';
-my $updated = '2024-05-15';
+my $version = '0.7g';
+my $updated = '2024-05-22';
 
 use strict;
 use warnings;
@@ -907,6 +907,10 @@ sub biases {
 		my $pos = $_[1];
 		my $divider = $_[2];
 
+		if ($divider == 0){
+			next;
+		}
+
 		my $gc = $curseq =~ tr/GgCc//;
 		my $at = $curseq =~ tr/AaTt//;
 		my $ga = $curseq =~ tr/GgAa//;
@@ -914,7 +918,6 @@ sub biases {
 		my $gt = $curseq =~ tr/GgTt//;
 		my $ac = $curseq =~ tr/AaCc//;
 		my $nn = $curseq =~ tr/Nn//;
-		
 
 		$percent{'GC'} = $gc = ($gc/$divider) * 100;
 		$percent{'AT'} = $at = ($at/$divider) * 100;
