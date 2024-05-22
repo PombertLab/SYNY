@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2c'
-updated = '2024-05-02'
+version = '0.3'
+updated = '2024-05-22'
 name = 'paf_metrics.py'
 
 import os
@@ -102,7 +102,31 @@ for dir in [outdir,txtdir,pngdir,svgdir]:
 ## Working on PAF file
 ################################################################################
 
-lsize = len(paf_files)
+## Checking of PAF files are empty
+non_zero_paf = []
+
+for paf in paf_files:
+
+    file_size = os.path.getsize(paf)
+    basename = os.path.basename(paf)
+    metrics_file = basename
+    metrics_output = txtdir + '/' + metrics_file  + '.txt'
+
+    if file_size == 0:
+        warning = f"[WARNING]: paf_metrics.py - {paf} size is 0 byte."
+        explanation = f"[WARNING]: paf_metrics.py - {paf} might have been terminated by OOM killer."
+        print(warning, explanation, sep="\n", file=sys.stderr)
+
+        metrics_output = txtdir + '/' + metrics_file
+        txtout = open(metrics_output,'w')
+        txtout.write(f"Metrics for {paf}:\n\n")
+        txtout.write(f"PAF file is empty\n")
+
+    else:
+        non_zero_paf.append(paf)
+
+## Plot if not empty
+lsize = len(non_zero_paf)
 counter = Value('i', 0)
 
 def scatterplot(paf):
@@ -174,7 +198,7 @@ def scatterplot(paf):
     median = "{:,}".format(median)
 
     # Print metrics to file or STDOUT
-    metrics_output = txtdir + '/' + metrics_file
+    metrics_output = txtdir + '/' + metrics_file  + '.txt'
     txtout = open(metrics_output,'w')
 
     txtout.write(f"Metrics for {paf}:\n\n")
@@ -282,4 +306,4 @@ def scatterplot(paf):
 
 ## Run
 pool = Pool(threads)
-pool.map(scatterplot, paf_files)
+pool.map(scatterplot, non_zero_paf)
