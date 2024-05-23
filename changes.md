@@ -4,7 +4,7 @@
 
 ##### Additions
 - Added the `--include` option to select contigs by name from text file(s); one name per line
-- Added the `--ranges` option to select portion of contigs from text file(s); name start end
+- Added the `--ranges` option to select contig subranges from text file(s); name start end
 - Created `check_versions.pl` to summarize script versions; this information can now be displayed with `run_syny.pl --version`.
 
 ##### Bugfixes
