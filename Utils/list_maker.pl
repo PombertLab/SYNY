@@ -2,7 +2,7 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.8a';
+my $version = '0.5.8b';
 my $updated = '2024-05-23';
 
 use strict;
@@ -113,17 +113,19 @@ if (@ranges){
 		open RNG, '<', $inc or die "Can't open $inc: $!\n";
 		while (my $line = <RNG>){
 			chomp $line;
+			$line =~ s/^\s+//; ## Getting rid of spaces (if any) as the start of the line
 			if ($line =~ /^#/){
 				next;
 			}
+			elsif ($line eq ''){
+				next;
+			}
 			else {
-				$line =~ s/^\s+//; ## Getting rid of spaces (if any) as the start of the line
 				my @data = split(/\s+/, $line);
 				my ($cname) = $data[0] =~ /^(\w+)/;
 				my $cstart = $data[1];
 				my $cend = $data[2];
-				$ranges{$cname}{'start'} = $cstart;
-				$ranges{$cname}{'end'} = $cend;
+				push (@{$ranges{$cname}}, "$cstart;$cend");
 			}
 		}
 		close RNG;
@@ -327,11 +329,16 @@ foreach my $input_file (@input_files){
 							}
 
 							if (@ranges){
-								if ($start < $ranges{$contig}{'start'}){
-									next;
+								my @subranges = @{$ranges{$contig}};
+								my $check_range = 0;
+								for my $subr (@subranges){
+									my ($sstart,$send) = split(';', $subr);
+									if (($start >= $sstart) && ($end <= $send)){
+										$check_range = 1;
+									}
 								}
-								elsif ($end > $ranges{$contig}{'end'}){
-									next
+								if ($check_range == 0){
+									next;
 								}
 							}
 
@@ -471,27 +478,47 @@ foreach my $input_file (@input_files){
 					my $subrange;
 					if (%ranges){
 						if (exists $ranges{$sequence}){
-							my $cstart = $ranges{$sequence}{'start'} - 1;
-							my $cend = $ranges{$sequence}{'end'} - 1;
-							my $sublen = $cend - $cstart + 1;
-							$genome_seq = substr($genome{$sequence}, $cstart, $sublen);
-							$subrange .= 'subrange: ';
-							$subrange .= $ranges{$sequence}{'start'};
-							$subrange .= ' - ';
-							$subrange .= $ranges{$sequence}{'end'};
+			
+							my @subranges = @{$ranges{$sequence}};
+							my $rng_counter = 0;
+							my $rng_total = scalar (@subranges);
+
+							for my $subr (@subranges){
+
+								$rng_counter++;
+
+								my ($cstart,$cend) = split(';', $subr);
+								my $sublen = $cend - $cstart + 1;
+
+								$genome_seq = substr($genome{$sequence}, $cstart - 1, $sublen);
+								$subrange = 'subrange: ';
+								$subrange .= $cstart;
+								$subrange .= ' - ';
+								$subrange .=  $cend;
+
+								if ($rng_total == 1){
+									print GEN ">$sequence \[$subrange\]\n";
+								}
+								else {
+									print GEN ">${sequence}_${rng_counter} \[${subrange}\]\n";
+								}
+
+								my @data = unpack ("(A60)*", $genome_seq);
+								while (my $tmp = shift@data){
+									print GEN "$tmp\n";
+								}
+
+							}
+
 						}
 					}
 
-					if (%ranges){
-						print GEN ">$sequence \[$subrange\]\n";
-					}
-					else{
+					else {
 						print GEN ">$sequence\n";
-					}
-
-					my @data = unpack ("(A60)*", $genome_seq);
-					while (my $tmp = shift@data){
-						print GEN "$tmp\n";
+						my @data = unpack ("(A60)*", $genome_seq);
+						while (my $tmp = shift@data){
+							print GEN "$tmp\n";
+						}
 					}
 
 				}
