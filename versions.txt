@@ -30,6 +30,6 @@ protein_cluster_hm.py                   0.3d
 check_mp_colors.py                      0.2b
 check_versions.pl                       0.1b
 fasta_to_gbff.pl                        0.1
-list_maker.pl                           0.5.8a
+list_maker.pl                           0.5.8b
 
 #############################################################
