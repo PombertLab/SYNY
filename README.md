@@ -1011,7 +1011,7 @@ Barplots (genome alignments; minimap2):
 
 Barplots (genome alignments; mashmap; --mpid 85): 
 <p align="left">
-  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/Eh50604_vs_OcOC4.mmap70.barplot.19.2x10.8.Spectral.png">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/Eh50604_vs_OcOC4.mmap85.barplot.19.2x10.8.Spectral.png">
 </p>
 
 Barplots (genome alignments; mashmap; --mpid 70): 
