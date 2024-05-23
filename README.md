@@ -14,6 +14,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
 * [Requirements](#Requirements)
   * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
   * [Installing dependencies](#installing-SYNY-dependencies)
+  * [About memory usage](#about-memory-usage)
 * [Using SYNY](#Using-SYNY)
   * [Why use two distinct approaches?](#Why-use-two-distinct-approaches)
   * [Command line options](#Command-line-options)
@@ -361,6 +362,9 @@ printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.profile      ## Ubuntu
 printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ```
 </details>
+
+### <b>About memory usage</b>
+Performing pairwise alignments between genomes can quickly consume a large amount of RAM. The amount of memory required depends on the size of the genomes being aligned and on the amounts of repetitive elements present in their sequences. When working with genomes larger than 150 Mbp, we recommend using [MashMap3](https://github.com/marbl/MashMap) instead of [minimap2](https://github.com/lh3/minimap2) as the genome alignment tool. While MashMap3 does not product exact alignments <i>per se</i>, its results are congruent with the exact alignments produced by minimap2 (and as such constitute good approximations). For example, alignments between two repeat-laden 500 Mbp genomes ran within 5 GB of RAM with MashMap3 whereas the same alignments with minimap2 peaked at 100 GB for RAM despite the two tools producing similar outcomes. However, note that when using MashMap3, reducing its minimum percentage identity threshold below its 85% default settings will significantly increase it RAM usage.
 </details>
 
 <details open>
