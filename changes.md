@@ -1,5 +1,24 @@
 # SYNY CHANGE LOG
 
+## SYNY-v1.1a
+
+##### Additions
+- Added the `--include` option to select contigs by name from text file(s); one name per line
+- Added the `--ranges` option to select portion of contigs from text file(s); name start end
+- Created `check_versions.pl` to summarize script versions; this information can now be displayed with `run_syny.pl --version`.
+
+##### Bugfixes
+- `list_maker.pl` now grabs GeneID tags if locus tags are absent from GBFF annotation files.
+- Fixed .txt file extension + added a file size check to `paf_metrics.py`. Now skips plotting if file is empty.
+- Fixed div by zero issue in `nucleotide_biases.pl`.
+- Added a check to detect if annotations parsed are blank. `run_syny.pl` no longer crashes if annotations are blank when running gene cluster inferences. If blank, it now now skips this section automatically.
+
+##### Readme / logs
+- Added section about memory usage with genome alignments
+- Added mashmap barplot examples in the <i>Encephalitozoon</i> section
+- Added `changes.md` summarizing changes between versions
+- Improved `syny.log` file.
+
 ## SYNY-v1.1
 
 ##### Additions:
