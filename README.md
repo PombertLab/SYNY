@@ -995,16 +995,28 @@ run_syny.pl \
   --no_circos
 ```
 
-Here, while the pairwise alignments and gene cluster collinear inferences produce similar results within species (not shown), they differ substantially between species. For example, below are two barplots between <i>Encephalitozoon hellem</i> and <i>Ordospora colligata</i>. While the results are congruent, gene clusters inferences `.gap_0.` perform better than those based on pairwise alignments (`.mmap.`), the latter of which struggle due to the high levels of sequence divergence involved. These differences will also be reflected in the dotplots, heatmaps and Circos plots generated (not shown).
+Here, while the pairwise alignments and gene cluster collinear inferences produce similar results within species (not shown), they differ substantially between species. For example, below are two barplots between <i>Encephalitozoon hellem</i> and <i>Ordospora colligata</i>. While the results are congruent, gene clusters inferences `.gap_0.` perform better than those based on pairwise alignments (`.mmap.`), the latter of which struggle due to the high levels of sequence divergence involved. These differences will also be reflected in the dotplots, heatmaps and Circos plots generated (not shown)
+
+When working with genomes exhibiting a high level of divergence, both minimap2 and MashMap3 may fail to produce decent alignments. If that happens, we recommend using MashMap3 with a minimum percentage identity set lower than its default 85% threshold (e.g. `--mpid 70`). Note that doing so will increase its RAM usage and may introduce artefacts/noise in the plots produced.
 
 Barplots (gene clusters): 
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/Eh50604_vs_OcOC4.gap_0.barplot.19.2x10.8.Spectral.png">
 </p>
 
-Barplots (genome alignments): 
+Barplots (genome alignments; minimap2): 
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/Eh50604_vs_OcOC4.mmap.barplot.19.2x10.8.Spectral.png">
+</p>
+
+Barplots (genome alignments; mashmap; --mpid 85): 
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/Eh50604_vs_OcOC4.mmap70.barplot.19.2x10.8.Spectral.mmmap.png">
+</p>
+
+Barplots (genome alignments; mashmap; --mpid 70): 
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/Eh50604_vs_OcOC4.mmap70.barplot.19.2x10.8.Spectral.mmmap.png">
 </p>
 
 ##### About concatenated Circos plots:
