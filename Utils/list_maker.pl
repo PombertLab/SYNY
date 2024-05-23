@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.8';
-my $updated = '2024-05-22';
+my $version = '0.5.8a';
+my $updated = '2024-05-23';
 
 use strict;
 use warnings;
@@ -468,16 +468,27 @@ foreach my $input_file (@input_files){
 
 					my $genome_seq = $genome{$sequence};
 
+					my $subrange;
 					if (%ranges){
 						if (exists $ranges{$sequence}){
 							my $cstart = $ranges{$sequence}{'start'} - 1;
 							my $cend = $ranges{$sequence}{'end'} - 1;
 							my $sublen = $cend - $cstart + 1;
 							$genome_seq = substr($genome{$sequence}, $cstart, $sublen);
+							$subrange .= 'subrange: ';
+							$subrange .= $ranges{$sequence}{'start'};
+							$subrange .= ' - ';
+							$subrange .= $ranges{$sequence}{'end'};
 						}
 					}
 
-					print GEN ">$sequence\n";
+					if (%ranges){
+						print GEN ">$sequence \[$subrange\]\n";
+					}
+					else{
+						print GEN ">$sequence\n";
+					}
+
 					my @data = unpack ("(A60)*", $genome_seq);
 					while (my $tmp = shift@data){
 						print GEN "$tmp\n";
