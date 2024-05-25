@@ -5,6 +5,8 @@
 ##### Additions
 - Added the `--include` option to select contigs by name from text file(s); one name per line
 - Added the `--ranges` option to select contig subranges from text file(s); name start end
+- Added the `--bpmode` option to generate pairwise (pair) and/or concatenated (cat) barplots. Possible values are `pair` (default), `cat`, and `all` (for both).
+- Added the `--bclusters` option to color clusters by alternating colors in the barplots. The colors are not related within or between contigs, they are just used to highlight collinear chunks.
 - Created `check_versions.pl` to summarize script versions; this information can now be displayed with `run_syny.pl --version`.
 
 ##### Bugfixes
