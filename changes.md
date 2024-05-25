@@ -14,6 +14,7 @@
 - Fixed .txt file extension + added a file size check to `paf_metrics.py`. Now skips plotting if file is empty.
 - Fixed div by zero issue in `nucleotide_biases.pl`.
 - Added a check to detect if annotations parsed are blank. `run_syny.pl` no longer crashes if annotations are blank when running gene cluster inferences. If blank, it now now skips this section automatically.
+- Fixed perl env shebangs causing issues with conda
 
 ##### Readme / logs
 - Added section about memory usage with genome alignments
