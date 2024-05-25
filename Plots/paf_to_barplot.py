@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.3e'
-updated = '2024-04-29'
+version = '0.4'
+updated = '2024-05-25'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -42,6 +42,8 @@ OPTIONS:
                 # for a list of color palettes
 -m (--mono)     Use a single specified mochochrome color for all chromosomes instead
                 of a color palette
+--clusters      Color matches by clusters instead; colors are not related between contigs
+--catenate      Concatenate queries against the same reference in a single barplot
 --fontsize      Font size [Default: 8]
 --threads       Number of threads to use [Default: 16]
 """
@@ -65,6 +67,8 @@ cmd.add_argument("-a", "--affix")
 cmd.add_argument("-c", "--palette", default='Spectral')
 cmd.add_argument("-n", "--noticks", action='store_true')
 cmd.add_argument("-m", "--mono")
+cmd.add_argument("--clusters", action='store_true')
+cmd.add_argument("--catenate", action='store_true')
 cmd.add_argument("--fontsize", default=8)
 cmd.add_argument("--threads", default=16)
 args = cmd.parse_args()
@@ -78,6 +82,8 @@ affix = args.affix
 color_palette = args.palette
 noticks = args.noticks
 monochrome = args.mono
+clusters = args.clusters #
+catenate = args.catenate
 fontsize = int(args.fontsize)
 threads = int(args.threads)
 
@@ -102,6 +108,7 @@ for dir in subdirs:
 ################################################################################
 
 len_dict = {}
+cat_dict = {}
 
 if fasta_files is not None:
 
@@ -123,9 +130,11 @@ if fasta_files is not None:
                 if m:
                     seqname = m.group(1)
                     len_dict[basename][seqname] = 0
+                    cat_dict[seqname] = 0
                 else:
                     length = len(line)
                     len_dict[basename][seqname] += length
+                    cat_dict[seqname] += length
 
 ################################################################################
 ## Parsing and plotting PAF file(s) 
@@ -139,6 +148,7 @@ def barplot(paf):
     basename = os.path.basename(paf)
     qfile = None
     sfile = None
+
     global counter
 
     m = re.search(r'^(\w+)_vs_(\w+)', basename)
@@ -152,7 +162,12 @@ def barplot(paf):
 
     if fasta_files is not None:
         query_len_dict = len_dict[qfile]
-        subject_len_dict = len_dict[sfile]
+        if catenate:
+            for key in len_dict:
+                if key != qfile:
+                    subject_len_dict.update(len_dict[key])
+        else:
+            subject_len_dict = len_dict[sfile]
 
     with open(paf) as file:
 
@@ -183,7 +198,6 @@ def barplot(paf):
 
             y_width = s_end - s_start + 1
             dataframe[query][subject][s_start] = y_width
-
 
     ##### Plotting data
     palette = sns.color_palette(color_palette, len(query_len_dict))
@@ -217,26 +231,36 @@ def barplot(paf):
     cnum = 0
     legend = []
     dlegend = {}
+
     for subject in reversed(sorted(subject_len_dict.keys())):
 
         for query in sorted(query_len_dict.keys()):
 
-            ccolor = palette[cnum]
+            if not clusters:
+                ccolor = palette[cnum]
+                xlegend = mpatches.Patch(color=ccolor, label=query)
+                if query not in dlegend:
+                    dlegend[query] = {}
+                    legend.append(xlegend)
+
             if monochrome:
                 ccolor = monochrome
-
-            xlegend = mpatches.Patch(color=ccolor, label=query)
-            if query not in dlegend:
-                dlegend[query] = {}
-                legend.append(xlegend)
 
             cnum += 1
 
             if query in dataframe:
+                xnum = 0
                 if subject in dataframe[query]:
                     for start in dataframe[query][subject]:
                         end = dataframe[query][subject][start]
-                        ax.add_patch(Rectangle((start, x), end, 1, color=ccolor))
+                        if clusters:
+                            palette = sns.color_palette(color_palette, len(dataframe[query][subject]))
+                            ccolor = palette[xnum]
+                            print (subject, query, 'xnum', xnum, sep="\t")
+                            ax.add_patch(Rectangle((start, x), end, 1, color=ccolor))
+                        else:
+                            ax.add_patch(Rectangle((start, x), end, 1, color=ccolor))
+                        xnum += 1
 
         x += 2
         cnum = 0
@@ -257,7 +281,7 @@ def barplot(paf):
     output = basename
     fig.suptitle(basename)
 
-    if monochrome:
+    if monochrome or clusters:
         next
     else:
         plt.legend(handles=legend, loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
@@ -266,6 +290,9 @@ def barplot(paf):
     affix_color = color_palette
     if monochrome:
         affix_color = monochrome
+    
+    if clusters:
+        affix_color = 'clus'
 
     suffix = ''
     if affix is not None:
@@ -277,7 +304,7 @@ def barplot(paf):
     with counter.get_lock():
         counter.value += 1
     print(f"{counter.value} / {lsize} - plotting {png}...")
-    if monochrome:
+    if monochrome or clusters:
         plt.savefig(png)
     else:
         plt.savefig(png, bbox_inches='tight')
@@ -285,7 +312,7 @@ def barplot(paf):
     with counter.get_lock():
         counter.value += 1
     print(f"{counter.value} / {lsize} - plotting {svg}...")
-    if monochrome:
+    if monochrome or clusters:
         plt.savefig(svg)
     else:
         plt.savefig(svg, bbox_inches='tight')
