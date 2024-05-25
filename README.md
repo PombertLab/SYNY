@@ -449,6 +449,8 @@ Options for run_SYNY.pl are:
 --bfsize                Barplot font size [Default: 8]
 --palette               Barplot color palette [Default: Spectral]
 --monobar               Use a monochrome barplot color instead: e.g. --monobar blue
+--bclusters             Color clusters by alternating colors; colors are not related within/between contigs; [Default: off]
+--bpmode                Barplot mode: pair (pairwise), cat (concatenated), all (cat + pair) [Default: pair]
 --no_barplot            Turn off barplots
 
 ### Dotplots
