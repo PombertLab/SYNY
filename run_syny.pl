@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.7g';
-my $updated = '2024-05-22';
+my $version = '0.8';
+my $updated = '2024-05-25';
 
 use strict;
 use warnings;
@@ -91,6 +91,8 @@ my $plot_options = <<"PLOT_OPTIONS";
 --bfsize                Barplot font size [Default: 8]
 --palette               Barplot color palette [Default: Spectral]
 --monobar               Use a monochrome barplot color instead: e.g. --monobar blue
+--bclusters             Color clusters by alternating colors; colors are not related within/between contigs; [Default: off]
+--bpmode                Barplot mode: pair (pairwise), cat (concatenated), all (cat + pair) [Default: pair]
 --no_barplot            Turn off barplots
 
 ### Dotplots
@@ -179,6 +181,8 @@ my $bwidth = 19.2;
 my $bfsize = 8;
 my $palette = 'Spectral';
 my $monobar;
+my $bclusters;
+my $bpmode  = 'pair';
 my $no_barplot;
 
 # Dotplots
@@ -261,6 +265,8 @@ GetOptions(
 	'bfsize=i' => \$bfsize,
 	'palette=s' => \$palette,
 	'monobar=s' => \$monobar,
+	'bclusters' => \$bclusters,
+	'bpmode=s' => \$bpmode,
 	'no_barplot' => \$no_barplot,
 	# Dotplots
 	'dh|dheight=s' => \$dheight,
@@ -511,6 +517,8 @@ my $cluster_synteny = $cluster_dir.'/SYNTENY';
 my $plots_dir = $outdir.'/PLOTS';
 my $paf_hm_dir = $plots_dir.'/HEATMAPS';
 my $barplot_dir = $plots_dir.'/BARPLOTS';
+my $barplot_cat_dir = $barplot_dir.'/Concatenated';
+my $barplot_pair_dir = $barplot_dir.'/Pairwise';
 my $dotplot_dir = $plots_dir.'/DOTPLOTS';
 my $linemap_dir = $plots_dir.'/LINEMAPS';
 my $circos_plot_dir = $plots_dir.'/CIRCOS';
@@ -579,6 +587,11 @@ if (@ranges){
 my $cluster_flag = '';
 if ($clusters){
 	$cluster_flag = '--clusters';
+}
+
+my $bcluster_flag = '';
+if ($bclusters){
+	$bcluster_flag = '--clusters';
 }
 
 my $custom_cc_file = '';
@@ -663,6 +676,8 @@ logs(\*LOG, 'Genome alignments', 'header');
 logs(\*LOG, 'get_paf.pl', 'start');
 
 my $paf_dir = "$mmap_dir/PAF";
+my $pafcat_dir = "$mmap_dir/PAFCAT";
+my @pafcat_files;
 
 system("
 	$align_path/get_paf.pl \\
@@ -679,12 +694,47 @@ opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
 while (my $file = readdir(PAFDIR)){
 	if ($file =~ /\.paf$/){
 		my $paf_file = "$paf_dir/$file";
+		push (@pafcat_files, $paf_file);
 		if (-z $paf_file){
 			print LOG "  - $paf_file is empty. No collinearity or process terminated by OOM killer?\n";
 		}
 	}
 }
 closedir PAFDIR;
+
+if (($bpmode eq 'cat') or ($bpmode eq 'all')){
+
+	unless (-d $pafcat_dir){
+		mkdir($pafcat_dir,0755) or die "Can't create $pafcat_dir: $!\n";
+	}
+
+	my %references;
+
+	for my $paf_file (@pafcat_files){
+		if ($paf_file =~ /(\w+)_vs_(\w+).\w+.paf$/){
+			my $query = $1;
+			my $reference = $2;
+			push (@{$references{$reference}}, $paf_file);
+		}
+	}
+
+	for my $ref (keys %references){
+
+		my $catfile = $pafcat_dir.'/all_vs_'.$ref.'.mmap.paf';
+		open CCAT, '>', $catfile or die "Can't create $catfile: $!\n";
+
+		for my $file (@{$references{$ref}}){
+			open SCAT, '<', $file or die "Can't read $file: $!\n";
+			while (my $line = <SCAT>){
+				print CCAT "$line";
+			}
+			close SCAT;
+		} 
+		close CCAT;
+
+	}
+
+}
 
 logs(\*LOG, 'get_paf.pl', 'end');
 
@@ -752,24 +802,60 @@ unless ($no_barplot){
 
 	$tstart = time();
 	print ERROR "\n### paf_to_barplot.py (genome alignments) ###\n";
-	print "\n# Barplots (genome alignments):\n";
 
 	logs(\*LOG, 'paf_to_barplot.py', 'start');
 
-	system("
-		$plot_path/paf_to_barplot.py \\
-		--paf $paf_dir/*.paf \\
-		--fasta $genome_dir/*.fasta \\
-		--outdir $barplot_dir \\
-		--threads $pthreads \\
-		--height $bheight \\
-		--width $bwidth \\
-		--palette $palette \\
-		--fontsize $bfsize \\
-		$tick_flag \\
-		$monobar_flag \\
-		2>> $log_err
-	") == 0 or checksig();
+	if (($bpmode eq 'pair') or ($bpmode eq 'all')){
+	
+		print "\n# Barplots - pairwise (genome alignments):\n";
+
+		unless (-d $barplot_pair_dir){
+			make_path($barplot_pair_dir,{mode=>0755}) or die "Can't create $barplot_pair_dir: $!\n";
+		}
+
+		system("
+			$plot_path/paf_to_barplot.py \\
+			--paf $paf_dir/*.paf \\
+			--fasta $genome_dir/*.fasta \\
+			--outdir $barplot_pair_dir \\
+			--threads $pthreads \\
+			--height $bheight \\
+			--width $bwidth \\
+			--palette $palette \\
+			--fontsize $bfsize \\
+			$tick_flag \\
+			$monobar_flag \\
+			$bcluster_flag \\
+			2>> $log_err
+		") == 0 or checksig();
+
+	}
+
+	if (($bpmode eq 'cat') or ($bpmode eq 'all')){
+
+		print "\n# Barplots - catenated (genome alignments):\n";
+
+		unless (-d $barplot_cat_dir){
+			make_path($barplot_cat_dir,{mode=>0755}) or die "Can't create $barplot_cat_dir: $!\n";
+		}
+
+		system("
+			$plot_path/paf_to_barplot.py \\
+			--paf $pafcat_dir/*.paf \\
+			--fasta $genome_dir/*.fasta \\
+			--outdir $barplot_cat_dir \\
+			--threads $pthreads \\
+			--height $bheight \\
+			--width $bwidth \\
+			--palette $palette \\
+			--fontsize $bfsize \\
+			--catenate \\
+			$tick_flag \\
+			$monobar_flag \\
+			$bcluster_flag \\
+			2>> $log_err
+		") == 0 or checksig();
+	}
 
 	logs(\*LOG, 'paf_to_barplot.py', 'end');
 
@@ -1030,6 +1116,7 @@ foreach my $gap (@gaps){
 
 	my $clusdir = $cluster_synteny.'/gap_'.$gap.'/CLUSTERS';
 	my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
+	my $ppafcatdir = $cluster_synteny.'/gap_'.$gap.'/PAFCAT';
 
 	system ("
 		$cluster_path/clusters_to_paf.pl \\
@@ -1039,6 +1126,50 @@ foreach my $gap (@gaps){
 		--outdir $ppafdir \\
 		2>> $log_err
 	") == 0 or checksig();
+
+	if (($bpmode eq 'cat') or ($bpmode eq 'all')){
+
+		unless (-d $ppafcatdir){
+			mkdir($ppafcatdir,0755) or die "Can't create $ppafcatdir: $!\n";
+		}
+
+		opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
+			while (my $file = readdir(PAFDIR)){
+				if ($file =~ /\.paf$/){
+				my $paf_file = "$ppafdir/$file";
+				push (@pafcat_files, $paf_file);
+			}
+		}
+		closedir PAFDIR;
+
+		my %references;
+
+		for my $paf_file (@pafcat_files){
+			if ($paf_file =~ /(\w+)_vs_(\w+).\w+.paf$/){
+				my $query = $1;
+				my $reference = $2;
+				push (@{$references{$reference}}, $paf_file);
+			}
+		}
+
+		for my $ref (keys %references){
+
+			my $catfile = $ppafcatdir.'/all_vs_'.$ref.'.gap_'.$gap.'.paf';
+			open CCAT, '>', $catfile or die "Can't create $catfile: $!\n";
+
+			for my $file (@{$references{$ref}}){
+				open SCAT, '<', $file or die "Can't read $file: $!\n";
+				while (my $line = <SCAT>){
+					print CCAT "$line";
+				}
+				close SCAT;
+			} 
+			close CCAT;
+
+		}
+
+	}
+
 }
 
 logs(\*LOG, 'clusters_to_paf.pl', 'end');
@@ -1048,26 +1179,64 @@ unless ($no_barplot){
 
 	$tstart = time();
 	print ERROR "\n### paf_to_barplot.py (gene clusters) ###\n";
-	print "\n# Barplots (gene clusters):\n";
 
-	my @barplot_files = getpaf_files();
+	my @barplot_files = getpaf_files('PAF');
 
 	logs(\*LOG, 'paf_to_barplot.py', 'start');
 
-	system("
-		$plot_path/paf_to_barplot.py \\
-		--paf @barplot_files \\
-		--fasta $genome_dir/*.fasta \\
-		--threads $pthreads \\
-		--outdir $barplot_dir \\
-		--height $bheight \\
-		--width $bwidth \\
-		--palette $palette \\
-		--fontsize $bfsize \\
-		$tick_flag \\
-		$monobar_flag \\
-		2>> $log_err
-	") == 0 or checksig();
+	if (($bpmode eq 'pair') or ($bpmode eq 'all')){
+
+		print "\n# Barplots - pairwise (gene clusters):\n";
+
+		unless (-d $barplot_pair_dir){
+			make_path($barplot_pair_dir,{mode=>0755}) or die "Can't create $barplot_pair_dir: $!\n";
+		}
+
+		system("
+			$plot_path/paf_to_barplot.py \\
+			--paf @barplot_files \\
+			--fasta $genome_dir/*.fasta \\
+			--threads $pthreads \\
+			--outdir $barplot_pair_dir \\
+			--height $bheight \\
+			--width $bwidth \\
+			--palette $palette \\
+			--fontsize $bfsize \\
+			$tick_flag \\
+			$monobar_flag \\
+			$bcluster_flag \\
+			2>> $log_err
+		") == 0 or checksig();
+
+	}
+
+	if (($bpmode eq 'cat') or ($bpmode eq 'all')){
+
+		print "\n# Barplots - catenated (gene clusters):\n";
+
+		unless (-d $barplot_cat_dir){
+			make_path($barplot_cat_dir,{mode=>0755}) or die "Can't create $barplot_cat_dir: $!\n";
+		}
+
+		my @cat_barplot_files = getpaf_files('PAFCAT');
+
+		system("
+			$plot_path/paf_to_barplot.py \\
+			--paf @cat_barplot_files \\
+			--fasta $genome_dir/*.fasta \\
+			--threads $pthreads \\
+			--outdir $barplot_cat_dir \\
+			--height $bheight \\
+			--width $bwidth \\
+			--palette $palette \\
+			--fontsize $bfsize \\
+			--catenate \\
+			$tick_flag \\
+			$monobar_flag \\
+			$bcluster_flag \\
+			2>> $log_err
+		") == 0 or checksig();
+	}
 
 	logs(\*LOG, 'paf_to_barplot.py', 'end');
 
@@ -1080,7 +1249,7 @@ unless ($no_dotplot){
 	print ERROR "\n### paf_to_dotplot.py (gene clusters) ###\n";
 	print "\n# Dotplots (gene clusters):\n";
 
-	my @dotplot_files = getpaf_files();
+	my @dotplot_files = getpaf_files('PAF');
 
 	logs(\*LOG, 'paf_to_dotplot.py', 'start');
 
@@ -1113,7 +1282,7 @@ unless ($no_linemap){
 	print ERROR "\n### linear_maps.py (gene clusters) ###\n";
 	print "\n# Linemaps (gene clusters):\n";
 
-	my @linemap_files = getpaf_files();
+	my @linemap_files = getpaf_files('PAF');
 
 	logs(\*LOG, 'linear_maps.py', 'start');
 
@@ -1612,11 +1781,13 @@ sub list_maker {
 
 sub getpaf_files {
 
+	my $subdir = $_[0];
+
 	my @paf_files;
 
 	foreach my $gap (@gaps){
 
-		my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
+		my $ppafdir = $cluster_synteny.'/gap_'.$gap.'/'.$subdir;
 		opendir (PAFDIR, $ppafdir) or die "\n\n[ERROR]\tCan't open $ppafdir: $!\n\n";
 
 		while (my $file = readdir(PAFDIR)){
