@@ -1,7 +1,9 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # Pombert Lab 2022
 
-use strict; use warnings; use Getopt::Long qw(GetOptions);
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
 
 my $name = "id_conserved_regions.pl";
 my $version = '0.5.3';

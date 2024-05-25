@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 ## Pombert Lab 2022
 
 my $name = 'get_synteny.pl';

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 ## Pombert Lab, 2022
 my $name = 'nucleotide_biases.pl';
 my $version = '0.7g';
