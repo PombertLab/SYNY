@@ -256,7 +256,6 @@ def barplot(paf):
                         if clusters:
                             palette = sns.color_palette(color_palette, len(dataframe[query][subject]))
                             ccolor = palette[xnum]
-                            print (subject, query, 'xnum', xnum, sep="\t")
                             ax.add_patch(Rectangle((start, x), end, 1, color=ccolor))
                         else:
                             ax.add_patch(Rectangle((start, x), end, 1, color=ccolor))
