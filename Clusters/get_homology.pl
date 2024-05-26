@@ -32,7 +32,10 @@ OPTIONS
 -t (--threads)	Number of threads to use [Default = 8]
 EXIT
 
-die("\n$usage\n") unless (@ARGV);
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
 
 ###################################################################################################
 # Setting up script variables

@@ -27,7 +27,11 @@ OPTIONS:
 -o (--out)      Output text file [Default: versions.txt]
 -g (--git)      Specify git tag (otherwise finds latest from .git/FETCH_HEAD)
 USAGE
-die "\n$usage\n" unless @ARGV;
+
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
 
 my $indir;
 my $outfile = 'versions.txt';

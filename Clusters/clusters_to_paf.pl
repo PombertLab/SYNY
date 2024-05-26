@@ -28,7 +28,11 @@ OPTIONS:
 -f (--fasta)        FASTA files
 -o (--outdir)       Output directory [Default: ./PAF]
 USAGE
-die "\n$usage\n" unless @ARGV;
+
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
 
 my @clusters;
 my @fastas;

@@ -31,7 +31,11 @@ OPTIONS:
                     # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
                     # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
 USAGE
-die "\n$usage\n" unless @ARGV;
+
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};;
 
 my $paf_dir;
 my $links_file = 'paf_links.txt';

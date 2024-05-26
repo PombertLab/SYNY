@@ -36,7 +36,11 @@ OPTIONS:
 -x (--exclude)	Exclude contigs with names matching the provided regular expression(s)
 -v (--verbose)	Add verbosity
 REGEX
-die "$usage\n" unless @ARGV;
+
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
 
 my %filetypes = (
 	'gbf' => 'gbf',

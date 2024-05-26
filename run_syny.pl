@@ -127,7 +127,10 @@ my $plot_options = <<"PLOT_OPTIONS";
 --no_linemap            Turn off linemaps
 PLOT_OPTIONS
 
-die ("\n$usage\n") unless (@ARGV);
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
 
 my @commands = @ARGV;
 

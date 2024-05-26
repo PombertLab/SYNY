@@ -35,7 +35,11 @@ OPTIONS: ### query and subject files must correspond to qseqid and sseqid respec
 -o (--outdir)		Output directory ## Writes detected gene pairs
 -sd (--sumdir)		Summary output directory
 EXIT
-die "\n$usage\n" unless @ARGV;
+
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
 
 my $query_list;
 my $query_blast;

@@ -60,7 +60,11 @@ OPTIONS (Circos data files options)
 -clusters		Color by clusters [Default: off]
 -no_biases		Skip nucleotide bias subplots in Circos configuration files
 OPTIONS
-die "\n$usage\n" unless @ARGV;
+
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
 
 my @fasta;
 my $outdir = 'ntBiases';

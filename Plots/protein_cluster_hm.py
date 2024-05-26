@@ -46,7 +46,7 @@ OPTIONS:
 # Print custom message if argv is empty
 if (len(sys.argv) <= 1):
     print(usage)
-    sys.exit()
+    exit(0)
 
 ################################################################################
 ## Create command lines switches

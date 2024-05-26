@@ -37,7 +37,11 @@ OPTIONS:
 -p (--percent)  Specify mashmap3 percentage identity [Default: 75] 
 USAGE
 
-die "\n$usage\n" unless @ARGV;
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
+
 my @commands = @ARGV;
 
 my @fasta;

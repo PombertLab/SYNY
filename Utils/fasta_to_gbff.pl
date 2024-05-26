@@ -29,7 +29,11 @@ OPTIONS:
 -g (--gzip)     Compress the GBFF output files
 -v (--verbose)  Add verbosity
 USAGE
-die "\n$usage\n" unless @ARGV;
+
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
 
 my @fasta;
 my $outdir = 'GBFF';

@@ -31,7 +31,11 @@ OPTIONS:
 -i (--install)  Installation directory (for dependencies) [Default: ./TOOLS]
 --list_distro   Lists supported distribution/package managers
 USAGE
-die "\n$usage\n" unless @ARGV;
+
+unless (@ARGV){
+	print "\n$usage\n";
+	exit(0);
+};
 
 my $linux = 'fedora';
 my $config = '~/.bash_profile';
