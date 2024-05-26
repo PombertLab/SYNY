@@ -15,6 +15,7 @@
 - Fixed div by zero issue in `nucleotide_biases.pl`.
 - Added a check to detect if annotations parsed are blank. `run_syny.pl` no longer crashes if annotations are blank when running gene cluster inferences. If blank, it now now skips this section automatically.
 - Fixed perl env shebangs causing issues with conda
+- Fixed wrong exit codes with readmes
 
 ##### Readme / logs
 - Added section about memory usage with genome alignments
