@@ -15,7 +15,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
   * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
   * [Installing SYNY](#installing-SYNY)
     * [With Conda](#With-Conda)
-    * [With setup_syny.pl](#With-setup_syny.pl)
+    * [With setup_syny.pl](#With-setup_syny-.-pl)
     * [Manual installation](#Manual-installation)
   * [About memory usage](#about-memory-usage)
 * [Using SYNY](#Using-SYNY)
@@ -76,7 +76,7 @@ export PATH=$PATH:$(pwd)
 
 ### <b>Installing SYNY</b>
 
-SYNY dependencies can be installed automatically with Conda (does not require sudo privileges), with `setup_syny.pl` (requires sudo privileges) or manually.
+SYNY dependencies can be installed automatically with Conda (does not require sudo privileges), with `setup_syny.pl` (requires sudo privileges), or manually.
 
 <details open>
   <summary><b><i>Show/hide: Installing SYNY with Conda</i></b></summary>
