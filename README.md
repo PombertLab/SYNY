@@ -13,7 +13,10 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
 * [Introduction](#Introduction)
 * [Requirements](#Requirements)
   * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
-  * [Installing dependencies](#installing-SYNY-dependencies)
+  * [Installing SYNY](#installing-SYNY)
+    * [With Conda](#With-Conda)
+    * [With setup_syny.pl](#With-setup_syny.pl)
+    * [Manual installation](#Manual-installation)
   * [About memory usage](#about-memory-usage)
 * [Using SYNY](#Using-SYNY)
   * [Why use two distinct approaches?](#Why-use-two-distinct-approaches)
@@ -71,51 +74,15 @@ cd SYNY
 export PATH=$PATH:$(pwd)
 ```
 
-### <b>Installing SYNY dependencies</b>
+### <b>Installing SYNY</b>
 
-SYNY dependencies can be installed automatically with `setup_syny.pl` (requires sudo privileges), in a mostly automatic fashion via conda packages (does not require sudo privileges), or manually.
-
-<details open>
-  <summary><b><i>Show/hide: Installing dependencies with setup_syny.pl </i></b></summary>
-
-#### <b>Installing dependencies automatically with setup_syny.pl (requires sudo privileges)</b>
-Dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [MashMap3](https://github.com/marbl/MashMap), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
-
-```Bash
-## Listing supported Linux distributions:
-setup_syny.pl --list_distro
-
-Supported Linux distributions/package managers are:
-
-debian      apt
-fedora      dnf
-kali        apt
-opensuse    zypper
-ubuntu      apt
-```
-
-``` Bash
-## Installing dependencies:
-
-LINUX=fedora              ## Replace by Linux distribution: Ubuntu, Debian or Fedora 
-CONFIG=~/.bash_profile    ## Replace by desired configuration file
-DIR=~/TOOLS               ## Replace by desired installation directory
-
-setup_syny.pl \
-  --linux $LINUX \
-  --config $CONFIG \
-  --install $DIR
-
-## Loading the configuration file:
-source $CONFIG
-```
-</details>
+SYNY dependencies can be installed automatically with Conda (does not require sudo privileges), with `setup_syny.pl` (requires sudo privileges) or manually.
 
 <details open>
-  <summary><b><i>Show/hide: Installing dependencies with Conda</i></b></summary>
+  <summary><b><i>Show/hide: Installing SYNY with Conda</i></b></summary>
 
-#### <b>Installing dependencies with Conda (does not require sudo privileges)</b>
-Dependencies can also be installed without sudo-elevated privileges by leveraging conda packages. The installation process was tested with Miniconda3 on Ubuntu-22.04.3 LTS and Fedora 40 Linux distributions running as virtual machines on Microsoft Windows Subsystem for Linux (WSL).
+#### <b>With Conda</b>
+SYNY can be installed without sudo-elevated privileges by leveraging conda packages. The installation process was tested with Miniconda3 on Ubuntu-22.04.3 LTS and Fedora 40 Linux distributions running as virtual machines on Microsoft Windows Subsystem for Linux (WSL).
 
 To install SYNY with conda:
 ```Bash
@@ -135,7 +102,7 @@ conda activate syny
 (syny) username:~$ run_syny.pl -a *.gbff.gz -o output directory
 ```
 
-To install Miniconda:
+If a conda package manager is needed, Miniconda can be installed without the need for sudo-elevated privileges. To install Miniconda (tested on Ubuntu/Fedora):
 ```Bash
 ## Setup variables
 DOWN_DIR=$HOME/Downloads          ## Replace by desired download directory
@@ -174,7 +141,45 @@ conda config --set auto_activate_base false
 </details>
 
 <details open>
-  <summary><b><i>Show/hide: Installing dependencies manually</i></b></summary>
+  <summary><b><i>Show/hide: Installing SYNY with setup_syny.pl </i></b></summary>
+
+#### <b>With setup_syny.pl</b>
+SYNY and its dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [MashMap3](https://github.com/marbl/MashMap), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
+
+```Bash
+## Listing supported Linux distributions:
+setup_syny.pl --list_distro
+
+Supported Linux distributions/package managers are:
+
+debian      apt
+fedora      dnf
+kali        apt
+opensuse    zypper
+ubuntu      apt
+```
+
+``` Bash
+## Installing dependencies:
+
+LINUX=fedora              ## Replace by Linux distribution: Ubuntu, Debian or Fedora 
+CONFIG=~/.bash_profile    ## Replace by desired configuration file
+DIR=~/TOOLS               ## Replace by desired installation directory
+
+setup_syny.pl \
+  --linux $LINUX \
+  --config $CONFIG \
+  --install $DIR
+
+## Loading the configuration file:
+source $CONFIG
+```
+</details>
+
+
+
+<details open>
+  <summary><b><i>Show/hide: Installing SYNY manually</i></b></summary>
 
 #### <b>Installing dependencies manually</b>
 ##### To install PerlIO::gzip:
