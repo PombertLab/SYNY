@@ -15,7 +15,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
   * [Downloading SYNY from GitHub](#downloading-SYNY-from-github)
   * [Installing SYNY](#installing-SYNY)
     * [With Conda](#With-Conda)
-    * [With setup_syny.pl](#With-setup_syny-.-pl)
+    * [With Perl install script](#With-Perl-install-script)
     * [Manual installation](#Manual-installation)
   * [About memory usage](#about-memory-usage)
 * [Using SYNY](#Using-SYNY)
@@ -143,7 +143,7 @@ conda config --set auto_activate_base false
 <details open>
   <summary><b><i>Show/hide: Installing SYNY with setup_syny.pl </i></b></summary>
 
-#### <b>With setup_syny.pl</b>
+#### <b>With Perl install script</b>
 SYNY and its dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [MashMap3](https://github.com/marbl/MashMap), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
 
 ```Bash
