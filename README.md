@@ -181,7 +181,7 @@ source $CONFIG
 <details open>
   <summary><b><i>Show/hide: Installing SYNY manually</i></b></summary>
 
-#### <b>Installing dependencies manually</b>
+#### <b>Manual installation</b>
 ##### To install PerlIO::gzip:
 
 ```Bash
