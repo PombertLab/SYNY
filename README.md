@@ -141,7 +141,7 @@ conda config --set auto_activate_base false
 </details>
 
 <details open>
-  <summary><b><i>Show/hide: Installing SYNY with setup_syny.pl </i></b></summary>
+  <summary><b><i>Show/hide: Installing SYNY with Perl install script</i></b></summary>
 
 #### <b>With Perl install script</b>
 SYNY and its dependencies can be installed automatically with `setup_syny.pl`. This script will download and install [DIAMOND](https://github.com/bbuchfink/diamond), [minimap2](https://github.com/lh3/minimap2), [MashMap3](https://github.com/marbl/MashMap), [Circos](https://circos.ca/) together with the required dnf/apt/zypper packages (this script has been tested on Fedora, Ubuntu, Debian, Kali, and openSUSE Tumbleweed distributions). Note that using this script will require sudo privileges to install dnf/apt/zypper packages.
