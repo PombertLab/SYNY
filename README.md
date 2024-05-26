@@ -117,6 +117,24 @@ source $CONFIG
 #### <b>Installing dependencies with Conda (does not require sudo privileges)</b>
 Dependencies can also be installed without sudo-elevated privileges by leveraging conda packages. The installation process was tested with Miniconda3 on Ubuntu-22.04.3 LTS and Fedora 40 Linux distributions running as virtual machines on Microsoft Windows Subsystem for Linux (WSL).
 
+To install SYNY with conda:
+```Bash
+# Creating a conda environment
+conda create -n syny  
+
+# Activating the conda environment
+conda activate syny
+
+## Installing syny within the conda environment
+conda install syny -c conda-forge -c bioconda 
+```
+
+To run SYNY within its conda environment:
+```Bash
+conda activate syny
+(syny) username:~$ run_syny.pl -a *.gbff.gz -o output directory
+```
+
 To install Miniconda:
 ```Bash
 ## Setup variables
@@ -152,72 +170,6 @@ conda config --set solver libmamba
 
 ## Disabling automatic activation of the base environment at login
 conda config --set auto_activate_base false
-```
-
-To download and install SYNY:
-```Bash
-TOOLS_DIR=$HOME/Tools               ## Replace by desired directory
-SYNY=$TOOLS_DIR/SYNY                ## Replace by desired SYNY installation directory
-CONFIG=~/.profile                   ## Desired configuration file
-
-mkdir -p $TOOLS_DIR
-git clone https://github.com/PombertLab/SYNY.git $SYNY
-echo "export PATH=\$PATH:$SYNY" >> $CONFIG
-source $CONFIG
-```
-
-
-To create a conda environment for SYNY:
-```Bash
-SYNY=$TOOLS_DIR/SYNY                ## Replace by SYNY installation directory
-
-## Creating a conda environment + installing syny dependencies from its yaml file
-conda env create -f $SYNY/SYNY.yaml
-conda activate syny
-
-### Installing Text::Roman manually (not found in conda repositories)
-# Setup variables
-DOWN_DIR=$HOME/Downloads            ## Replace by desired download directory
-TOOLS_DIR=$HOME/Tools               ## Replace by desired directory
-PERL_LIB=$TOOLS_DIR/Perl5           ## Replace by desired installation directory
-
-# Downloading/setting up Text::Roman
-mkdir -p $DOWN_DIR $TOOLS_DIR $PERL_LIB
-wget https://cpan.metacpan.org/authors/id/S/SY/SYP/Text-Roman-3.5.tar.gz -P $DOWN_DIR
-tar -zxvf $DOWN_DIR/Text-Roman-3.5.tar.gz -C $PERL_LIB
-mv $PERL_LIB/Text-Roman-3.5/lib/* $PERL_LIB
-rm -R $PERL_LIB/Text-Roman-3.5*
-
-# Adding Perl lib location to PERL5LIB environment variable
-conda env config vars set PERL5LIB=$PERL5LIB:$PERL_LIB
-conda activate syny
-```
-
-While there is a conda package for Circos, its dependencies clash vith newer packages. Installing Circos outside conda will prevent dependency issues. To install Circos outside conda:
-
-```Bash 
-##  Setup variables
-DOWN_DIR=$HOME/Downloads            ## Replace by desired download directory
-TOOLS_DIR=$HOME/Tools               ## Replace by desired directory
-CIRCOS_DIR=$TOOLS_DIR/CIRCOS        ## Replace by desired installation directory
-CONFIG=~/.profile                   ## Desired configuration file
-
-## Downloading Circos
-mkdir -p $DOWN_DIR $TOOLS_DIR $CIRCOS_DIR
-wget \
-  --no-check-certificate \
-  https://circos.ca/distribution/circos-0.69-9.tgz \
-  -P $DOWN_DIR \
-
-tar -zxvf $DOWN_DIR/circos-0.69-9.tgz -C $CIRCOS_DIR && rm $DOWN_DIR/circos-0.69-9.tgz
-echo "export PATH=\$PATH:$CIRCOS_DIR/circos-0.69-9/bin" >> $CONFIG
-source $CONFIG
-```
-
-To run SYNY within its conda environment:
-```Bash
-conda activate syny
-(syny) username:~$ run_syny.pl -a *.gbff.gz -o output directory
 ```
 </details>
 
