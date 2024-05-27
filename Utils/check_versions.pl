@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'check_versions.pl';
-my $version = '0.1b';
-my $updated = '2020-05-22';
+my $version = '0.1c';
+my $updated = '2020-05-27';
 
 use strict;
 use warnings;
@@ -11,6 +11,10 @@ use File::Find;
 use File::Basename;
 use Cwd qw(abs_path);
 use Getopt::Long qw(GetOptions);
+
+#########################################################################
+### Command line options
+#########################################################################
 
 my $usage = <<"USAGE";
 NAME        ${name}
@@ -26,6 +30,7 @@ OPTIONS:
 -d (--dir)      Directory to check
 -o (--out)      Output text file [Default: versions.txt]
 -g (--git)      Specify git tag (otherwise finds latest from .git/FETCH_HEAD)
+-v (--version)  Show script version
 USAGE
 
 unless (@ARGV){
@@ -36,18 +41,38 @@ unless (@ARGV){
 my $indir;
 my $outfile = 'versions.txt';
 my $git_tag;
+my $sc_version;
 GetOptions(
     'd|dir=s' => \$indir,
     'o|out=s' => \$outfile,
-    'g|git=s' => \$git_tag
+    'g|git=s' => \$git_tag,
+    'v|version' => \$sc_version
 );
 
-## Locating scripts/subscripts
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
+
+#########################################################################
+### Locating scripts/subscripts
+#########################################################################
+
 my @scripts;
 $indir = abs_path($indir);
 find(\&scripts, $indir);
 
-# Getting git tag automatically
+#########################################################################
+### Getting git tag automatically
+#########################################################################
+
 unless ($git_tag){
     my $gitfile = $indir.'/.git/FETCH_HEAD';
     open GIT, '<', $gitfile or die "Can't read $gitfile: $!\n";
@@ -61,7 +86,10 @@ unless ($git_tag){
     }
 }
 
-## Getting scripts + versions info
+#########################################################################
+### Getting scripts + versions info
+#########################################################################
+
 my %master_scripts;
 my %subscripts;
 
@@ -104,7 +132,10 @@ for my $abscript (@scripts){
 
 }
 
-## SYNY info
+#########################################################################
+### SYNY info
+#########################################################################
+
 open OUT, '>', $outfile or die "Can't create $outfile: $!\n";
 for my $fh (\*OUT, \*STDOUT){
 
@@ -144,7 +175,10 @@ for my $fh (\*OUT, \*STDOUT){
 
 }
 
+#########################################################################
 ### Subroutine(s)
+#########################################################################
+
 sub scripts {
 
     my $sub = abs_path($_);

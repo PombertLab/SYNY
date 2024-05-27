@@ -11,29 +11,34 @@ use Getopt::Long qw(GetOptions);
 use File::Path qw(make_path);
 use File::Basename;
 
+#########################################################################
+### Command line options
+#########################################################################
+
 my $usage = <<"EXIT";
-NAME		${name}
-VERSION		${version}
-UPDATED		${updated}
-SYNOPSIS	Detects pairs of genes that are shared between genomes based on BLAST/DIAMOND homology searches,
-		then reconstructs clusters based on these pairs.
+NAME        ${name}
+VERSION     ${version}
+UPDATED     ${updated}
+SYNOPSIS    Detects pairs of genes that are shared between genomes based on BLAST/DIAMOND homology searches,
+            then reconstructs clusters based on these pairs.
 
-USAGE		$name \\
-		  -ql RCC138.list \\
-		  -qb RCC_vs_CCMP.diamond.blastp.6 \\
-		  -sl CCMP1205.list \\
-		  -sb CCMP_vs_RCC.diamond.blastp.6
-		  -gap 10 \\
-		  -o RCCvsCCMP \\
+USAGE     $name \\
+            -ql RCC138.list \\
+            -qb RCC_vs_CCMP.diamond.blastp.6 \\
+              -sl CCMP1205.list \\
+            -sb CCMP_vs_RCC.diamond.blastp.6
+            -gap 10 \\
+            -o RCCvsCCMP \\
 
-OPTIONS: ### query and subject files must correspond to qseqid and sseqid respectively
--ql (--query_list)	List (.list) file from query organism generated with list_maker.pl
--qb (--query_blast)	BLAST/DIAMOND homology searches in output format 6 for query_vs_subject
--sl (--subject_list)	List (.list) file from subject organism generated with list_maker.pl
--sb (--subject_blast)	BLAST/DIAMOND homology searches in output format 6 for subject_vs_query
--g (--gap)		Space allowed between adjacent genes [Default: 0]
--o (--outdir)		Output directory ## Writes detected gene pairs
--sd (--sumdir)		Summary output directory
+OPTIONS: ### query and subject files must correspond to qseqid and sseqid, respectively
+-ql (--query_list)      List (.list) file from query organism generated with list_maker.pl
+-qb (--query_blast)     BLAST/DIAMOND homology searches in output format 6 for query_vs_subject
+-sl (--subject_list)    List (.list) file from subject organism generated with list_maker.pl
+-sb (--subject_blast)   BLAST/DIAMOND homology searches in output format 6 for subject_vs_query
+-g (--gap)              Space allowed between adjacent genes [Default: 0]
+-o (--outdir)           Output directory ## Writes detected gene pairs
+-sd (--sumdir)          Summary output directory
+-v (--version)          Show script version
 EXIT
 
 unless (@ARGV){
@@ -48,7 +53,7 @@ my $subject_blast;
 my $gap = 0;
 my $outdir = 'SYNTENY';
 my $sumdir = $outdir;
-
+my $sc_version;
 GetOptions(
 	'ql|query_list=s' => \$query_list,
 	'qb|query_blast=s' => \$query_blast,
@@ -56,8 +61,25 @@ GetOptions(
 	'sb|subject_blast=s' => \$subject_blast,
 	'g|gap=s' => \$gap,
 	'o|outdir=s' => \$outdir,
-	'sd|sumdir=s' => \$sumdir
+	'sd|sumdir=s' => \$sumdir,
+	'v|version' => \$sc_version
 );
+
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
+
+#########################################################################
+### Output dir/subdirs
+#########################################################################
 
 my $pair_dir = $outdir."/PAIRS";
 my $cluster_dir = $outdir."/CLUSTERS";

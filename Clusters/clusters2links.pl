@@ -2,8 +2,8 @@
 ## Pombert Lab, Illinois Tech 2023
 
 my $name = 'clusters2links.pl';
-my $version = '0.2c';
-my $updated = '2023-04-20';
+my $version = '0.3';
+my $updated = '2023-05-27';
 
 use strict;
 use warnings;
@@ -11,6 +11,10 @@ use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
 use Math::Round;
+
+#########################################################################
+### Command line options
+#########################################################################
 
 my $usage = <<"USAGE";
 NAME        ${name}
@@ -32,6 +36,7 @@ OPTIONS:
 --custom_preset     Use a custom color preset; e.g.
                     # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
                     # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+-v (--version)  Show script version
 USAGE
 
 unless (@ARGV){
@@ -45,16 +50,33 @@ my $outdir = 'Circos';
 my $clusters;
 my $custom_file;
 my $custom_cc;
+my $sc_version;
 GetOptions(
     'c|cluster=s@{1,}' => \@clusters,
     'l|list=s@{1,}' => \@lists,
     'o|outdir=s' => \$outdir,
     'clusters' => \$clusters,
     'custom_file=s' => \$custom_file,
-    'custom_preset=s' => \$custom_cc
+    'custom_preset=s' => \$custom_cc,
+    'v|version' => \$sc_version
 );
 
-### Check if output directory / subdirs can be created
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
+
+#########################################################################
+### Output dir/subdirs
+#########################################################################
+
 $outdir =~ s/\/$//;
 unless (-d $outdir) {
 	make_path($outdir,{mode => 0755}) or die "Can't create $outdir: $!\n";
@@ -64,8 +86,12 @@ unless (-d $catdir) {
 	make_path($catdir,{mode => 0755}) or die "Can't create $catdir: $!\n";
 }
 
-my %loci_db;
+#########################################################################
 ### Iterating through annotations lists
+#########################################################################
+
+my %loci_db;
+
 while (my $list = shift @lists){
 
     open LIST, '<', $list or die "Can't open $list: $!\n";
@@ -90,7 +116,9 @@ while (my $list = shift @lists){
 
 }
 
-#################### Circos colors
+#########################################################################
+### Circos colors
+#########################################################################
 
 my @reds = ('vvlred','vlred','lred','red','dred','vdred','vvdred');
 my @oranges = ('vvlorange','vlorange','lorange','orange','dorange','vdorange','vvdorange');
@@ -132,7 +160,10 @@ if ($custom_cc){
 	@color_set = sort (keys %{$custom_colors{$custom_cc}});
 } 
 
+#########################################################################
 ### Iterating through cluster files
+#########################################################################
+
 my $dflag;
 my $zdepth = 1;
 my $color = 'grey_a5';

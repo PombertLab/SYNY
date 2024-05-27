@@ -2,8 +2,8 @@
 ## Pombert Lab, 2022
 
 my $name = "get_homology.pl";
-my $version = "0.1.8";
-my $updated = "2024-05-15";
+my $version = "0.1.8a";
+my $updated = "2024-05-27";
 
 use warnings;
 use strict;
@@ -11,25 +11,30 @@ use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
 
-my $usage = << "EXIT";
-NAME		${name}
-VERSION		${version}
-UPDATED		${updated}
-SYNOPSIS	Creates DIAMOND databases based on input protein files and performs round-robin BLASTP homology searches
+#########################################################################
+### Command line options
+#########################################################################
 
-USAGE		${name} \\
-		  -i *.prot \\
-		  -a *.annotations \\
-		  -e 1e-40 \\
-		  -o DIAMOND
+my $usage = << "EXIT";
+NAME        ${name}
+VERSION     ${version}
+UPDATED     ${updated}
+SYNOPSIS    Creates DIAMOND databases based on input protein files and performs round-robin BLASTP homology searches
+
+USAGE       ${name} \\
+              -i *.prot \\
+              -a *.annotations \\
+              -e 1e-40 \\
+              -o DIAMOND
 
 OPTIONS
--i (--input)	Input protein files
--l (--list)	Directory containing tab-delimited lists of features [Default = LISTS]
--e (--evalue)	Evalue [Default = 1e-10]
--o (--outdir)	Diamond searches output directory [Default = DIAMOND]
--s (--shared)	Shared proteins output directory [Default = SHARED]
--t (--threads)	Number of threads to use [Default = 8]
+-i (--input)    Input protein files
+-l (--list)     Directory containing tab-delimited lists of features [Default = LISTS]
+-e (--evalue)   Evalue [Default = 1e-10]
+-o (--outdir)   Diamond searches output directory [Default = DIAMOND]
+-s (--shared)   Shared proteins output directory [Default = SHARED]
+-t (--threads)  Number of threads to use [Default = 8]
+-v (--version)  Show script version
 EXIT
 
 unless (@ARGV){
@@ -37,25 +42,38 @@ unless (@ARGV){
 	exit(0);
 };
 
-###################################################################################################
-# Setting up script variables
-###################################################################################################
-
 my @input_files;
 my $e_value = "1e-10";
 my $outdir = "DIAMOND";
 my $shared_dir = "SHARED";
 my $list_dir = "LISTS";
 my $threads = 8;
-
+my $sc_version;
 GetOptions(
 	'i|input=s@{2,}' => \@input_files,
 	'e|evalue=s' => \$e_value,
 	'o|outdir=s' => \$outdir,
 	's|shared=s' => \$shared_dir,
 	'l|list=s' => \$list_dir,
-	't|threads=i' => \$threads
+	't|threads=i' => \$threads,
+	'v|version' => \$sc_version
 );
+
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
+
+#########################################################################
+### Req. check
+#########################################################################
 
 my $diamond_check = `echo \$(command -v diamond)`;
 chomp $diamond_check;
@@ -63,6 +81,10 @@ if ($diamond_check eq ''){
 	print STDERR "\n[E]: Cannot find diamond. Please install diamond in your \$PATH. Exiting..\n\n";
 	exit;
 }
+
+#########################################################################
+### Output dir/subdirs
+#########################################################################
 
 unless (-d $outdir){
 	make_path($outdir,{mode=>0755});
@@ -76,7 +98,6 @@ unless (-d $db_dir){
 unless (-d $shared_dir){
 	make_path($shared_dir,{mode=>0755});
 }
-
 
 ###################################################################################################
 # Creating diamond databases

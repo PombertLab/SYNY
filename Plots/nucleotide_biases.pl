@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
 ## Pombert Lab, 2022
+
 my $name = 'nucleotide_biases.pl';
-my $version = '0.7g';
-my $updated = '2024-05-22';
+my $version = '0.8';
+my $updated = '2024-05-27';
 
 use strict;
 use warnings;
@@ -11,54 +12,59 @@ use File::Basename;
 use File::Path qw(make_path);
 use Text::Roman qw(:all);
 
-my $usage = <<"OPTIONS";
-NAME		$name
-VERSION		$version
-UPDATED		$updated
-SYNOPSIS	Generates tab-delimited sliding windows of GC, AT, purine and pyrimidine
-		 distributions for easy plotting with MS Excel or other tool. Can also generate
-		 coordinate files for Circos.
+#########################################################################
+### Command line options
+#########################################################################
 
-COMMAND		$name \\
-		  -fasta *.fasta \\
-		  -outdir output_directory \\
-		  -winsize 1000 \\
-		  -step 500 \\
-		  -minsize 1 \\
-		  -reference CCMP1205 \\
-		  -gap 0 \\
-		  -custom_preset chloropicon
+my $usage = <<"OPTIONS";
+NAME        ${name}
+VERSION     ${version}
+UPDATED     ${updated}
+SYNOPSIS    Generates tab-delimited sliding windows of GC, AT, purine and pyrimidine
+            distributions for easy plotting with MS Excel or other tool. Can also generate
+            coordinate files for Circos.
+
+COMMAND     ${name} \\
+              -fasta *.fasta \\
+              -outdir output_directory \\
+              -winsize 1000 \\
+              -step 500 \\
+              -minsize 1 \\
+              -reference CCMP1205 \\
+              -gap 0 \\
+              -custom_preset chloropicon
 
 OPTIONS (Main)
--f (--fasta)		Fasta file(s) to process
--o (--outdir)		Output directory [Default: ntBiases]
--w (--winsize)		Sliding window size [Default: 10000]
--s (--step)		Sliding window step [Default: 5000]
--m (--minsize)	Minimum contig size (in bp) [Default: 1]
--n (--ncheck)		Check for ambiguous/masked (Nn) nucleotides
--t (--tsv)		Output tab-delimited files (e.g. for excel plotting)
+-f (--fasta)           Fasta file(s) to process
+-o (--outdir)          Output directory [Default: ntBiases]
+-w (--winsize)         Sliding window size [Default: 10000]
+-s (--step)            Sliding window step [Default: 5000]
+-m (--minsize)         Minimum contig size (in bp) [Default: 1]
+-n (--ncheck)          Check for ambiguous/masked (Nn) nucleotides
+-t (--tsv)             Output tab-delimited files (e.g. for excel plotting)
+-v (--version)         Show script version
 
 OPTIONS (Circos data files options)
--r (--reference)	Genome reference for Circos plotting
--g (--gap)		Default gap links file for Circos plotting [Default: 0]
--u (--unit)		Size unit (Kb or Mb) [Default: Mb]
--l (--labels)	Contig label type: mixed (arabic + roman numbers), arabic, roman, or names [Default: mixed]
--label_size		Contig label size [Default: 36]
--label_font		Contig label font [Default: bold]
--custom_file		Load custom colors from file
--list_preset		List available custom color presets
--custom_preset		Use a custom color preset; e.g.
-			# chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
-			# encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
-			# presets can be added to the cc_colors subroutine
--noticks		Comment out ticks.conf in Circos configuration file
--max_ticks		Set max number of ticks [Default: 5000]
--max_ideograms		Set max number of ideograms [Default: 200]
--max_links		Set max number of links [Default: 75000]
--max_points_per_track	Set max number of points per track [Default: 75000]
--zdepth			Set links zdepth in ruleset [Default: 50]
--clusters		Color by clusters [Default: off]
--no_biases		Skip nucleotide bias subplots in Circos configuration files
+-r (--reference)       Genome reference for Circos plotting
+-g (--gap)             Default gap links file for Circos plotting [Default: 0]
+-u (--unit)            Size unit (Kb or Mb) [Default: Mb]
+-l (--labels)          Contig label type: mixed (arabic + roman numbers), arabic, roman, or names [Default: mixed]
+-label_size            Contig label size [Default: 36]
+-label_font            Contig label font [Default: bold]
+-custom_file           Load custom colors from file
+-list_preset           List available custom color presets
+-custom_preset         Use a custom color preset; e.g.
+                       # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
+                       # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+                       # presets can be added to the cc_colors subroutine
+-noticks               Comment out ticks.conf in Circos configuration file
+-max_ticks             Set max number of ticks [Default: 5000]
+-max_ideograms         Set max number of ideograms [Default: 200]
+-max_links             Set max number of links [Default: 75000]
+-max_points_per_track  Set max number of points per track [Default: 75000]
+-zdepth                Set links zdepth in ruleset [Default: 50]
+-clusters              Color by clusters [Default: off]
+-no_biases             Skip nucleotide bias subplots in Circos configuration files
 OPTIONS
 
 unless (@ARGV){
@@ -91,6 +97,7 @@ my $max_points_per_track = 75000;
 my $zdepth = 50;
 my $clusters;
 my $no_biases;
+my $sc_version;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
 	'o|outdir=s' => \$outdir,
@@ -116,10 +123,26 @@ GetOptions(
 	'max_points_per_track=i' => \$max_points_per_track,
 	'zdepth=i' => \$zdepth,
 	'clusters' => \$clusters,
-	'no_biases' => \$no_biases
+	'no_biases' => \$no_biases,
+	'v|version' => \$sc_version
 );
 
-### List presets and stop
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
+
+#########################################################################
+### List presets
+#########################################################################
+
 if ($list_preset){
 
 	print "\n".'Available color presets:'."\n";
@@ -135,7 +158,10 @@ if ($list_preset){
 
 }
 
-### Check if output directory / subdirs can be created
+#########################################################################
+### Output dir/subdirs
+#########################################################################
+
 $outdir =~ s/\/$//;
 my $catdir = $outdir.'/concatenated';
 my $pairwisedir = $outdir.'/pairwise';
@@ -156,7 +182,9 @@ foreach my $cfh (@cathandles){
 	print $cfh '#chr START END GC_PERCENTAGE'."\n";
 }
 
-### Iterating through FASTA file(s); creating database of sequences (could be multifasta)
+#########################################################################
+### Creating sequence database + calculating sequence metrics
+#########################################################################
 
 my %sequences;
 my %percent;

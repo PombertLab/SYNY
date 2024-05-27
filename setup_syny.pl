@@ -13,6 +13,10 @@ use Cwd qw(abs_path);
 use Cwd qw(getcwd);
 use File::Path qw(make_path);
 
+###################################################################################################
+## Command line options
+###################################################################################################
+
 my $usage = <<"USAGE";
 NAME        ${name}
 VERSION     ${version}
@@ -29,6 +33,7 @@ OPTIONS:
 -l (--linux)    Linux distribution [Default: fedora]
 -c (--config)   Configuration file to edit/create [Default: ~/.bash_profile]
 -i (--install)  Installation directory (for dependencies) [Default: ./TOOLS]
+-v (--version)  Show script version
 --list_distro   Lists supported distribution/package managers
 USAGE
 
@@ -41,12 +46,26 @@ my $linux = 'fedora';
 my $config = '~/.bash_profile';
 my $install_dir = './TOOLS';
 my $list_distro;
+my $sc_version;
 GetOptions(
     'l|linux=s' => \$linux,
     'c|config=s' => \$config,
     'i|install=s' => \$install_dir,
-    'list_distro' => \$list_distro
+    'list_distro' => \$list_distro,
+    'v|version' => \$sc_version
 );
+
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
 
 ###################################################################################################
 ## Grabbing absolute paths

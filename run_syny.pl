@@ -3,7 +3,7 @@
 
 my $name = 'run_syny.pl';
 my $version = '0.8';
-my $updated = '2024-05-25';
+my $updated = '2024-05-27';
 
 use strict;
 use warnings;
@@ -16,28 +16,29 @@ use threads;
 use threads::shared;
 
 ###################################################################################################
-## Options
+## Command line options
 ###################################################################################################
 
 my $usage = <<"EXIT";
-NAME		${name}
-VERSION		${version}
-UPDATED		${updated}
-SYNOPSIS	Runs the SYNY pipeline
+NAME        ${name}
+VERSION     ${version}
+UPDATED     ${updated}
+SYNOPSIS    Runs the SYNY pipeline
 
-REQS		Perl / PerlIO::gzip - https://metacpan.org/pod/PerlIO::gzip
-		Python3 / matplotlib / seaborn / pandas - https://www.python.org/
-		Diamond - https://github.com/bbuchfink/diamond
-		Minimap2 - https://github.com/lh3/minimap2
-		Circos - http://circos.ca/
+REQS        Perl / PerlIO::gzip - https://metacpan.org/pod/PerlIO::gzip
+            Python3 / matplotlib / seaborn / pandas - https://www.python.org/
+            Diamond - https://github.com/bbuchfink/diamond
+            Minimap2 - https://github.com/lh3/minimap2
+            MashMap3 - https://github.com/marbl/MashMap
+            Circos - http://circos.ca/
 
-USAGE		${name} \\
-		  -t 16 \\
-		  -a *.gbff \\
-		  -o SYNY \\
-		  -e 1e-10 \\
-		  -g 0 1 5 \\
-		  --circos pair
+USAGE       ${name} \\
+              -t 16 \\
+              -a *.gbff \\
+              -o SYNY \\
+              -e 1e-10 \\
+              -g 0 1 5 \\
+              --circos pair
 
 OPTIONS:
 -h (--help)             Display all command line options

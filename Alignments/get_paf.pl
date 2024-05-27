@@ -1,15 +1,19 @@
 #!/usr/bin/env perl
 ## Pombert Lab, 2024
 
+my $name = 'get_paf.pl';
+my $version = '0.4b';
+my $updated = '2024-05-27';
+
 use strict;
 use warnings;
 use File::Basename;
 use Cwd qw(abs_path);
 use Getopt::Long qw(GetOptions);
 
-my $name = 'get_paf.pl';
-my $version = '0.4a';
-my $updated = '2024-05-14';
+#########################################################################
+### Command line options
+#########################################################################
 
 my $usage =<<"USAGE";
 NAME        ${name}
@@ -35,6 +39,7 @@ OPTIONS:
 -t (--threads)  Number of threads for minimap2 [Default: 8]
 -a (--asm)      Specify minimap2 max divergence preset (asm 5, 10 or 20) [Default: off]
 -p (--percent)  Specify mashmap3 percentage identity [Default: 75] 
+-v (--version)  Show script version
 USAGE
 
 unless (@ARGV){
@@ -51,6 +56,7 @@ my $resume;
 my $threads = 8;
 my $asm;
 my $mashmap_pid = 75;
+my $sc_version;
 GetOptions(
     'f|fasta=s@{1,}' => \@fasta,
     'o|outdir=s' => \$outdir,
@@ -58,8 +64,21 @@ GetOptions(
     't|threads=i' => \$threads,
     'r|resume' => \$resume,
     'asm=i' => \$asm,
-    'p|percent=s' => \$mashmap_pid
+    'p|percent=s' => \$mashmap_pid,
+    'v|version' => \$sc_version
 );
+
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
 
 #########################################################################
 ### Output dir/subdirs

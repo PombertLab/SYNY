@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'fasta_to_gbff.pl';
-my $version = '0.1';
-my $updated = '2024-04-26';
+my $version = '0.1a';
+my $updated = '2024-05-27';
 
 use strict;
 use warnings;
@@ -11,6 +11,10 @@ use File::Basename;
 use File::Path qw(make_path);
 use PerlIO::gzip;
 use Getopt::Long qw(GetOptions);
+
+#########################################################################
+### Command line options
+#########################################################################
 
 my $usage =<<"USAGE";
 NAME        ${name}
@@ -28,6 +32,7 @@ OPTIONS:
 -o (--outdir)   Output directory [Default: GBFF]
 -g (--gzip)     Compress the GBFF output files
 -v (--verbose)  Add verbosity
+--version       Show script version
 USAGE
 
 unless (@ARGV){
@@ -39,26 +44,49 @@ my @fasta;
 my $outdir = 'GBFF';
 my $gzip_flag;
 my $verbose;
+my $sc_version;
 GetOptions(
     'f|fasta=s@{1,}' => \@fasta,
     'o|outdir=s' => \$outdir,
     'g|gzip' => \$gzip_flag,
-    'v|verbose' => \$verbose
+    'v|verbose' => \$verbose,
+    'version' => \$sc_version
 );
 
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
+
+#########################################################################
 ### Pigz check
+#########################################################################
+
 my $gzip_tool = 'gzip';
 my $pigz_check = `echo \$(command -v pigz)`;
 if ($pigz_check =~ /pigz/){
     $gzip_tool = 'pigz';
 }
 
-### Outdir
+#########################################################################
+### Output dir/subdirs
+#########################################################################
+
 unless (-d $outdir){
     make_path($outdir,{mode=>0755}) or die "Can't create $outdir: $!\n";
 }
 
+#########################################################################
 ### Parsing fasta file(s)
+#########################################################################
+
 while (my $fasta = shift@fasta){
 
     if ($verbose){

@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.8b';
-my $updated = '2024-05-23';
+my $version = '0.5.8c';
+my $updated = '2024-05-27';
 
 use strict;
 use warnings;
@@ -12,29 +12,34 @@ use File::Basename;
 use File::Path qw(make_path);
 use PerlIO::gzip;
 
-my $usage = <<"OPTIONS";
-NAME		${name}
-VERSION		${version}
-UPDATED		${updated}
-SYNOPSIS	Creates a list containing all protein-coding genes with their genomic positions from
-		GenBank GBF/GBFF annotation files. Also creates .faa files containing protein sequences.
+#########################################################################
+### Command line options
+#########################################################################
 
-USAGE		${name}
-		  -i *.gbff \\
-		  -o LISTS \\
-		  -x CATOPV '^CAJUZD'
-		  -verbose
+my $usage = <<"OPTIONS";
+NAME        ${name}
+VERSION     ${version}
+UPDATED     ${updated}
+SYNOPSIS    Creates a list containing all protein-coding genes with their genomic positions from
+            GenBank GBF/GBFF annotation files. Also creates .faa files containing protein sequences.
+
+USAGE      ${name}
+             -i *.gbff \\
+             -o LISTS \\
+             -x CATOPV '^CAJUZD' \\
+             -verbose
 OPTIONS
 
 $usage .= <<'REGEX';
 OPTIONS:
--i (--input)	Input file(s) (GZIP supported; File type determined by file extension)
--o (--outdir)	Output directory [Default: LIST_MAKER]
--m (--minsize)	Keep only contigs larger or equal to specified size (in bp) [Default: 1]
--n (--include)	Select contigs with names from input text file(s) (one name per line); i.e. excludes everything else
--r (--ranges)	Select contigs with subranges from input text file(s): name start end
--x (--exclude)	Exclude contigs with names matching the provided regular expression(s)
--v (--verbose)	Add verbosity
+-i (--input)    Input file(s) (GZIP supported; File type determined by file extension)
+-o (--outdir)   Output directory [Default: LIST_MAKER]
+-m (--minsize)  Keep only contigs larger or equal to specified size (in bp) [Default: 1]
+-n (--include)  Select contigs with names from input text file(s) (one name per line); i.e. excludes everything else
+-r (--ranges)   Select contigs with subranges from input text file(s): name start end
+-x (--exclude)  Exclude contigs with names matching the provided regular expression(s)
+-v (--verbose)  Add verbosity
+--version       Show script version
 REGEX
 
 unless (@ARGV){
@@ -56,6 +61,7 @@ my @included;
 my @ranges;
 my @regexes;
 my $verbose;
+my $sc_version;
 GetOptions(
 	'i|input=s@{1,}' => \@input_files,
 	'o|outdir=s' => \$outdir,
@@ -63,8 +69,21 @@ GetOptions(
 	'n|included=s@{0,}' => \@included,
 	'r|ranges=s@{0,}' => \@ranges,
 	'x|exclude=s@{0,}' => \@regexes,
-	'v|verbose' => \$verbose
+	'v|verbose' => \$verbose,
+	'version' => \$sc_version
 );
+
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
 
 ###################################################################################################
 ## Output dir/subdir creation and setup

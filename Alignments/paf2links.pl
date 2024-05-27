@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'paf2links.pl';
-my $version = '0.1c';
-my $updated = '2024-04-20';
+my $version = '0.2';
+my $updated = '2024-05-27';
 
 use strict;
 use warnings;
@@ -11,6 +11,10 @@ use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
 use Math::Round;
+
+#########################################################################
+### Command line options
+#########################################################################
 
 my $usage = <<"USAGE";
 NAME        ${name}
@@ -30,6 +34,7 @@ OPTIONS:
 --custom_preset     Use a custom color preset; e.g.
                     # chloropicon - 20 colors - Lemieux et al. (2019) https://pubmed.ncbi.nlm.nih.gov/31492891/
                     # encephalitozoon - 11 colors - Pombert et al. (2012) https://pubmed.ncbi.nlm.nih.gov/22802648/
+-v (--version)      Show script version
 USAGE
 
 unless (@ARGV){
@@ -42,15 +47,32 @@ my $links_file = 'paf_links.txt';
 my $clusters;
 my $custom_file;
 my $custom_cc;
+my $sc_version;
 GetOptions(
     'p|paf=s' => \$paf_dir,
     'l|links=s' => \$links_file,
     'clusters' => \$clusters,
     'custom_file=s' => \$custom_file,
-    'custom_preset=s' => \$custom_cc
+    'custom_preset=s' => \$custom_cc,
+    'v|version' => \$sc_version
 );
 
-## Grabbing paf files
+#########################################################################
+### Version
+#########################################################################
+
+if ($sc_version){
+    print "\n";
+    print "Script:     $name\n";
+    print "Version:    $version\n";
+    print "Updated:    $updated\n\n";
+    exit(0);
+}
+
+#########################################################################
+### Grabbing paf files
+#########################################################################
+
 opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
 
 my @paf_files;
@@ -60,7 +82,10 @@ while (my $file = readdir(PAFDIR)){
 	}
 }
 
-#################### Circos colors
+#########################################################################
+### Circos colors
+#########################################################################
+
 my @reds = ('vvlred','vlred','lred','red','dred','vdred','vvdred');
 my @oranges = ('vvlorange','vlorange','lorange','orange','dorange','vdorange','vvdorange');
 my @yellows = ('vlyellow','lyellow','yellow','dyellow','vdyellow','vvdyellow');
@@ -101,7 +126,10 @@ if ($custom_cc){
 	@color_set = sort (keys %{$custom_colors{$custom_cc}});
 }
 
-## Creating Circos links file
+#########################################################################
+### Creating Circos links file
+#########################################################################
+
 open PLINK, '>', $links_file or die "Can't create $links_file: $!\n";
 print PLINK '#locus1 start end locus2 start end'."\n";
 
