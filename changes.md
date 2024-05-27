@@ -1,5 +1,10 @@
 # SYNY CHANGE LOG
 
+## SYNY-v1.1b
+##### Code cleanup:
+- Added `--version` option for all scripts.
+- Minor code cleanup / standardisation across scripts
+
 ## SYNY-v1.1a
 
 ##### Additions
