@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2'
-updated = '2024-05-03'
+version = '0.2a'
+updated = '2024-05-27'
 name = 'paf_to_heatmap.py'
 
 import sys
@@ -43,6 +43,7 @@ OPTIONS:
 --vmax          Set maximum color bar value [Default: 100]
 --vmin          Set minimum color bar value [Default: 0]
 --vauto         Set color bar values automatically instead
+--version       Show script version
 """
 
 # Print custom message if argv is empty
@@ -66,6 +67,7 @@ cmd.add_argument("--fontsize", default=8)
 cmd.add_argument("--vmin", default=0)
 cmd.add_argument("--vmax", default=100)
 cmd.add_argument("--vauto", action='store_true')
+cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -79,6 +81,18 @@ fontsize = int(args.fontsize)
 vmin = int(args.vmin)
 vmax = int(args.vmax)
 vauto = args.vauto
+scversion = args.version
+
+#########################################################################
+### Version
+#########################################################################
+
+if scversion:
+    print ("\b")
+    print (f"Script:     {name}")
+    print (f"Version:    {version}")
+    print (f"Updated:    {updated}\n")
+    exit(0)
 
 ################################################################################
 ## Working on output directory

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.2b'
-updated = '2024-05-12'
+version = '0.2c'
+updated = '2024-05-27'
 name = 'check_mp_colors.py'
 
 import argparse
@@ -34,6 +34,7 @@ OPTIONS:
 -w (--width)    Figure width in inches [Default: 19.2]
 -f (--font)     Font size [Default: 6]
 -c (--check)    Check if color palettes entered exists
+--version       Show script version
 """
 
 # Print custom message if argv is empty
@@ -53,6 +54,7 @@ cmd.add_argument("-w", "--width", default=60)
 cmd.add_argument("-h", "--height", default=6)
 cmd.add_argument("-f", "--font", default=12)
 cmd.add_argument("-c", "--check", nargs='*')
+cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
 colorlist = args.list
@@ -62,6 +64,18 @@ height = args.height
 width = args.width
 fontsize = args.font
 check = args.check
+scversion = args.version
+
+#########################################################################
+### Version
+#########################################################################
+
+if scversion:
+    print ("\b")
+    print (f"Script:     {name}")
+    print (f"Version:    {version}")
+    print (f"Updated:    {updated}\n")
+    exit(0)
 
 ################################################################################
 ## Check for available color palettes

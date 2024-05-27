@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.3'
-updated = '2024-05-22'
+version = '0.3a'
+updated = '2024-05-27'
 name = 'paf_metrics.py'
 
 import os
@@ -36,6 +36,7 @@ I/O OPTIONS:
 -w (--width)  Figure width in inches [Default: 19.2]
 --fontsize    Figure font size [Default: 12]
 --threads     Number of threads to use [Default: 16]
+--version     Show script version
 """
 
 # Print custom message if argv is empty
@@ -55,6 +56,7 @@ cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
 cmd.add_argument("--fontsize", default=12)
 cmd.add_argument("--threads", default=16)
+cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -64,6 +66,18 @@ width = args.width
 rgb = args.color
 fontsize = int(args.fontsize)
 threads = int(args.threads)
+scversion = args.version
+
+#########################################################################
+### Version
+#########################################################################
+
+if scversion:
+    print ("\b")
+    print (f"Script:     {name}")
+    print (f"Version:    {version}")
+    print (f"Updated:    {updated}\n")
+    exit(0)
 
 ################################################################################
 ## Function to calculate n metrics; e.g n50, n75, n90

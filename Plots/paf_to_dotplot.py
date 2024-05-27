@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.5b'
-updated = '2024-04-29'
+version = '0.5c'
+updated = '2024-05-27'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -47,6 +47,7 @@ OPTIONS:
 --hdis          Vertical distance (height) between subplots [Default: 0.1]
 --fontsize      Font size [Default: 8]
 --threads       Number of threads to use [Default: 16]
+--version       Show script version
 """
 
 # Print custom message if argv is empty
@@ -73,6 +74,7 @@ cmd.add_argument("--wdis", default=0.05)
 cmd.add_argument("--hdis", default=0.1)
 cmd.add_argument("--fontsize", default=8)
 cmd.add_argument("--threads", default=16)
+cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -89,6 +91,18 @@ wdis = args.wdis
 hdis = args.hdis
 fontsize = int(args.fontsize)
 threads = int(args.threads)
+scversion = args.version
+
+#########################################################################
+### Version
+#########################################################################
+
+if scversion:
+    print ("\b")
+    print (f"Script:     {name}")
+    print (f"Version:    {version}")
+    print (f"Updated:    {updated}\n")
+    exit(0)
 
 ################################################################################
 ## Working on output directory

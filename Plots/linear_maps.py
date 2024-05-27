@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1a'
-updated = '2024-05-14'
+version = '0.1b'
+updated = '2024-05-27'
 name = 'linear_maps.py'
 
 import sys
@@ -41,6 +41,7 @@ OPTIONS:
 -w (--width)        Set figure width [Default: 20]
 --fontsize          Font size [Default: 8]
 --threads           Number of threads to use [Default: 16]
+--version           Show script version
 """
 
 # Print custom message if argv is empty
@@ -63,6 +64,7 @@ cmd.add_argument("-h", "--height", default=5)
 cmd.add_argument("-w", "--width", default=20)
 cmd.add_argument("--fontsize", default=8)
 cmd.add_argument("--threads", default=16)
+cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
 fasta_files = args.fasta
@@ -75,6 +77,18 @@ height = int(args.height)
 width = int(args.width)
 fontsize = int(args.fontsize)
 threads = int(args.threads)
+scversion = args.version
+
+#########################################################################
+### Version
+#########################################################################
+
+if scversion:
+    print ("\b")
+    print (f"Script:     {name}")
+    print (f"Version:    {version}")
+    print (f"Updated:    {updated}\n")
+    exit(0)
 
 ################################################################################
 ## Working on output directory

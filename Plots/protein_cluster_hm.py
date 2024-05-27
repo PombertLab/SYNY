@@ -2,8 +2,8 @@
 ## Pombert lab, 2024
 
 name = 'protein_cluster_hm.py'
-version = '0.3d'
-updated = '2024-05-03'
+version = '0.3e'
+updated = '2024-05-27'
 
 import sys
 import os
@@ -41,6 +41,7 @@ OPTIONS:
 --vmin          Set minimum color bar value [Default: 0]
 --vauto         Set color bar values automatically instead
 --threads       Number of threads to use [Default: 16]
+--version       Show script version
 """
 
 # Print custom message if argv is empty
@@ -63,6 +64,7 @@ cmd.add_argument("--vmin", default=0)
 cmd.add_argument("--vmax", default=100)
 cmd.add_argument("--vauto", action='store_true')
 cmd.add_argument("--threads", default=16)
+cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
 tsv_files = args.tsv
@@ -75,6 +77,18 @@ vmin = int(args.vmin)
 vmax = int(args.vmax)
 vauto = args.vauto
 threads = int(args.threads)
+scversion = args.version
+
+#########################################################################
+### Version
+#########################################################################
+
+if scversion:
+    print ("\b")
+    print (f"Script:     {name}")
+    print (f"Version:    {version}")
+    print (f"Updated:    {updated}\n")
+    exit(0)
 
 ################################################################################
 ## Working on output directory

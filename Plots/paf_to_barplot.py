@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.4'
-updated = '2024-05-25'
+version = '0.4a'
+updated = '2024-05-27'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -46,6 +46,7 @@ OPTIONS:
 --catenate      Concatenate queries against the same reference in a single barplot
 --fontsize      Font size [Default: 8]
 --threads       Number of threads to use [Default: 16]
+--version       Show script version
 """
 
 # Print custom message if argv is empty
@@ -71,6 +72,7 @@ cmd.add_argument("--clusters", action='store_true')
 cmd.add_argument("--catenate", action='store_true')
 cmd.add_argument("--fontsize", default=8)
 cmd.add_argument("--threads", default=16)
+cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
 paf_files = args.paf
@@ -86,6 +88,18 @@ clusters = args.clusters #
 catenate = args.catenate
 fontsize = int(args.fontsize)
 threads = int(args.threads)
+scversion = args.version
+
+#########################################################################
+### Version
+#########################################################################
+
+if scversion:
+    print ("\b")
+    print (f"Script:     {name}")
+    print (f"Version:    {version}")
+    print (f"Updated:    {updated}\n")
+    exit(0)
 
 ################################################################################
 ## Working on output directory
