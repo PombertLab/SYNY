@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1b'
-updated = '2024-05-27'
+version = '0.1c'
+updated = '2024-05-28'
 name = 'linear_maps.py'
 
 import sys
@@ -133,6 +133,7 @@ if fasta_files is not None:
 
             for line in f:
 
+                line = line.strip()
                 m = re.search(r'>(\S+)', line)
 
                 if m:

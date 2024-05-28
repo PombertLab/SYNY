@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2a'
-updated = '2024-05-27'
+version = '0.2b'
+updated = '2024-05-28'
 name = 'paf_to_heatmap.py'
 
 import sys
@@ -128,6 +128,7 @@ if fasta_files is not None:
 
         with open(fasta) as f:
             for line in f:
+                line = line.strip()
                 if '>' not in line:
                     length = len(line)
                     len_dict[basename] += length

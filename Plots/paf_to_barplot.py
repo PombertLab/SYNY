@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.4a'
-updated = '2024-05-27'
+version = '0.4b'
+updated = '2024-05-28'
 name = 'paf_to_barplot.py'
 
 import sys
@@ -139,6 +139,7 @@ if fasta_files is not None:
 
             for line in f:
 
+                line = line.strip()
                 m = re.search(r'>(\S+)', line)
 
                 if m:
