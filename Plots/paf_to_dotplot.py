@@ -98,7 +98,7 @@ scversion = args.version
 #########################################################################
 
 if scversion:
-    print ("\b")
+    print ("")
     print (f"Script:     {name}")
     print (f"Version:    {version}")
     print (f"Updated:    {updated}\n")
