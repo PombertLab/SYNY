@@ -1,6 +1,10 @@
 # SYNY CHANGE LOG
 
 ## SYNY-v1.1b
+
+##### Bugfixes:
+- Fixed extra length issues with barplots, dotplots and linemaps. Code was missing a line.strip()
+
 ##### Code cleanup:
 - Added `--version` option for all scripts.
 - Minor code cleanup / standardisation across scripts
