@@ -19,11 +19,11 @@ get_synteny.pl                          0.7.3a
 id_conserved_regions.pl                 0.5.4
 
 # Plots
-linear_maps.py                          0.1b
+linear_maps.py                          0.1c
 nucleotide_biases.pl                    0.8
-paf_to_barplot.py                       0.4a
-paf_to_dotplot.py                       0.5c
-paf_to_heatmap.py                       0.2a
+paf_to_barplot.py                       0.4b
+paf_to_dotplot.py                       0.5d
+paf_to_heatmap.py                       0.2b
 protein_cluster_hm.py                   0.3e
 
 # Utils
