@@ -800,6 +800,8 @@ If desired, the barplots can instead be generated using a single monochromatic c
 
 By default, the barplots are formatted for a widescreen (landscape) output (width/height ratio: 19.2/10.8). This ratio can be adjusted with the `--bheight` and `--bwidth` command line switches.
 
+By default, SYNY generates pairwise barplots. If desired, concatenated barplots can also be generated. In these concatenated barplots, the contigs from all species queried against another species (the reference) are plotted together. This behavior can be changed with the `--bpmode` option. Possible values are `pair` (pairwise), `cat` (concatenated), `all` (cat + pair) [Default: `pair`].
+
 #### Linemaps
 Linear chromosome maps (aka linemaps) highlighting collinear genome segments will be generated with [linear_maps.py](https://github.com/PombertLab/SYNY/blob/main/Plots/linear_maps.py) and [matplotlib](https://matplotlib.org/) from pairwise genome alignments (`.mmap.`) and from protein clusters identified with SYNY (e.g. `.gap_0.`). In these plots, collinear regions found between the compared genomes are highlighted by colored polygons. By default, these polygons are color-coded based on the contigs/chromosomes of the reference. The above linemap image was generated using the tab20/Blues color palettes for the reference/target genomes (both set as defaults in SYNY). These palettes can be replaced using the `--lm_rpalette` and `--lm_xpalette` command line switches; <i>e.g.</i> `--lm_xpalette Grays` (see [URL](https://github.com/PombertLab/SYNY/blob/main/Images/python_color_palettes.png) for a list of color palettes). By default, the linemaps are formatted using a 20:5 width:height ratio. This ratio can be adjusted with the `--lheight` and `--lwidth` command line switches.
 
