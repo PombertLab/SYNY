@@ -3,7 +3,7 @@
 ## SYNY-v1.1b
 
 ##### Bugfixes:
-- Fixed extra length issues with barplots, dotplots and linemaps. Code was missing a line.strip()
+- Fixed extra length issues with barplots, dotplots and linemaps. Code was missing a line.strip(). Issue created visual artefacts on barplots (longer frames).
 
 ##### Code cleanup:
 - Added `--version` option for all scripts.
