@@ -571,7 +571,7 @@ curl \
 
 ##### Running SYNY:
 
-SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed during gene cluster inferences, and Circos plots are produced in pairwise mode. The latter can be changed with the `--circos` command line switch (possible values are: `pair`, `concatenated`, `both`). Note that when comparing several genomes, concatenated plots can quickly become too dense for legibility. Producing concatenated plots can also significantly increase computation time.
+SYNY can be run from the command line with the `run_syny.pl` master script. In the command line below, no gap is allowed during gene cluster inferences, and Circos plots are produced in pairwise mode. The latter can be changed with the `--circos` command line switch (possible values are: `pair`, `concatenated`, `all`). Note that when comparing several genomes, concatenated plots can quickly become too dense for legibility. Producing concatenated plots can also significantly increase computation time.
 
 ```Bash
 ##### Runtime (Intel i5-12500H mobile CPU)
