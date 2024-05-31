@@ -1,6 +1,7 @@
 # SYNY CHANGE LOG
 
 ## SYNY-v1.1b
+### Bugfix release
 
 ##### Bugfixes:
 - Fixed extra length issues with barplots, dotplots and linemaps. Code was missing a line.strip(). Issue created visual artefacts on barplots (longer frames).
