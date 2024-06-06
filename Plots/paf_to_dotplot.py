@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.5d'
-updated = '2024-05-28'
+version = '0.5e'
+updated = '2024-06-06'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -141,14 +141,13 @@ if fasta_files is not None:
 
             for line in f:
 
-                line = line.strip()
                 m = re.search(r'>(\S+)', line)
 
                 if m:
                     seqname = m.group(1)
                     len_dict[basename][seqname] = 0
                 else:
-                    length = len(line)
+                    length = len(line.strip())
                     len_dict[basename][seqname] += length
 
 ################################################################################

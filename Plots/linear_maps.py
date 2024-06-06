@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1c'
-updated = '2024-05-28'
+version = '0.1d'
+updated = '2024-06-06'
 name = 'linear_maps.py'
 
 import sys
@@ -133,7 +133,6 @@ if fasta_files is not None:
 
             for line in f:
 
-                line = line.strip()
                 m = re.search(r'>(\S+)', line)
 
                 if m:
@@ -142,7 +141,7 @@ if fasta_files is not None:
                     cumul_seq_length = genome_len
                     cumul_seq_len_dict[basename][seqname] = genome_len
                 else:
-                    length = len(line)
+                    length = len(line.strip())
                     len_dict[basename][seqname] += length
                     genome_len += length
 

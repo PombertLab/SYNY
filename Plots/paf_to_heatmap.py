@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2b'
-updated = '2024-05-28'
+version = '0.2c'
+updated = '2024-06-06'
 name = 'paf_to_heatmap.py'
 
 import sys
@@ -128,9 +128,8 @@ if fasta_files is not None:
 
         with open(fasta) as f:
             for line in f:
-                line = line.strip()
                 if '>' not in line:
-                    length = len(line)
+                    length = len(line.strip())
                     len_dict[basename] += length
 
 ### Matrix dataframe

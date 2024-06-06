@@ -139,7 +139,6 @@ if fasta_files is not None:
 
             for line in f:
 
-                line = line.strip()
                 m = re.search(r'>(\S+)', line)
 
                 if m:
@@ -147,7 +146,7 @@ if fasta_files is not None:
                     len_dict[basename][seqname] = 0
                     cat_dict[seqname] = 0
                 else:
-                    length = len(line)
+                    length = len(line.strip())
                     len_dict[basename][seqname] += length
                     cat_dict[seqname] += length
 
