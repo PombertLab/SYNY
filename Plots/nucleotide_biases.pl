@@ -2,8 +2,8 @@
 ## Pombert Lab, 2022
 
 my $name = 'nucleotide_biases.pl';
-my $version = '0.8';
-my $updated = '2024-05-27';
+my $version = '0.8a';
+my $updated = '2024-06-11';
 
 use strict;
 use warnings;
@@ -179,7 +179,7 @@ foreach my $cfh (@cathandles){
 	my ($lfh) = $cfh =~ /C(\w+)$/;
 	my $cat_bias = $catdir.'/concatenated.'.$lfh;
 	open $cfh, '>', $cat_bias or die "Can't create $cat_bias: $!\n";
-	print $cfh '#chr START END GC_PERCENTAGE'."\n";
+	print $cfh "#chr START END ${lfh}_PERCENTAGE"."\n";
 }
 
 #########################################################################
@@ -244,7 +244,7 @@ while (my $fasta = shift@fasta){
 		my $subdir = $singledir.'/'.$fileprefix;
 		my $filename = $subdir.'/'.$fileprefix.'.'.$lfh;
 		open $fh, ">", $filename or die "Can't create $filename: $!\n";
-		print $fh '#chr START END GC_PERCENTAGE'."\n";
+		print $fh "#chr START END ${lfh}_PERCENTAGE"."\n";
 	}
 
 	### Iterating through each sequence in the FASTA file
