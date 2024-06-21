@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1d'
-updated = '2024-06-06'
+version = '0.1e'
+updated = '2024-06-21'
 name = 'linear_maps.py'
 
 import sys
@@ -11,6 +11,7 @@ import argparse
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from multiprocessing import Pool, Value
+import colorsys
 import seaborn as sns
 
 ################################################################################
@@ -269,9 +270,11 @@ def linemap(paf):
 
         for band in bands:
             start, end, pcolor = band
+            h,l,s = colorsys.rgb_to_hls(*pcolor)
+            ecolor = colorsys.hls_to_rgb(h,min(1,l*0.33),s=s)
             bwidth = end - start + 1
             ax[xnum].set_ylim(0, 1)
-            ax[xnum].add_patch(plt.Rectangle((start, 0), bwidth, 1, color=pcolor))
+            ax[xnum].add_patch(plt.Rectangle((start, 0), bwidth, 1, facecolor=pcolor, edgecolor=ecolor))
 
         ax[xnum].set_xlim(0, maxlen)
 
@@ -323,14 +326,18 @@ def linemap(paf):
 
         palette = sns.color_palette(rpalette, len(list(len_dict[ref])))
         pcolor = palette[pnum]
+        h,l,s = colorsys.rgb_to_hls(*pcolor)
+        ecolor = colorsys.hls_to_rgb(h,min(1,l*0.33),s=s)
         pnum += 1
 
         if query not in points:
             next
         else:
             for point in points[query]:
-                polygon= plt.Polygon(point, fill=True, edgecolor=pcolor, facecolor=pcolor)
+                polygon= plt.Polygon(point, fill=True, facecolor=pcolor,alpha=0.5)
+                polygonedge = plt.Polygon(point, fill=False, facecolor="none", closed=True, edgecolor=ecolor, linewidth=0.75,alpha=1)
                 ax[1].add_patch(polygon)
+                ax[1].add_patch(polygonedge)
 
     ax[1].axis('off')
 
