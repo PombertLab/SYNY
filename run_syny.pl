@@ -470,22 +470,23 @@ if (!@annot_files){
 }
 else {
 
-	my $gbff_counter = 0;
 	my @files;
 
 	for my $file (@annot_files){
-		if ($file =~ /\.gbff(\.gz)?$/){
-			$gbff_counter++;
+		if ($file =~ /\*/){
+			@files = glob($file);
+		}
+		elsif ($file =~ /\.gbff(\.gz)?$/){
 			push (@files, $file);
 		}
 	}
 
-	if ($gbff_counter == 0){
+	if (scalar(@files) == 0){
 		print "\n[E] No .gbff/.gbff.gz file detected: --annot @annot_files\n";
 		print "[E] Please check the command line. Exiting...\n\n";
 		exit;
 	}
- 	elsif ($gbff_counter == 1){
+ 	elsif (scalar(@files) == 1){
 		print "\n[E] Only one annotation file (.gbff/.gbff.gz) detected: $files[0]\n";
 		print "[E] Please enter at least two annotation files to compare. Exiting...\n\n";
 		exit;
