@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.5.8c';
-my $updated = '2024-05-27';
+my $version = '0.6.0';
+my $updated = '2024-07-05';
 
 use strict;
 use warnings;
@@ -213,6 +213,8 @@ foreach my $input_file (@input_files){
 		my $incomplete_product_name;
 		my %excluded_seq = ();
 
+		my $locus_tag_flag = 0;
+
 		while (my $line = <GBK>){
 			
 			chomp $line;
@@ -292,10 +294,23 @@ foreach my $input_file (@input_files){
 					undef $CDS;
 				}
 
-				## Gather CDS metadata
+				## Gather CDS metadata from locus tag (or GeneID if locus_tag is missing)
 				if ($line =~ /^\s{21}\/locus_tag="(.*)"/){
 					$locus = $1;
 					$locus =~ s/\W/\_/g;
+					$locus_tag_flag = 1;
+				}
+
+				if ($line =~ /^\s{21}\/db_xref="GeneID:(\d+)"/){
+
+					my $gene_id_locus = $1;
+
+					if ($locus_tag_flag == 0){
+						$locus = $gene_id_locus;
+					}
+
+					$locus_tag_flag = 0;
+
 				}
 
 				## Checking for product names, including accross multiple lines
@@ -316,8 +331,8 @@ foreach my $input_file (@input_files){
 				}
 
 				elsif ($line =~ /^\s{21}\/translation="([a-zA-Z]+)"*/){
+					$sequence = $1;
 					$translate = 1;
-					$sequence .= $1;
 				}
 				elsif ($translate){
 					if ($line =~/^\s{21}([a-zA-Z]+)/){
@@ -325,17 +340,20 @@ foreach my $input_file (@input_files){
 					}
 					else{
 
-						my $start,
-						my $end;
-						my $strand;
+						my $tr_start,
+						my $tr_end;
+						my $tr_strand;
+
 						if (exists $location_data{$locus}){
-							($start,$end,$strand) = @{$location_data{$locus}};
+							($tr_start,$tr_end,$tr_strand) = @{$location_data{$locus}};
 						}
 						else{
 							next;
 						}
 
 						unless (exists $isoform{$locus}){ ## Keeping only the first isoform
+
+							$isoform{$locus} = 1;
 
 							if (@regexes){
 								for my $regex (@regexes){
@@ -351,55 +369,101 @@ foreach my $input_file (@input_files){
 								}
 							}
 
+							### Using subranges
+
+							my $range_index = 0;
+
 							if (@ranges){
-								my @subranges = @{$ranges{$contig}};
-								my $check_range = 0;
-								for my $subr (@subranges){
-									my ($sstart,$send) = split(';', $subr);
-									if (($start >= $sstart) && ($end <= $send)){
-										$check_range = 1;
+
+								if (exists $ranges{$contig}){
+
+									my @subranges = @{$ranges{$contig}};
+									my $rng_total = scalar (@subranges);
+									my $rng_counter = 0;
+									my $contig_name = $contig;
+
+									for my $subr (@subranges){
+
+										$rng_counter++;
+
+										if ($rng_total > 1){
+											$contig_name = "${contig}_${rng_counter}";
+										}
+
+										my ($sstart,$send) = split(';', $subr);
+
+										if (($tr_start >= $sstart) && ($tr_end <= $send)){
+
+											## Adjusing feature start to match substring
+											my $adj_start = $tr_start - $sstart;
+											my $adj_end = $tr_end - $sstart;
+
+											print OUT $locus."\t";
+											print OUT $contig_name."\t";
+											print OUT $adj_start."\t";
+											print OUT $adj_end."\t";
+
+											print OUT $tr_strand."\t";
+											print OUT $gene_num."\t";
+
+											$product = "undefined product in accession" unless defined $product;
+											print OUT $product."\n";
+
+											print PROT ">$locus \[$product\]\n"; #\t$contig\t$start\t$end\t$strand\n";
+											foreach my $line (unpack("(A60)*",$sequence)){
+												print PROT "$line\n";
+											}
+
+										}
+
+										$range_index++;
+
 									}
+
 								}
-								if ($check_range == 0){
-									next;
-								}
+
 							}
 
-							if ($contig_size >= $minsize){
+							### Not using subranges
+							else {
+								
+								if ($contig_size >= $minsize){
 
-								unless (exists $excluded_seq{$contig}){
+									unless (exists $excluded_seq{$contig}){
 
-									$isoform{$locus} = '';
-									print OUT $locus."\t";
-									print OUT $contig."\t";
-									print OUT $start."\t";
-									print OUT $end."\t";
-									print OUT $strand."\t";
-									print OUT $gene_num."\t";
+										print OUT $locus."\t";
+										print OUT $contig."\t";
+										print OUT $tr_start."\t";
+										print OUT $tr_end."\t";
+										print OUT $tr_strand."\t";
+										print OUT $gene_num."\t";
 
-									$product = "undefined product in accession" unless defined $product;
-									print OUT $product."\n";
+										$product = "undefined product in accession" unless defined $product;
+										print OUT $product."\n";
 
-									print PROT ">$locus \[$product\]\n"; #\t$contig\t$start\t$end\t$strand\n";
-									foreach my $line (unpack("(A60)*",$sequence)){
-										print PROT "$line\n";
+										print PROT ">$locus \[$product\]\n"; #\t$contig\t$start\t$end\t$strand\n";
+										foreach my $line (unpack("(A60)*",$sequence)){
+											print PROT "$line\n";
+										}
+
 									}
 
 								}
 
 							}
 
-							undef $translate;
-							undef $sequence;
-							undef $product;
 							$gene_num ++;
 
 						}
 
+						undef $translate;
+						undef $sequence;
+						undef $product;
+
 					}
 				}
 			}
-			
+
 			## Entering the gene metadata
 			if ($line =~ /^\s{5}gene\s{12}(?:complement)*\(*<*(\d+)\.\.>*(\d+)/){
 				$gene = 1;
