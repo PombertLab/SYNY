@@ -1,5 +1,13 @@
 # SYNY CHANGE LOG
 
+## SYNY-v1.2
+### Bugfix release
+
+- Fixed concatenation issue with isoforms in `list_maker.pl`
+- Fixed subranges issues in `list_maker.pl`
+- Adjusted linearmap alpha value and edge color for readability in `linear_maps.py`
+
+
 ## SYNY-v1.1b
 ### Bugfix release
 
