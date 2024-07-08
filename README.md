@@ -321,6 +321,8 @@ printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ```
 </details>
 
+</details>
+
 <details open>
   <summary><b><i>Show/hide: About memory usage</i></b></summary>
 
