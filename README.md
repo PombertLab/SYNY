@@ -1168,7 +1168,7 @@ run_syny.pl \
   --include contigs.txt
 ```
 
-If desired we can also plot only segments from specified contigs/chromosomes. These segments can be specified in a simple (tab/space)-delimited text file, then run SYNY with the `--ranges` command line switch::
+If desired we can also plot only segments from specified contigs/chromosomes. These segments can be specified in a simple (tab/space)-delimited text file, then run SYNY with the `--ranges` command line switch:
 
 ```Bash
 # Content of subranges.txt
