@@ -519,9 +519,6 @@ The contents of the subdirectories are:
 
 ### <b>Step by step examples</b>
 
-<details open>
-  <summary><b><i>Show/hide: Example 1</i></b></summary>
-
 ### Example 1 - <i>Cryptococcus</i>
 Below is a quick example describing how to compare a few select <i>Cryptococcus</i> genomes (<i>C. neoformans</i> var. <i>neoformans</i> strain [JEC21](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13856/), <i>C. gattii</i> strain [WM276](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13692/), <i>C. gattii</i> VGV strain [MF34](hhttps://www.ncbi.nlm.nih.gov/bioproject/PRJNA487802/), <i>C. decagattii</i> strain [7685027](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA660466/), <i>C. deuterogattii</i> strain [R265](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395628/)) using annotation data available from the public NCBI [Genome](https://www.ncbi.nlm.nih.gov/genome/database) database.
 
@@ -888,11 +885,6 @@ As a rule of thumb, pairwise alignments featuring lower sequence identity percen
 
 PAF metrics cannot be calculated for [MashMap3](https://github.com/marbl/MashMap) aligments since the data required is missing from its PAF output files. MashMap3 does not calculate alignments explicitly (as per its intructional manual) but runs in a much smaller memory footprint than minimap2 when using its default percentage identity (`--mpid 85`). As such, it constitutes an interesting alternative when running into memory constraints. However, note that lowering the MashMap3 default threshold will significantly increase its memory usage.
 
-</details>
-
-<details open>
-  <summary><b><i>Show/hide: Example 2</i></b></summary>
-
 ### Example 2 - Encephalitozoonidae
 Below is a quick example describing how to compare a few select genomes from the Encephalitozoonidae (<i>Encephalitozoon/Ordospora</i> species <i>E. intestinalis</i> strain [ATCC 50506](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. hellem</i> strain [ATCC 50604](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. cuniculi</i> strain [ATCC 50602](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA705735/), <i>O. colligata</i> strain [OC4](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA210314/) and <i>O. pajunii</i> strain [FI-F-10](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA630072/)) using annotation data from NCBI.
 
@@ -1103,10 +1095,6 @@ Options for `fasta_to_gbff.pl` are:
 -v (--verbose)  Add verbosity
 ```
 When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
-</details>
-
-<details open>
-  <summary><b><i>Show/hide: Example 3</i></b></summary>
 
 ### Example 3 - Subsets
 Because large and/or fragmented genomes can be difficult to visualize due to plot density, SYNY also includes options to look at subsets of genomes. Contigs to be investigated/plotted can be specified from a single text file with the `--include` command line switch, while portions of contigs can also be specified in a tab-delimited text file with the `--ranges` command line switch. Alternatively, contigs can also be excluded using a regular expression with the `--exclude`command line switch. The latter option is useful when dealing with accession numbers containing a mixture of complete chromosomes and partial contigs, the latter often indicated with distinctive names. These partial contigs are often small, numerous, and tend to clutter plots. As such, removing them is often desirable.
@@ -1213,9 +1201,6 @@ In the above example, numbers will be appended to contig names whenever approria
 <p align="left">
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/TAIR10_vs_AARE701.mmap.barplot.19.2x10.8.Spectral.png">
 </p>
-
-
-</details>
 
 <details open>
   <summary><b><i>Show/hide: Funding and acknowledgments</i></b></summary>
