@@ -31,6 +31,7 @@ The SYNY pipeline investigates gene collinearity (synteny) between genomes by re
       * [PAF metrics](#PAF-metrics)
     * [Example 2: Encephalitozoonidae](#Example-2---Encephalitozoonidae)
       * [Custom Circos colors](#Custom-Circos-colors)
+    * [Example 3: Subsets](#Example-3---Subsets)
   * [File conversion](#File-conversion)
 * [Funding and acknowledgments](#Funding-and-acknowledgments)
 * [How to cite](#how-to-cite)
@@ -320,8 +321,12 @@ printf "\nexport PATH=\$PATH:$(pwd)" >> ~/.bash_profile ## Fedora
 ```
 </details>
 
+<details open>
+  <summary><b><i>Show/hide: About memory usage</i></b></summary>
+
 ### <b>About memory usage</b>
 Performing pairwise alignments between genomes can quickly consume a large amount of RAM. The amount of memory required depends on the size of the genomes being aligned and on the amounts of repetitive elements present in their sequences. When working with genomes larger than 150 Mbp, we recommend using [MashMap3](https://github.com/marbl/MashMap) instead of [minimap2](https://github.com/lh3/minimap2) as the genome alignment tool. While MashMap3 does not product exact alignments <i>per se</i>, its results are congruent with the exact alignments produced by minimap2 (and as such constitute good approximations). For example, alignments between two repeat-laden 500 Mbp genomes ran within 5 GB of RAM with MashMap3 whereas the same alignments with minimap2 peaked around 100 GB of RAM despite the two tools producing similar outcomes. However, note that when using MashMap3, reducing its minimum percentage identity threshold below its 85% default settings will significantly increase its RAM usage. If running above the maximum amount of memory available (real + virtual memory), pairwise genome alignments will be terminated by Linux out-of-memory (OOM) killer, resulting in blank outputs for the corresponding alignments and plots.
+
 </details>
 
 <details open>
@@ -513,6 +518,9 @@ The contents of the subdirectories are:
 </details>
 
 ### <b>Step by step examples</b>
+
+<details open>
+  <summary><b><i>Show/hide: Example 1</i></b></summary>
 
 ### Example 1 - <i>Cryptococcus</i>
 Below is a quick example describing how to compare a few select <i>Cryptococcus</i> genomes (<i>C. neoformans</i> var. <i>neoformans</i> strain [JEC21](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13856/), <i>C. gattii</i> strain [WM276](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA13692/), <i>C. gattii</i> VGV strain [MF34](hhttps://www.ncbi.nlm.nih.gov/bioproject/PRJNA487802/), <i>C. decagattii</i> strain [7685027](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA660466/), <i>C. deuterogattii</i> strain [R265](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395628/)) using annotation data available from the public NCBI [Genome](https://www.ncbi.nlm.nih.gov/genome/database) database.
@@ -880,6 +888,11 @@ As a rule of thumb, pairwise alignments featuring lower sequence identity percen
 
 PAF metrics cannot be calculated for [MashMap3](https://github.com/marbl/MashMap) aligments since the data required is missing from its PAF output files. MashMap3 does not calculate alignments explicitly (as per its intructional manual) but runs in a much smaller memory footprint than minimap2 when using its default percentage identity (`--mpid 85`). As such, it constitutes an interesting alternative when running into memory constraints. However, note that lowering the MashMap3 default threshold will significantly increase its memory usage.
 
+</details>
+
+<details open>
+  <summary><b><i>Show/hide: Example 2</i></b></summary>
+
 ### Example 2 - Encephalitozoonidae
 Below is a quick example describing how to compare a few select genomes from the Encephalitozoonidae (<i>Encephalitozoon/Ordospora</i> species <i>E. intestinalis</i> strain [ATCC 50506](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. hellem</i> strain [ATCC 50604](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA594722/), <i>E. cuniculi</i> strain [ATCC 50602](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA705735/), <i>O. colligata</i> strain [OC4](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA210314/) and <i>O. pajunii</i> strain [FI-F-10](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA630072/)) using annotation data from NCBI.
 
@@ -1090,6 +1103,119 @@ Options for `fasta_to_gbff.pl` are:
 -v (--verbose)  Add verbosity
 ```
 When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
+</details>
+
+<details open>
+  <summary><b><i>Show/hide: Example 3</i></b></summary>
+
+### Example 3 - Subsets
+Because large and/or fragmented genomes can be difficult to visualize due to plot density, SYNY also includes options to look at subsets of genomes. Contigs to be investigated/plotted can be specified from a single text file with the `--include` command line switch, while portions of contigs can also be specified in a tab-delimited text file with the `--ranges` command line switch. Alternatively, contigs can also be excluded using a regular expression with the `--exclude`command line switch. The latter option is useful when dealing with accession numbers containing a mixture of complete chromosomes and partial contigs, the latter often indicated with distinctive names. These partial contigs are often small, numerous, and tend to clutter plots. As such, removing them is often desirable.
+
+Below are example to plots portions from two Arabidopsis genomes (<i>A. thaliana</i> and <i>A. arenosa</i>). These genomes can be downloaded automatically using the Arabidopsis.sh shell script (from the `Examples/` directory).
+
+```Bash
+## Downloading example data from NCBI using the Arabidopsis.sh shell script 
+
+DATA=~/DATA               ## Replace ~/DATA by desired annotation data directory
+Arabidopsis.sh $DATA
+```
+
+To plot the full dataset:
+
+```Bash
+##### Runtime (Intel i5-12500H mobile CPU)
+# Total: 6 min; Circos: 4 min)
+
+DATA=~/DATA                   ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/ARAB_ALL  ## Replace by desired output directory
+
+run_syny.pl \
+  --threads 16 \
+  --annot $DATA/*.gbff.gz \
+  --aligner mashmap \
+  --outdir $SYNY \
+  --g 0 1 5
+```
+
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/TAIR10_vs_AARE701.gap_0.barplot.19.2x10.8.Spectral.png">
+</p>
+
+In the corresponding plots, two small contigs (NC_000932 and NC_037304) are observed. These are organelle genomes (chloroplast + mitochondrion) sometimes present together with nuclear genomes in accesssion numbers.
+
+To plot only the chromosomes originating from the nuclear genomes, we can specify them in a simple text file, then run SYNY with the `--include` command line switch:
+
+```Bash
+# Content of contigs.txt
+NC_003070
+NC_003071
+NC_003074
+NC_003075
+NC_003076
+LR999451
+LR999452
+LR999453
+LR999454
+LR999455
+LR999456
+LR999457
+LR999458
+```
+
+```Bash
+##### Runtime (Intel i5-12500H mobile CPU)
+# Total: 6 min; Circos: 4 min)
+
+DATA=~/DATA                   ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/ARAB_INC  ## Replace by desired output directory
+
+run_syny.pl \
+  --threads 16 \
+  --annot $DATA/*.gbff.gz \
+  --aligner mashmap \
+  --outdir $SYNY \
+  --g 0 1 5 \
+  --include contigs.txt
+```
+
+If desired we can also plot only segments from specified contigs/chromosomes. These segments can be specified in a simple (tab/space)-delimited text file, then run SYNY with the `--ranges` command line switch::
+
+```Bash
+# Content of subranges.txt
+# Contig    start      end
+NC_003070   1          1000000
+NC_003070   1500000    2500000
+NC_003070   3000000    4000000
+NC_003071   1          19698289
+LR999451    1          25224288
+LR999452    1          14316399
+LR999453    1          21694789
+```
+
+```Bash
+##### Runtime (Intel i5-12500H mobile CPU)
+# Total: 1 min; Circos: 30 sec)
+
+DATA=~/DATA                   ## Replace by annotation data directory
+SYNY=~/SYNY_RESULTS/ARAB_SUB  ## Replace by desired output directory
+
+run_syny.pl \
+  --threads 16 \
+  --annot $DATA/*.gbff.gz \
+  --aligner mashmap \
+  --outdir $SYNY \
+  --g 0 1 5 \
+  --ranges subranges.txt
+```
+
+In the above example, numbers will be appended to contig names whenever approriate to differentiate between multiple segments, i.e. NC_003070_1, NC_003070_2 and NC_003070_3 (see below).
+
+<p align="left">
+  <img src="https://github.com/PombertLab/SYNY/blob/main/Images/TAIR10_vs_AARE701.mmap.barplot.19.2x10.8.Spectral.png">
+</p>
+
+
+</details>
 
 <details open>
   <summary><b><i>Show/hide: Funding and acknowledgments</i></b></summary>
