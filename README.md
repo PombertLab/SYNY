@@ -1102,7 +1102,7 @@ When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if av
 ##### <i>Fasta + GFF3 to GBFF</i>
 A simple Fasta + GFF3 to GBFF converter [gff3_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/gff3_to_gbff.pl) is available in the `Utils/` subdirectory. This tool was tested on NCBI GFF3 files and expects the GFF3 file(s) to include gene/mRNA/exon/CDS entries in the `type` column and the `ID` and `Parent` tags in the attributes column. It also expects the corresponding Fasta and GFF3 files to share the same prefixes (<i>e.g.</i> genome_1.fasta / genome_1.gff). The GBFF files created by [gff3_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/gff3_to_gbff.pl) were designed to work with SYNY but do not adhere exactly to the GBFF format and may not work for other purposes.
 
-To convert FASTA + GFF3 file(s) to pseudo-GBFF files compressed in gzip format:
+To convert FASTA + GFF3 file(s) to pseudo-GBFF files (compressed in gzip format) using the standard genetic code:
 ```Bash
 gff3_to_gbff.pl \
   --fasta FASTA/* \
