@@ -1079,6 +1079,7 @@ run_syny.pl \
 </p>
 
 ### <b>File conversion</b>
+##### <i>Fasta to GBFF</i>
 SYNY uses [GenBank flat files](https://www.ncbi.nlm.nih.gov/genbank/samplerecord/) (.gbff) containing DNA sequences and annotated features as input. However, when performing genome alignment-based comparisons, the latter annotated features are not required. Because users may want to compare genomes before their annotation becomes available (this process often comes in the late stages of genome sequencing projects), a simple FASTA to GBFF converter [fasta_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/fasta_to_gbff.pl) producing feature-less .gbff files is available in the `Utils/` subdirectory.
 
 To convert FASTA file(s) to feature-less GBFF files compressed in gzip format:
@@ -1097,6 +1098,38 @@ Options for `fasta_to_gbff.pl` are:
 -v (--verbose)  Add verbosity
 ```
 When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
+
+##### <i>Fasta + GFF3 to GBFF</i>
+A simple Fasta + GFF3 to GBFF converter [gff3_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/gff3_to_gbff.pl) is available in the `Utils/` subdirectory. This tool was tested on NCBI GFF3 files and expects the GFF3 file(s) to include gene/mRNA/exon/CDS entries in the `type` column and the `ID` and `Parent` tags in the attributes column. It also expects the corresponding Fasta and GFF3 files to share the same prefixes (<i>e.g.</i> genome_1.fasta / genome_1.gff). The GBFF files created by [gff3_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/gff3_to_gbff.pl) were designed to work with SYNY but do not adhere exactly to the GBFF format and may not work for other purposes.
+
+To convert FASTA + GFF3 file(s) to pseudo-GBFF files compressed in gzip format:
+```Bash
+gff3_to_gbff.pl \
+  --fasta FASTA/* \
+  --gff3 GFF/* \
+  --outdir GBFF \
+  --gzip \
+  --gcode 1 \
+  --verbose
+```
+
+Options for `gff3_to_gbff.pl` are:
+```
+-f (--fasta)    FASTA file(s) to convert (gziped files are supported)
+-g (--gff3)     GFF3 files to convert (gziped files are supported)
+-o (--outdir)   Output directory [Default: GBFF]
+-z (--gzip)     Compress the GBFF output files
+-c (--gcode)    NCBI genetic code [Default: 1]
+                1  - The Standard Code
+                2  - The Vertebrate Mitochondrial Code
+                3  - The Yeast Mitochondrial Code
+                4  - The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+                11 - The Bacterial, Archaeal and Plant Plastid Code
+                NOTE - For complete list; see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+-v (--verbose)  Add verbosity
+--version       Show script version
+```
+When compressing the GBFF output files, gff3_to_gbff.pl will use pigz if available, otherwise it will default to gzip
 
 ### Example 3 - Subsets
 Because large and/or fragmented genomes can be difficult to visualize due to plot density, SYNY also includes options to look at subsets of genomes. Contigs to be investigated/plotted can be specified from a single text file with the `--include` command line switch, while portions of contigs can also be specified in a tab-delimited text file with the `--ranges` command line switch. Alternatively, contigs can also be excluded using a regular expression with the `--exclude`command line switch. The latter option is useful when dealing with accession numbers containing a mixture of complete chromosomes and partial contigs, the latter often indicated with distinctive names. These partial contigs are often small, numerous, and tend to clutter plots. As such, removing them is often desirable.
