@@ -1,6 +1,6 @@
 
 #############################################################
-SYNY - Version 1.2
+SYNY - Version 1.2a
 #############################################################
 
 # Main                                  Versions
@@ -30,6 +30,7 @@ protein_cluster_hm.py                   0.3e
 check_mp_colors.py                      0.2c
 check_versions.pl                       0.1c
 fasta_to_gbff.pl                        0.1a
+gff3_to_gbff.pl                         0.1a
 list_maker.pl                           0.6.0
 
 #############################################################
