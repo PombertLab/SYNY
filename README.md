@@ -403,7 +403,8 @@ Options for run_SYNY.pl are:
 --max_links             Set max number of links [Default: 75000]
 --max_points_per_track  Set max number of points per track [Default: 75000]
 --clusters              Color by cluster instead of contig/chromosome [Default: off]
---no_ntbiases           Turn off nucleotide biases subplots
+--no_ntbiases           Turn off nucleotide biases and GC/AT skews subplots
+--no_skews              Turn off GC / AT skews subplots
 --no_cticks             Turn off ticks in Circos plots
 --no_circos             Turn off Circos plots
 
@@ -715,13 +716,15 @@ Karyotypes can be plotted with Circos in normal and/or inverted orientation(s). 
   <img src="https://github.com/PombertLab/SYNY/blob/main/Images/WM276_vs_JEC21.gap_0.normal.png">
 </p>
 
-In this figure, nucleotides biases are plotted in the concentric rings. These subplots can be skipped with the `--no_ntbiases` command line switch. From from outer to inner, the concentric rings are:
+In this figure, nucleotides biases and GC/AT skews are plotted in the concentric rings. These subplots can be skipped with the `--no_ntbiases` command line switch. GC/AT skews can be further turned off independently from nucleotide biases subplots with the `--no_skews` options.
+
+From from outer to inner, the concentric rings are:
 
 - AT and GC nucleotide biases (grey and red lines)
 - GT and AC nucleotide biases (blue and green lines)
 - GA and CT nucleotide biases (purple and yellow lines)
-
-
+- GC skews (histogram: blue [positive], red [negative] values)
+- AT skews (histogram: orange [positive], purple [negative] values)
 
 
 Syntenic blocks identified by SYNY are indicated by ribbons. These ribbons are color-coded based on the chromosomes/contigs present in the reference genome used. If desired, color coding can be set by cluster instead with `--clusters`. This option is useful when working with prokaryotes featuring a single chromosome, so that the ribbons are not all of the same color.
@@ -744,6 +747,7 @@ run_syny.pl \
   -o $SYNY \
   --circos all \
   --circos_prefix WM276_vs_JEC21 \
+  --no_skews \
   --labels names \
   --label_size 20 \
   --label_font semibold

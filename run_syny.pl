@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.8';
-my $updated = '2024-05-27';
+my $version = '0.8a';
+my $updated = '2024-11-06';
 
 use strict;
 use warnings;
@@ -82,7 +82,8 @@ my $plot_options = <<"PLOT_OPTIONS";
 --max_links             Set max number of links [Default: 75000]
 --max_points_per_track  Set max number of points per track [Default: 75000]
 --clusters              Color by cluster instead of contig/chromosome [Default: off]
---no_ntbiases           Turn off nucleotide biases subplots
+--no_ntbiases           Turn off nucleotide biases and GC/AT skews subplots
+--no_skews              Turn off GC / AT skews subplots
 --no_cticks             Turn off ticks in Circos plots
 --no_circos             Turn off Circos plots
 
@@ -176,6 +177,7 @@ my $max_points_per_track = 75000;
 my $clusters;
 my $circos_orientation = 'normal';
 my $no_ntbiases;
+my $no_skews;
 my $no_circos;
 my $no_cticks;
 
@@ -261,6 +263,7 @@ GetOptions(
 	'clusters' => \$clusters,
 	'orientation=s' => \$circos_orientation,
 	'no_ntbiases' => \$no_ntbiases,
+	'no_skews' => \$no_skews,
 	'no_circos' => \$no_circos,
 	'no_cticks' => \$no_cticks,
 	# Barplots
@@ -1557,6 +1560,11 @@ if ($no_ntbiases){
 	$circos_ntbiases_flag = '--no_biases';
 }
 
+my $circos_skew_flag = '--skews';
+if ($no_skews){
+	$circos_skew_flag = '';
+}
+
 my $gap = $gaps[0];
 
 ## Running nucleotide_biases.pl
@@ -1568,6 +1576,7 @@ system("
 	--winsize $winsize \\
 	--step $stepsize \\
 	--gap $gap \\
+	$circos_skew_flag \\
 	--labels $labels \\
 	--label_size $label_size \\
 	$ref \\

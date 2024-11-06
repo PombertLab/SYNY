@@ -2,8 +2,8 @@
 ## Pombert Lab, 2022
 
 my $name = 'nucleotide_biases.pl';
-my $version = '0.8a';
-my $updated = '2024-06-11';
+my $version = '0.9';
+my $updated = '2024-11-05';
 
 use strict;
 use warnings;
@@ -21,8 +21,9 @@ NAME        ${name}
 VERSION     ${version}
 UPDATED     ${updated}
 SYNOPSIS    Generates tab-delimited sliding windows of GC, AT, purine and pyrimidine
-            distributions for easy plotting with MS Excel or other tool. Can also generate
-            coordinate files for Circos.
+            distributions for easy plotting with MS Excel or other tool. It also 
+            calculates GC and AT skews from these slidings windows. This script can
+            also generate coordinate files for Circos.
 
 COMMAND     ${name} \\
               -fasta *.fasta \\
@@ -65,6 +66,7 @@ OPTIONS (Circos data files options)
 -zdepth                Set links zdepth in ruleset [Default: 50]
 -clusters              Color by clusters [Default: off]
 -no_biases             Skip nucleotide bias subplots in Circos configuration files
+-k (--skews)           Plot GC and AT skews
 OPTIONS
 
 unless (@ARGV){
@@ -79,6 +81,7 @@ my $winsize = 10000;
 my $step = 5000;
 my $reference;
 my $ncheck;
+my $skews;
 my $gap = 0;
 my $unit = 'Mb';
 my $labels = 'mixed';
@@ -105,6 +108,7 @@ GetOptions(
 	'w|winsize=i' => \$winsize,
 	's|step=i' => \$step,
 	'n|ncheck' => \$ncheck,
+	'k|skews' => \$skews,
 	'c|circos' => \$circos_plot,
 	'u|unit=s' => \$unit,
 	'l|labels=s' => \$labels,
@@ -191,6 +195,21 @@ my %percent;
 my $seqname;
 my $fileprefix;
 
+my $cat_gskew = $catdir.'/concatenated.gc_skew';
+my $cat_askew = $catdir.'/concatenated.at_skew';
+my $cat_gskew_cm = $catdir.'/concatenated.gc_skew_cm'; ## Cumulative skews
+my $cat_askew_cm = $catdir.'/concatenated.at_skew_cm'; ## Cumulative skews
+
+open CAT_GSKEW, ">", $cat_gskew or die "Can't create $cat_gskew: $!\n";
+open CAT_ASKEW, ">", $cat_askew or die "Can't create $cat_askew: $!\n";
+open CAT_GSKEW_CM, ">", $cat_gskew_cm or die "Can't create $cat_gskew_cm: $!\n";
+open CAT_ASKEW_CM, ">", $cat_askew_cm or die "Can't create $cat_askew_cm: $!\n";
+
+print CAT_GSKEW "#chr START END GC_SKEW"."\n";
+print CAT_GSKEW_CM "#chr START END GC_SKEW (cumulative)"."\n";
+print CAT_ASKEW "#chr START END AT_SKEW"."\n";
+print CAT_ASKEW_CM "#chr START END AT_SKEW (cumulative)"."\n";
+
 while (my $fasta = shift@fasta){
 
 	my ($basename) = fileparse($fasta);
@@ -240,12 +259,29 @@ while (my $fasta = shift@fasta){
 
 	## Nucleotide biases
 	for my $fh (@filehandles){
-		my ($lfh) = $fh =~ /(\w+)$/; ## grabbing test from filehandle
+		my ($lfh) = $fh =~ /(\w+)$/; ## grabbing text from filehandle
 		my $subdir = $singledir.'/'.$fileprefix;
 		my $filename = $subdir.'/'.$fileprefix.'.'.$lfh;
 		open $fh, ">", $filename or die "Can't create $filename: $!\n";
 		print $fh "#chr START END ${lfh}_PERCENTAGE"."\n";
 	}
+
+	## GC / AT skews
+	my $subdir = $singledir.'/'.$fileprefix;
+	my $gskew = $subdir.'/'.$fileprefix.'.gc_skew';
+	my $askew = $subdir.'/'.$fileprefix.'.at_skew';
+	my $gskew_cm = $subdir.'/'.$fileprefix.'.gc_skew_cm';
+	my $askew_cm = $subdir.'/'.$fileprefix.'.at_skew_cm';
+
+	open GC_SKEW, ">", $gskew or die "Can't create $gskew: $!\n";
+	open AT_SKEW, ">", $askew or die "Can't create $askew: $!\n";
+	open GC_SKEW_CM, ">", $gskew_cm or die "Can't create $gskew_cm: $!\n";
+	open AT_SKEW_CM, ">", $askew_cm or die "Can't create $askew_cm: $!\n";
+
+	print GC_SKEW "#chr START END GC_SKEW"."\n";
+	print GC_SKEW_CM "#chr START END GC_SKEW (cumulative)"."\n";
+	print AT_SKEW "#chr START END AT_SKEW"."\n";
+	print AT_SKEW_CM "#chr START END AT_SKEW (cumulative)"."\n";
 
 	### Iterating through each sequence in the FASTA file
 	foreach my $sequence (sort (keys %{$sequences{$fileprefix}})){
@@ -258,13 +294,15 @@ while (my $fasta = shift@fasta){
 			if ($ncheck){
 				print BIAS "\t% NN";
 			}
-			print BIAS "\n";
 		}
 
 		### Sliding windows
 		my $seq = $sequences{$fileprefix}{$sequence};
 		my $csize = length $seq;
 		my $x;
+
+		my $gc_skew_cm = 0;
+		my $at_skew_cm = 0;
 
 		for ($x = 0; $x <= ($csize - $winsize); $x += $step){
 
@@ -282,6 +320,19 @@ while (my $fasta = shift@fasta){
 				my ($lfh) = $cfh =~ /C(\w+)$/;
 				print $cfh "$sequence $x $end $percent{$lfh}\n";
 			}
+
+			my ($gc_skew, $at_skew) = skews($subseq);
+			$gc_skew_cm += $gc_skew;
+			$at_skew_cm += $at_skew;
+
+			print GC_SKEW "$sequence $x $end $gc_skew\n";
+			print AT_SKEW "$sequence $x $end $at_skew\n";
+			print GC_SKEW_CM "$sequence $x $end $gc_skew_cm\n";
+			print AT_SKEW_CM "$sequence $x $end $at_skew_cm\n";
+			print CAT_GSKEW "$sequence $x $end $gc_skew\n";
+			print CAT_ASKEW "$sequence $x $end $at_skew\n";
+			print CAT_GSKEW_CM "$sequence $x $end $gc_skew_cm\n";
+			print CAT_ASKEW_CM "$sequence $x $end $at_skew_cm\n";
 
 		}
 
@@ -303,6 +354,20 @@ while (my $fasta = shift@fasta){
 				my ($lfh) = $cfh =~ /C(\w+)$/;
 				print $cfh "$sequence $x $end $percent{$lfh}\n";
 			}
+
+			my ($gc_skew, $at_skew) = skews($subseqleft);
+			$gc_skew_cm += $gc_skew;
+			$at_skew_cm += $at_skew;
+
+			print GC_SKEW "$sequence $x $end $gc_skew\n";
+			print AT_SKEW "$sequence $x $end $at_skew\n";
+			print GC_SKEW_CM "$sequence $x $end $gc_skew_cm\n";
+			print AT_SKEW_CM "$sequence $x $end $at_skew_cm\n";
+			print CAT_GSKEW "$sequence $x $end $gc_skew\n";
+			print CAT_ASKEW "$sequence $x $end $at_skew\n";
+			print CAT_GSKEW_CM "$sequence $x $end $gc_skew_cm\n";
+			print CAT_ASKEW_CM "$sequence $x $end $at_skew_cm\n";
+
 		}
 
 		close BIAS;
@@ -310,8 +375,17 @@ while (my $fasta = shift@fasta){
 	}
 
 	close FASTA;
+	close GC_SKEW;
+	close AT_SKEW;
+	close GC_SKEW_CM;
+	close AT_SKEW_CM;
 
 }
+
+close CAT_GSKEW;
+close CAT_ASKEW;
+close CAT_GSKEW_CM;
+close CAT_ASKEW_CM;
 
 ####################################################################
 ### Circos
@@ -823,6 +897,69 @@ sub print_circos_conf {
 
 		}
 
+		if ($skews){
+
+			print $cg '################# Skews'."\n\n";
+			print $cg '## GC skew'."\n";
+
+			print $cg '<plot>'."\n";
+			print $cg "file    = $bias_file.gc_skew"."\n";
+			print $cg 'type      = histogram'."\n";
+			print $cg 'thickness = 0'."\n";
+			print $cg "color   = vvlgray"."\n";
+			print $cg "r1      = ${r_start}r"."\n";
+			print $cg "r0      = ${r_end}r"."\n\n";
+			axes(\*$cg);
+
+			print $cg '<rules>'."\n";
+			print $cg '<rule>'."\n";
+			print $cg 'condition  = var(value) >= 0'."\n";
+			print $cg 'fill_color = vdblue'."\n";
+			print $cg 'flow       = continue'."\n";
+			print $cg '</rule>'."\n\n";
+
+			print $cg '<rule>'."\n";
+			print $cg 'condition  = var(value) < 0'."\n";
+			print $cg 'fill_color = vdred'."\n";
+			print $cg 'flow       = continue'."\n";
+			print $cg '</rule>'."\n";
+			print $cg '</rules>'."\n";
+			print $cg '</plot>'."\n\n";
+
+			$r_start -= 0.05;
+			$r_end -= 0.05;
+
+			print $cg '## AT skew'."\n";
+
+			print $cg '<plot>'."\n";
+			print $cg "file    = $bias_file.at_skew"."\n";
+			print $cg 'type      = histogram'."\n";
+			print $cg 'thickness = 0'."\n";
+			print $cg "color   = vvlgray"."\n";
+			print $cg "r1      = ${r_start}r"."\n";
+			print $cg "r0      = ${r_end}r"."\n\n";
+			axes(\*$cg);
+
+			print $cg '<rules>'."\n";
+			print $cg '<rule>'."\n";
+			print $cg 'condition  = var(value) >= 0'."\n";
+			print $cg 'fill_color = orange'."\n";
+			print $cg 'flow       = continue'."\n";
+			print $cg '</rule>'."\n\n";
+
+			print $cg '<rule>'."\n";
+			print $cg 'condition  = var(value) < 0'."\n";
+			print $cg 'fill_color = purple'."\n";
+			print $cg 'flow       = continue'."\n";
+			print $cg '</rule>'."\n";
+			print $cg '</rules>'."\n";
+			print $cg '</plot>'."\n\n";
+
+			$r_start -= 0.05;
+			$r_end -= 0.05;
+
+		}
+
 		print $cg '</plots>'."\n\n";
 
 		LINKS:
@@ -932,6 +1069,35 @@ sub print_circos_conf {
 		}
 
 		close $cg;
+
+}
+
+sub skews {
+
+		my $seq = $_[0];
+
+		my $c = $seq =~ tr/Cc//;
+		my $g = $seq =~ tr/Gg//;
+		my $a = $seq =~ tr/Aa//;
+		my $t = $seq =~ tr/Tt//;
+
+		my $gc_skew;
+		if ($c == $g) {
+ 			$gc_skew = 0;
+		}
+		else {
+			$gc_skew = ($c - $g) / ($c + $g);
+		}
+
+		my $at_skew;
+		if ($a == $t) {
+ 			$at_skew = 0;
+		}
+		else{
+			$at_skew = ($a - $t) / ($a + $t);
+		}
+
+		return $gc_skew, $at_skew;
 
 }
 
