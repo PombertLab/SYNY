@@ -1135,6 +1135,33 @@ Options for `gff3_to_gbff.pl` are:
 ```
 When compressing the GBFF output files, gff3_to_gbff.pl will use pigz if available, otherwise it will default to gzip
 
+##### <i>Reordering/reorienting contigs</i>
+When working with newly assembled genomes, contigs are sometimes found out-of-order and/or on opposite strands when compared to reference genomes. As such, reordering/reorienting contigs based on their reference genome counterparts is often useful to facilitate comparisons. A simple python script [orient_fastas_to_reference.py](https://github.com/PombertLab/SYNY/blob/main/Utils/orient_fastas_to_reference.py) is available in the `Utils/` subdirectory to help with this task. In a nutshell, `orient_fastas_to_reference.py` performs BLASTN homology searches between genomes (queries) and a reference genome (subject) by leveraging [NCBI BLAST+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/), then reorder/reorient contigs from the queries according to the results of these homology searches.
+
+To reorder/reorient contigs with `orient_fastas_to_reference.py`:
+```Bash
+orient_fastas_to_reference.py \
+  --fasta *.fasta \
+  --ref reference.fasta \
+  --outdir FASTA_oriented \
+  --min_pident 75 \
+  --min_palign 20 \
+  --max_overlp
+```
+
+Options for `orient_fastas_to_reference.py` are:
+```
+-f (--fasta)         FASTA files to reorder/reorient
+-r (--ref)           Reference genome assembly
+-o (--outdir)        Output directory [Default:'oriented_fastas']
+-i (--min_pident)    Minimum percent identity to assign segment to reference [Default: 85%]
+-a (--min_palign)    Minimum percent of the contig participating in alignment to assign segment to reference [Default: 20%]
+-x (--max_overlp)    Maximum percent of alignment allowed to overlap a previous alignment to assign segment to reference [Default: 5%]
+--version            Show script version
+```
+
+A subdirectory will be created foreach FASTA file queried. Inside each subdirectory, BLASTN results will be located in `results.blastn.6`. Contigs with or without matches against the reference genomes will be located in the `.oriented.fasta` and `unmatched.fasta` files, respectively, and summaries will be found in `all.map`. Circos karyotype and links files will also be generated automatically.
+
 ### Example 3 - Subsets
 Because large and/or fragmented genomes can be difficult to visualize due to plot density, SYNY also includes options to look at subsets of genomes. Contigs to be investigated/plotted can be specified from a single text file with the `--include` command line switch, while portions of contigs can also be specified in a tab-delimited text file with the `--ranges` command line switch. Alternatively, contigs can also be excluded using a regular expression with the `--exclude`command line switch. The latter option is useful when dealing with accession numbers containing a mixture of complete chromosomes and partial contigs, the latter often indicated with distinctive names. These partial contigs are often small, numerous, and tend to clutter plots. As such, removing them is often desirable.
 
