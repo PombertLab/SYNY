@@ -32,5 +32,6 @@ check_versions.pl                       0.1c
 fasta_to_gbff.pl                        0.1a
 gff3_to_gbff.pl                         0.1a
 list_maker.pl                           0.6.0
+orient_fastas_to_reference.py           0.3.5
 
 #############################################################
