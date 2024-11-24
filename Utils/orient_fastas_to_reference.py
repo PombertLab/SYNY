@@ -31,7 +31,7 @@ USAGE       {name} \\
               -r REF/assembly.fasta
 
 OPTIONS
--f (--fasta)         FASTA files to orient
+-f (--fasta)         -f (--fasta)         FASTA files to reorder/reorient
 -r (--ref)           Reference genome assembly
 -o (--outdir)        Output directory [Default:'oriented_fastas']
 
