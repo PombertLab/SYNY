@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.2c'
-updated = '2024-05-27'
+version = '0.3'
+updated = '2024-11-28'
 name = 'check_mp_colors.py'
 
+import sys
 import argparse
+import matplotlib.pyplot as plt
 from matplotlib import colormaps
-from pylab import *
-from numpy import outer
+from numpy import outer, arange, ones
 
 ################################################################################
 ## README
@@ -156,7 +157,7 @@ if colorplot:
 
     a = outer(arange(0,1,0.01),ones(10))
 
-    subplots_adjust(
+    plt.subplots_adjust(
         top=0.9,
         bottom=0.05,
         left=0.01,
@@ -166,9 +167,9 @@ if colorplot:
     palette_num = len(mcolors) + 1
 
     for x, name in enumerate(mcolors):
-        subplot(1, palette_num, x + 1)
-        axis("off")
-        imshow(a, aspect='equal', cmap=get_cmap(name), origin='lower')
-        title(name, rotation=90, fontsize=fontsize)
+        plt.subplot(1, palette_num, x + 1)
+        plt.axis("off")
+        plt.imshow(a, aspect='equal', cmap=plt.get_cmap(name), origin='lower')
+        plt.title(name, rotation=90, fontsize=fontsize)
 
     plt.savefig(outfile)
