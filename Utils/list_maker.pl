@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.6.0';
-my $updated = '2024-07-05';
+my $version = '0.6.0a';
+my $updated = '2024-12-18';
 
 use strict;
 use warnings;
@@ -161,7 +161,11 @@ foreach my $input_file (@input_files){
 	my @file_data = split('\.',$file_name);
 	my ($file_prefix) = $file_data[0] =~ /^(\w+)/;
 	my $diamond = "<";
+
 	my $ext = $file_data[-1];
+	if (exists $filetypes{$ext}){
+		$ext = 'gbf';
+	}
 
 	if ($file_data[-1] eq 'gz'){ 
 		$diamond = "<:gzip";
