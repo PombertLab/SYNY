@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'get_paf.pl';
-my $version = '0.4b';
-my $updated = '2024-05-27';
+my $version = '0.5';
+my $updated = '2024-12-21';
 
 use strict;
 use warnings;
@@ -92,11 +92,12 @@ my @subdirs = ($outdir);
 my $paf_dir = $outdir.'/'.'PAF';
 my $maf_dir = $outdir.'/'.'MAF';
 my $blast_dir = $outdir.'/'.'ALN';
+my $vcf_dir = $outdir.'/'.'VCF';
 
 push (@subdirs, $paf_dir);
 
 if ($aligner =~ /minimap/){
-    push (@subdirs, ($maf_dir,$blast_dir));
+    push (@subdirs, ($maf_dir, $blast_dir, $vcf_dir));
 }
 
 for my $dir (@subdirs){
@@ -157,6 +158,7 @@ foreach my $query (@fasta){
             my $paf_outfile = $paf_dir.'/'.$bquery.'_vs_'.$btarget.".$affix.paf";
             my $maf_outfile = $maf_dir.'/'.$bquery.'_vs_'.$btarget.".$affix.maf";
             my $blast_outfile = $blast_dir.'/'.$bquery.'_vs_'.$btarget.".$affix.aln";
+            my $vcf_outfile = $vcf_dir.'/'.$bquery.'_vs_'.$btarget.".$affix.vcf";
 
             my $map_time_start = time;
 
@@ -251,7 +253,7 @@ foreach my $query (@fasta){
                 GETALN:
                 if ((-e $blast_outfile) && ($resume)){
                     print "Found $blast_outfile, skipping paftools.js conversion ...\n";
-                    goto ENDLOG;
+                    goto GETVCF;
                 }
 
                 system (
@@ -261,6 +263,21 @@ foreach my $query (@fasta){
                     > $blast_outfile
                     "
                 ) == 0 or checksig();
+
+                ## Creating VCF file
+                GETVCF:
+                if ((-e $vcf_outfile) && ($resume)){
+                    print "Found $vcf_outfile, skipping paftools.js conversion ...\n";
+                    goto ENDLOG;
+                }
+
+                # -L => min alignment length to call variants 
+                system (
+                    "sort -k6,6 -k8,8n $paf_outfile \\
+                      | paftools.js call -L 1000 -f $query - > $vcf_outfile
+                    "
+                ) == 0 or checksig();
+
             }
 
             ENDLOG:
