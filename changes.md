@@ -1,6 +1,7 @@
 # SYNY CHANGE LOG
 
 ## SYNY-v1.2a
+- `get_paf.pl` now generates VCF files from minimap2 genome alignment (min. alignment lenght = 1000 bp)
 - `nucleotide_biases.pl` now calculates GC and AT skews. Corresponding data files are located in the `PLOTS/CIRCOS_DATA/` subdirectory.
 - GC/AT skews are now plotted automatically with Circos. If desired, these subplots can be turned off independently with the `--no_skews` option, or together with all nucleotide biases subplots (with `--no_ntbiases`).
 - Added a simple Fasta + GFF3 to GBFF converter (`gff3_to_gbff.pl`) in the `Utils/` subdirectory. This tool was tested on NCBI GFF3 files and expects the GFF3 file(s) to include gene/mRNA/exon/CDS entries in the `type` column and the `ID` and `Parent` tags in the attributes column. It also expects the corresponding Fasta and GFF3 files to share the same prefixes (e.g. genome_1.fasta / genome_1.gff). The GBFF files thus created were designed to work with SYNY but do not adhere exactly to the GBFF format and may not work for other purposes.

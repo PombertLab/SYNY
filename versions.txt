@@ -8,7 +8,7 @@ run_syny.pl                             0.8b
 setup_syny.pl                           0.3a
 
 # Alignments
-get_paf.pl                              0.4b
+get_paf.pl                              0.5
 paf2links.pl                            0.2
 paf_metrics.py                          0.3a
 
