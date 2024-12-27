@@ -382,7 +382,9 @@ Options for run_SYNY.pl are:
 --mpid                  Specify mashmap percentage identity [Default: 85]
 --resume                Resume minimap/mashmap computations (skip completed alignments)
 --no_map                Skip minimap/mashmap pairwise genome alignments
+--no_vcf                Skip minimap VCF file creation (files can be quite large)
 --no_clus               Skip gene cluster reconstructions
+--version               Display SYNY version
 
 ### Circos plots
 -c (--circos)           Circos plot mode: pair (pairwise), cat (concatenated), all (cat + pair) [Default: pair]
@@ -470,6 +472,7 @@ The contents of the subdirectories are:
 - ALIGNMENTS:
   - PAF: pairwise genome alignments in the corresponding format (minimap2/MashMap3)
   - MAF, ALN: pairwise genome alignments in the corresponding formats (minimap2)
+  - VCF: Variant Call Format files from minimap2 alignments (can be turned off with --no_vcf)
   - METRICS (minimap2):
       - Alignment length vs. similarity scatter plots (in PNG format)
       - Alignment metrics summaries (in plain TXT format)
