@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.8b';
-my $updated = '2024-12-18';
+my $version = '0.8c';
+my $updated = '2024-12-27';
 
 use strict;
 use warnings;
@@ -58,6 +58,7 @@ OPTIONS:
 --mpid                  Specify mashmap3 percentage identity [Default: 85]
 --resume                Resume minimap/mashmap computations (skip completed alignments)
 --no_map                Skip minimap/mashmap pairwise genome alignments
+--no_vcf                Skip minimap VCF file creation (files can be quite large)
 --no_clus               Skip gene cluster reconstructions
 --version               Display SYNY version
 EXIT
@@ -150,6 +151,7 @@ my @ranges;
 my $aligner = 'minimap';
 my $nomap;
 my $noclus;
+my $novcf;
 my $resume;
 my $asm;
 my $mashmap_pid = 85;
@@ -237,6 +239,7 @@ GetOptions(
 	'aligner=s' => \$aligner,
 	'no_map' => \$nomap,
 	'no_clus' => \$noclus,
+	'no_vcf' => \$novcf,
 	'resume' => \$resume,
 	'asm=i' => \$asm,
 	'mpid=s' => \$mashmap_pid,
@@ -632,6 +635,11 @@ if ($asm){
 	$asm_flag = "--asm $asm";
 }
 
+my $vcf_flag = '';
+if ($novcf){
+	$vcf_flag = "--no_vcf";
+}
+
 my $resume_flag = '';
 if ($resume){
 	$resume_flag = '--resume';
@@ -695,7 +703,8 @@ system("
 	  --threads $threads \\
 	  --percent $mashmap_pid \\
 	  $resume_flag \\
-	  $asm_flag
+	  $asm_flag \\
+	  $vcf_flag
 ") == 0 or checksig();
 
 opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";

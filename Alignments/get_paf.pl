@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'get_paf.pl';
-my $version = '0.5';
-my $updated = '2024-12-21';
+my $version = '0.5a';
+my $updated = '2024-12-27';
 
 use strict;
 use warnings;
@@ -38,7 +38,8 @@ OPTIONS:
 -r (--resume)   Resume computation (skip completed alignments)
 -t (--threads)  Number of threads for minimap2 [Default: 8]
 -a (--asm)      Specify minimap2 max divergence preset (asm 5, 10 or 20) [Default: off]
--p (--percent)  Specify mashmap3 percentage identity [Default: 75] 
+-p (--percent)  Specify mashmap3 percentage identity [Default: 75]
+-n (--no_vcf)   Turn off VCF creation for minimap2 alignments
 -v (--version)  Show script version
 USAGE
 
@@ -56,6 +57,7 @@ my $resume;
 my $threads = 8;
 my $asm;
 my $mashmap_pid = 75;
+my $novcf;
 my $sc_version;
 GetOptions(
     'f|fasta=s@{1,}' => \@fasta,
@@ -65,6 +67,7 @@ GetOptions(
     'r|resume' => \$resume,
     'asm=i' => \$asm,
     'p|percent=s' => \$mashmap_pid,
+    'n|no_vcf' => \$novcf,
     'v|version' => \$sc_version
 );
 
@@ -97,7 +100,10 @@ my $vcf_dir = $outdir.'/'.'VCF';
 push (@subdirs, $paf_dir);
 
 if ($aligner =~ /minimap/){
-    push (@subdirs, ($maf_dir, $blast_dir, $vcf_dir));
+    push (@subdirs, ($maf_dir, $blast_dir));
+    unless ($novcf){
+        push (@subdirs, $vcf_dir)
+    }
 }
 
 for my $dir (@subdirs){
@@ -266,17 +272,23 @@ foreach my $query (@fasta){
 
                 ## Creating VCF file
                 GETVCF:
-                if ((-e $vcf_outfile) && ($resume)){
-                    print "Found $vcf_outfile, skipping paftools.js conversion ...\n";
-                    goto ENDLOG;
-                }
 
-                # -L => min alignment length to call variants 
-                system (
-                    "sort -k6,6 -k8,8n $paf_outfile \\
-                      | paftools.js call -L 1000 -f $query - > $vcf_outfile
-                    "
-                ) == 0 or checksig();
+                unless ($novcf){
+
+                    if ((-e $vcf_outfile) && ($resume)){
+                        print "Found $vcf_outfile, skipping paftools.js conversion ...\n";
+                        goto ENDLOG;
+                    }
+
+                    # -L => min alignment length to call variants
+                    print "\n".'VCF stats:'."\n\n";
+                    system (
+                        "sort -k6,6 -k8,8n $paf_outfile \\
+                        | paftools.js call -L 1000 -f $query - > $vcf_outfile
+                        "
+                    ) == 0 or checksig();
+
+                }
 
             }
 
