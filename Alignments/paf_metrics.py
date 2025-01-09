@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.3a'
-updated = '2024-05-27'
+version = '0.3b'
+updated = '2025-01-09'
 name = 'paf_metrics.py'
 
 import os
@@ -36,6 +36,7 @@ I/O OPTIONS:
 -w (--width)  Figure width in inches [Default: 19.2]
 --fontsize    Figure font size [Default: 12]
 --threads     Number of threads to use [Default: 16]
+--no_sec      Filter out secondary alignments from minimap2 alignments
 --version     Show script version
 """
 
@@ -56,6 +57,7 @@ cmd.add_argument("-h", "--height", default=10.8)
 cmd.add_argument("-w", "--width", default=19.2)
 cmd.add_argument("--fontsize", default=12)
 cmd.add_argument("--threads", default=16)
+cmd.add_argument("--no_sec",  action='store_true')
 cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
@@ -66,6 +68,7 @@ width = args.width
 rgb = args.color
 fontsize = int(args.fontsize)
 threads = int(args.threads)
+nosec = args.no_sec
 scversion = args.version
 
 #########################################################################
@@ -178,11 +181,20 @@ def scatterplot(paf):
             n_matches = int(data[9])
             block_len = int(data[10])
 
-            matches.append(n_matches)
-            x_aln_sizes.append(block_len)
-
             sim = (n_matches/block_len)*100
-            similarity.append(sim)
+
+            if nosec:
+                # Checking for minimap2 primary alignment flag
+                for x in data:
+                    if x == 'tp:A:P':
+                        matches.append(n_matches)
+                        x_aln_sizes.append(block_len)
+                        similarity.append(sim)
+
+            else:
+                matches.append(n_matches)
+                x_aln_sizes.append(block_len)
+                similarity.append(sim)
 
     ################################################################################
     ## Calculate alignment metrics
