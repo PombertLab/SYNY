@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 
 my $name = 'jgi_to_ncbi_gff.pl';
-my $version = '0.1';
-my $updated = '2025-01-30';
+my $version = '0.1a';
+my $updated = '2025-01-31';
 
 use strict;
 use warnings;
@@ -71,6 +71,9 @@ while (my $line = <GFF3>){
     chomp $line;
 
     if ($line =~ /^#/){
+        next;
+    }
+    elsif ($line =~ /^\s*$/){
         next;
     }
     elsif ($line =~ /(stop|start)_codon/){
