@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'gff3_to_gbff.pl';
-my $version = '0.1a';
-my $updated = '2024-09-04';
+my $version = '0.1b';
+my $updated = '2025-01-31';
 
 use strict;
 use warnings;
@@ -149,12 +149,15 @@ while (my $fasta = shift@fasta){
 
     ## Creating a database of sequences
     my %sequences;
+    my %contigs;
     my $header;
+
     while (my $line = <FASTA>){
 
         chomp $line;
         if ($line =~ /^>(\w+)/){
             $header = $1;
+            @{$contigs{$header}} = ();
         }
         else {
             $sequences{$header} .= $line;
@@ -175,16 +178,24 @@ while (my $fasta = shift@fasta){
     }
 
     ## Parsing GFF3 file
-    my %contigs;
     my %genes;
     my %rnas;
     my $gene_counter = 0;
 
     while (my $line = <GFF3>){
+
         chomp $line;
+
+        # Skip comments
         if ($line =~ /^#/){
             next;
         }
+
+        # Skip blank lines
+        elsif ($line =~ /^\s*$/){
+            next;
+        }
+
         else{
 
             my @data = split("\t", $line);
@@ -428,8 +439,8 @@ while (my $fasta = shift@fasta){
                     }
 
                 }
-    
-            } 
+
+            }
 
         }
 
