@@ -1107,7 +1107,7 @@ Options for `fasta_to_gbff.pl` are:
 When compressing the GBFF output files, `fasta_to_gbff.pl` will use `pigz` if available, otherwise it will default to `gzip`.
 
 ##### <i>Fasta + GFF3 to GBFF</i>
-A simple Fasta + GFF3 to GBFF converter [gff3_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/gff3_to_gbff.pl) is available in the `Utils/` subdirectory. This tool was tested on NCBI GFF3 files and expects the GFF3 file(s) to include gene/mRNA/exon/CDS entries in the `type` column and the `ID` and `Parent` tags in the attributes column. It also expects the corresponding Fasta and GFF3 files to share the same prefixes (<i>e.g.</i> genome_1.fasta / genome_1.gff). The GBFF files created by [gff3_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/gff3_to_gbff.pl) were designed to work with SYNY but do not adhere exactly to the GBFF format and may not work for other purposes.
+A simple Fasta + GFF3 to GBFF converter ([gff3_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/gff3_to_gbff.pl)) is available in the `Utils/` subdirectory. This tool was tested on NCBI GFF3 files and expects the GFF3 file(s) to include gene/mRNA/exon/CDS entries in the `type` column and the `ID` and `Parent` tags in the attributes column. It also expects the corresponding Fasta and GFF3 files to share the same prefixes (<i>e.g.</i> genome_1.fasta / genome_1.gff). The GBFF files created by [gff3_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/gff3_to_gbff.pl) were designed to work with SYNY but do not adhere exactly to the GBFF format and may not work for other purposes.
 
 To convert FASTA + GFF3 file(s) to pseudo-GBFF files (compressed in gzip format) using the standard genetic code:
 ```Bash
@@ -1137,6 +1137,23 @@ Options for `gff3_to_gbff.pl` are:
 --version       Show script version
 ```
 When compressing the GBFF output files, gff3_to_gbff.pl will use pigz if available, otherwise it will default to gzip
+
+##### <i>JGI GFF to NCBI GFF3 format</i>
+A simple JGI GFF to NCBI GFF3 converter ([jgi_to_ncbi_gff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/jgi_to_ncbi_gff.pl)) is available in the `Utils/` subdirectory. This tool converts JGI GFF files to pseudo-NCBI GFF3 files compatible with [gff3_to_gbff.pl](https://github.com/PombertLab/SYNY/blob/main/Utils/gff3_to_gbff.pl).
+
+To convert JGI GFF to pseudo-GFF3 files:
+```Bash
+jgi_to_ncbi_gff \
+  --gff3 jgi.gff \
+  --out ncbi.gff3
+```
+
+Options for `jgi_to_ncbi_gff.pl` are:
+```
+-g (--gff3)     JGI GFF files to convert
+-o (--out)      Output file
+--version       Show script version
+```
 
 ##### <i>Reordering/reorienting contigs</i>
 When working with newly assembled genomes, contigs are sometimes found out-of-order and/or on opposite strands when compared to reference genomes. As such, reordering/reorienting contigs based on their reference genome counterparts is often useful to facilitate comparisons. A simple python script [orient_fastas_to_reference.py](https://github.com/PombertLab/SYNY/blob/main/Utils/orient_fastas_to_reference.py) is available in the `Utils/` subdirectory to help with this task. In a nutshell, `orient_fastas_to_reference.py` performs BLASTN homology searches between genomes (queries) and a reference genome (subject) by leveraging [NCBI BLAST+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/), then reorder/reorient contigs from the queries according to the results of these homology searches.
