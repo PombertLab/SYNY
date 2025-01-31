@@ -1,5 +1,10 @@
 # SYNY CHANGE LOG
 
+## SYNY-v1.2b
+- `paf_metrics.py`: Added the `--no_sec` command line option to filter out secondary alignments from minimap2 alignments.
+- `gff3_to_gbff.pl`: Fixed a bug that crashed the script when dealing with contigs without annotations.
+- `jgi_to_ncbi_gff.pl`: Added a new script to convert JGI GFF files to a NCBI-like GFF3 format compatible with `gff3_to_gbff.pl`.
+
 ## SYNY-v1.2a
 - Now generates VCF files from minimap2 genome alignments (min. alignment length = 1000 bp) automatically. VCF file creation can be turned off with the new `--no_vcf` flag in `run_syny.pl` (and/or in `get_paf.pl`). Note that these files can become quite large depending on the size of the genomes being compared.
 - `nucleotide_biases.pl` now calculates GC and AT skews. Corresponding data files are located in the `PLOTS/CIRCOS_DATA/` subdirectory.
