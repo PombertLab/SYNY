@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.8e';
+my $version = '0.8f';
 my $updated = '2025-03-26';
 
 use strict;
@@ -977,6 +977,11 @@ unless ($no_heatmap){
 
 	logs(\*LOG, 'paf_to_hm.py', 'start');
 
+	my $msize = 1;
+	if ($min_asize){
+		$msize = $min_asize;
+	}
+
 	system("
 		$plot_path/paf_to_heatmap.py \\
 		--paf $paf_dir/*.paf \\
@@ -986,6 +991,7 @@ unless ($no_heatmap){
 		--width $hwidth \\
 		--palette $hmpalette \\
 		--matrix $mmap_dir/paf_matrix.tsv \\
+		--minsize $msize \\
 		--fontsize $hfsize \\
 		--vmax $hmax \\
 		--vmin $hmin \\
@@ -1182,7 +1188,7 @@ foreach my $gap (@gaps){
 
 		system("
 			$align_path/paf_minsize.pl \\
-			--paf $paf_dir/*.paf \\
+			--paf $ppafdir/*.paf \\
 			--outdir $ppafdir_minsize \\
 			--minsize $min_asize
 		") == 0 or checksig();
@@ -1229,7 +1235,7 @@ foreach my $gap (@gaps){
 					print CCAT "$line";
 				}
 				close SCAT;
-			} 
+			}
 			close CCAT;
 
 		}
@@ -1246,7 +1252,14 @@ unless ($no_barplot){
 	$tstart = time();
 	print ERROR "\n### paf_to_barplot.py (gene clusters) ###\n";
 
-	my @barplot_files = getpaf_files('PAF');
+	my @barplot_files;
+
+	if ($min_asize){
+		@barplot_files = getpaf_files('PAF_MINSIZE');
+	}
+	else {
+		@barplot_files = getpaf_files('PAF');
+	}
 
 	logs(\*LOG, 'paf_to_barplot.py', 'start');
 
@@ -1315,7 +1328,14 @@ unless ($no_dotplot){
 	print ERROR "\n### paf_to_dotplot.py (gene clusters) ###\n";
 	print "\n# Dotplots (gene clusters):\n";
 
-	my @dotplot_files = getpaf_files('PAF');
+	my @dotplot_files;
+
+	if ($min_asize){
+		@dotplot_files = getpaf_files('PAF_MINSIZE');
+	}
+	else {
+		@dotplot_files = getpaf_files('PAF');
+	}
 
 	logs(\*LOG, 'paf_to_dotplot.py', 'start');
 
@@ -1348,7 +1368,14 @@ unless ($no_linemap){
 	print ERROR "\n### linear_maps.py (gene clusters) ###\n";
 	print "\n# Linemaps (gene clusters):\n";
 
-	my @linemap_files = getpaf_files('PAF');
+	my @linemap_files;
+
+	if ($min_asize){
+		@linemap_files = getpaf_files('PAF_MINSIZE');
+	}
+	else {
+		@linemap_files = getpaf_files('PAF');
+	}
 
 	logs(\*LOG, 'linear_maps.py', 'start');
 
@@ -1574,6 +1601,12 @@ while (my $dname = readdir(CDIR)) {
 }
 closedir CDIR;
 
+## Min cluster size flag
+my $clus_size_flag = '';
+if ($min_asize){
+	$clus_size_flag = "--minsize $min_asize";
+}
+
 foreach my $cluster_subdir (@cluster_dirs){
 	my ($basedir) = fileparse($cluster_subdir);
 	system("
@@ -1584,6 +1617,7 @@ foreach my $cluster_subdir (@cluster_dirs){
 		$cluster_flag \\
 		$custom_cc_file \\
 		$custom_cc \\
+		$clus_size_flag \\
 		2>> $log_err
 	") == 0 or checksig();
 }
@@ -2020,8 +2054,12 @@ sub circos_plot {
 
 			for my $orientation ('normal', 'inverted'){
 
+				my $asize = '';
+				if ($min_asize){
+					$asize = '.m'.$min_asize;
+				}
 				my $conf = $circos_pair_dir.'/'.$pair.'/'.$pair.'.'.$affix.'.'.$orientation.'.conf';
-				my $circos_plot = "$pair.$affix.$orientation.png";
+				my $circos_plot = $pair.$asize.".$affix.$orientation.png";
 
 				$circos_todo_list{$conf}{'dir'} = $plot_dir;
 				$circos_todo_list{$conf}{'png'} = $circos_plot;
