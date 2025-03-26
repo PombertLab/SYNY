@@ -2,7 +2,7 @@
 ## Pombert Lab, 2025
 
 my $name = 'paf_minsize.pl';
-my $version = '0.1a';
+my $version = '0.1b';
 my $updated = '2025-03-26';
 
 use strict;
@@ -81,9 +81,8 @@ unless (-d $outdir){
 foreach my $paf (@paf){
 
     my $basename = fileparse($paf);
-    $basename =~ s/\.paf$//;
-    my $outfile = $outdir.'/'.$basename.'.m'.$minsize.'.paf';
-    print $outfile."\n";
+    my ($prefix, $suffix) = $basename =~ /^(.*)(\.\w+.paf)$/;
+    my $outfile = $outdir.'/'.$prefix.'.m'.$minsize.$suffix;
 
     open IN, '<', $paf or die "Can't open $paf: $!\n";
     open OUT, '>', $outfile or die "Can't create $outfile: $!\n";
