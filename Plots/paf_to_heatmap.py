@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2c'
-updated = '2024-06-06'
+version = '0.2d'
+updated = '2025-03-26'
 name = 'paf_to_heatmap.py'
 
 import sys
@@ -39,6 +39,7 @@ OPTIONS:
 -c (--palette)  Seaborn color palette [Default: winter_r]
                 # See https://www.practicalpythonfordatascience.com/ap_seaborn_palette
                 # for a list of color palettes
+--minsize       Minimum alignment size to plot [Default: 1]
 --fontsize      Font size [Default: 8]
 --vmax          Set maximum color bar value [Default: 100]
 --vmin          Set minimum color bar value [Default: 0]
@@ -63,9 +64,10 @@ cmd.add_argument("-h", "--height", default=10)
 cmd.add_argument("-w", "--width", default=10)
 cmd.add_argument("-c", "--palette", default='winter_r')
 cmd.add_argument("-x", "--matrix", default='matrix.tsv')
-cmd.add_argument("--fontsize", default=8)
-cmd.add_argument("--vmin", default=0)
-cmd.add_argument("--vmax", default=100)
+cmd.add_argument("--minsize", type=int, default=1)
+cmd.add_argument("--fontsize", type=int, default=8)
+cmd.add_argument("--vmin", type=int, default=0)
+cmd.add_argument("--vmax", type=int, default=100)
 cmd.add_argument("--vauto", action='store_true')
 cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
@@ -77,9 +79,10 @@ height = args.height
 width = args.width
 matrix_file = args.matrix
 color_palette = args.palette
-fontsize = int(args.fontsize)
-vmin = int(args.vmin)
-vmax = int(args.vmax)
+minsize = args.minsize
+fontsize = args.fontsize
+vmin = args.vmin
+vmax = args.vmax
 vauto = args.vauto
 scversion = args.version
 
@@ -176,11 +179,15 @@ for paf in paf_files:
             s_start = int(data[7])
             s_end = int(data[8])
 
-            if query not in dataframe:
-                dataframe[query] = []
+            qsize = q_end - q_start + 1
 
-            pair = str(q_start) + ',' + str(q_end)
-            dataframe[query].append(pair)
+            if qsize >= minsize:
+
+                if query not in dataframe:
+                    dataframe[query] = []
+
+                pair = str(q_start) + ',' + str(q_end)
+                dataframe[query].append(pair)
 
         msum = 0
         ## Working per contig (query) to reduce mem usage
@@ -224,11 +231,10 @@ with open (matrix_file) as f:
 
     data = pd.read_csv(matrix_file, sep="\t", header=0, index_col=0)
 
-    clustered_png = pngdir + '/' + 'colinear_bases.mmap.clustered.png'
-    clustered_svg = svgdir + '/' + 'colinear_bases.mmap.clustered.svg'
-
-    heatmap_png = pngdir + '/' + 'colinear_bases.mmap.heatmap.png'
-    heatmap_svg = svgdir + '/' + 'colinear_bases.mmap.heatmap.svg'
+    clustered_png = f"{pngdir}/colinear_bases.m{minsize}.mmap.clustered.png"
+    clustered_svg = f"{svgdir}/colinear_bases.m{minsize}.mmap.clustered.svg"
+    heatmap_png = f"{pngdir}/colinear_bases.m{minsize}.mmap.heatmap.png"
+    heatmap_svg = f"{svgdir}/colinear_bases.m{minsize}.mmap.heatmap.svg"
 
     ## Clustered heatmaps
     cm = None
