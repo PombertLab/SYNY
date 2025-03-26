@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.8d';
+my $version = '0.8e';
 my $updated = '2025-03-26';
 
 use strict;
@@ -57,6 +57,7 @@ OPTIONS:
 --asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
 --mpid                  Specify mashmap3 percentage identity [Default: 85]
 --resume                Resume minimap/mashmap computations (skip completed alignments)
+--min_asize             Filter out alignments/clusters smaller than integer value (e.g. --min_asize 5000)
 --no_sec                Turn off minimap2 secondary alignments
 --no_map                Skip minimap/mashmap pairwise genome alignments
 --no_vcf                Skip minimap VCF file creation (files can be quite large)
@@ -150,6 +151,7 @@ my @excluded;
 my @included;
 my @ranges;
 my $aligner = 'minimap';
+my $min_asize;
 my $nosec;
 my $nomap;
 my $noclus;
@@ -244,6 +246,7 @@ GetOptions(
 	'no_clus' => \$noclus,
 	'no_vcf' => \$novcf,
 	'resume' => \$resume,
+	'min_asize=i' => \$min_asize,
 	'asm=i' => \$asm,
 	'mpid=s' => \$mashmap_pid,
 	'h|help' => \$help,
@@ -716,6 +719,24 @@ system("
 	  $no_sec_flag
 ") == 0 or checksig();
 
+## Filtering by minsize (if requested)
+if ($min_asize){
+
+	my $paf_dir_minsize = "$mmap_dir/PAF_MINSIZE";
+
+	system("
+		$align_path/paf_minsize.pl \\
+		--paf $paf_dir/*.paf \\
+		--outdir $paf_dir_minsize \\
+		--minsize $min_asize
+	") == 0 or checksig();
+
+	## Setting the filtered PAFs as the desired ones to plot
+	$paf_dir = $paf_dir_minsize;
+
+}
+
+## Checking for blank files (if any)
 opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
 while (my $file = readdir(PAFDIR)){
 	if ($file =~ /\.paf$/){
@@ -728,6 +749,7 @@ while (my $file = readdir(PAFDIR)){
 }
 closedir PAFDIR;
 
+## Concatenating paf files
 if (($bpmode eq 'cat') or ($bpmode eq 'all')){
 
 	unless (-d $pafcat_dir){
@@ -1153,6 +1175,24 @@ foreach my $gap (@gaps){
 		2>> $log_err
 	") == 0 or checksig();
 
+	## Filtering by minsize (if requested)
+	if ($min_asize){
+
+		my $ppafdir_minsize = $cluster_synteny.'/gap_'.$gap.'/PAF_MINSIZE';
+
+		system("
+			$align_path/paf_minsize.pl \\
+			--paf $paf_dir/*.paf \\
+			--outdir $ppafdir_minsize \\
+			--minsize $min_asize
+		") == 0 or checksig();
+
+		## Setting the filtered PAFs as the desired ones to plot
+		$ppafdir = $ppafdir_minsize;
+
+	}
+
+	## Concatenating paf files
 	if (($bpmode eq 'cat') or ($bpmode eq 'all')){
 
 		unless (-d $ppafcatdir){

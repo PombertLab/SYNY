@@ -381,6 +381,7 @@ Options for run_syny.pl are:
 --asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
 --mpid                  Specify mashmap percentage identity [Default: 85]
 --resume                Resume minimap/mashmap computations (skip completed alignments)
+--min_asize             Filter out alignments/clusters smaller than integer value (e.g. --min_asize 5000)
 --no_sec                Turn off minimap2 secondary alignments
 --no_map                Skip minimap/mashmap pairwise genome alignments
 --no_vcf                Skip minimap VCF file creation (files can be quite large)
