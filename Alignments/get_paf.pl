@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'get_paf.pl';
-my $version = '0.5a';
-my $updated = '2024-12-27';
+my $version = '0.5b';
+my $updated = '2025-03-26';
 
 use strict;
 use warnings;
@@ -39,6 +39,7 @@ OPTIONS:
 -t (--threads)  Number of threads for minimap2 [Default: 8]
 -a (--asm)      Specify minimap2 max divergence preset (asm 5, 10 or 20) [Default: off]
 -p (--percent)  Specify mashmap3 percentage identity [Default: 75]
+-s (--no_sec)   Turn off minimap2 secondary alignments
 -n (--no_vcf)   Turn off VCF creation for minimap2 alignments
 -v (--version)  Show script version
 USAGE
@@ -57,6 +58,7 @@ my $resume;
 my $threads = 8;
 my $asm;
 my $mashmap_pid = 75;
+my $nosec;
 my $novcf;
 my $sc_version;
 GetOptions(
@@ -67,6 +69,7 @@ GetOptions(
     'r|resume' => \$resume,
     'asm=i' => \$asm,
     'p|percent=s' => \$mashmap_pid,
+    's|no_sec' => \$nosec,
     'n|no_vcf' => \$novcf,
     'v|version' => \$sc_version
 );
@@ -136,6 +139,11 @@ if ($asm){
     $asm_flag = '-x asm'.$asm;
 }
 
+my $secondary_flag = 'yes';
+if ($nosec){
+    $secondary_flag = 'no';
+}
+
 my $fasta_num = scalar(@fasta);
 my $to_do = $fasta_num * ($fasta_num - 1);
 my $current_iteration = 0;
@@ -184,6 +192,7 @@ foreach my $query (@fasta){
                         --cs=long \\
                         $query \\
                         $target \\
+                        --secondary=$secondary_flag \\
                         > $tmp_paf_outfile
                     "
                 ) == 0 or checksig();

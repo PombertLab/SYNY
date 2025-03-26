@@ -4,11 +4,11 @@ SYNY - Version 1.2b
 #############################################################
 
 # Main                                  Versions
-run_syny.pl                             0.8c
+run_syny.pl                             0.8d
 setup_syny.pl                           0.3a
 
 # Alignments
-get_paf.pl                              0.5a
+get_paf.pl                              0.5b
 paf2links.pl                            0.2
 paf_metrics.py                          0.3b
 

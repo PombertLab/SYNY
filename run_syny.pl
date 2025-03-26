@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.8c';
-my $updated = '2024-12-27';
+my $version = '0.8d';
+my $updated = '2025-03-26';
 
 use strict;
 use warnings;
@@ -57,6 +57,7 @@ OPTIONS:
 --asm                   Specify minimap max divergence preset (--asm 5, 10 or 20) [Default: off]
 --mpid                  Specify mashmap3 percentage identity [Default: 85]
 --resume                Resume minimap/mashmap computations (skip completed alignments)
+--no_sec                Turn off minimap2 secondary alignments
 --no_map                Skip minimap/mashmap pairwise genome alignments
 --no_vcf                Skip minimap VCF file creation (files can be quite large)
 --no_clus               Skip gene cluster reconstructions
@@ -149,6 +150,7 @@ my @excluded;
 my @included;
 my @ranges;
 my $aligner = 'minimap';
+my $nosec;
 my $nomap;
 my $noclus;
 my $novcf;
@@ -237,6 +239,7 @@ GetOptions(
 	'included=s{0,}' => \@included,
 	'ranges=s{0,}' => \@ranges,
 	'aligner=s' => \$aligner,
+	'no_sec' => \$nosec,
 	'no_map' => \$nomap,
 	'no_clus' => \$noclus,
 	'no_vcf' => \$novcf,
@@ -650,6 +653,11 @@ if ($hauto){
 	$hm_vauto_flag = '--vauto';
 }
 
+my $no_sec_flag = '';
+if ($nosec){
+	$no_sec_flag = '--no_sec';
+}
+
 ###################################################################################################
 ## Run list_maker.pl
 ###################################################################################################
@@ -704,7 +712,8 @@ system("
 	  --percent $mashmap_pid \\
 	  $resume_flag \\
 	  $asm_flag \\
-	  $vcf_flag
+	  $vcf_flag \\
+	  $no_sec_flag
 ") == 0 or checksig();
 
 opendir (PAFDIR, $paf_dir) or die "\n\n[ERROR]\tCan't open $paf_dir: $!\n\n";
