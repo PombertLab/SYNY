@@ -2,7 +2,7 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.8f';
+my $version = '0.8g';
 my $updated = '2025-03-26';
 
 use strict;
@@ -991,6 +991,8 @@ unless ($no_heatmap){
 		--width $hwidth \\
 		--palette $hmpalette \\
 		--matrix $mmap_dir/paf_matrix.tsv \\
+		--prefix 'colinear_bases' \\
+		--title '% of total bases in pairwise alignments' \\
 		--minsize $msize \\
 		--fontsize $hfsize \\
 		--vmax $hmax \\
