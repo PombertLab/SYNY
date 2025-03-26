@@ -2,7 +2,7 @@
 ## Pombert Lab, 2025
 
 my $name = 'paf_minsize.pl';
-my $version = '0.1';
+my $version = '0.1a';
 my $updated = '2025-03-26';
 
 use strict;
@@ -105,9 +105,6 @@ foreach my $paf (@paf){
         else {
 
             my @data = split(/\t/, $line);
-
-            print $data[2]."\n";
-            print $data[3]."\n";
 
             # 1	string	Query sequence name
             # 2	int	Query sequence length
