@@ -2,8 +2,8 @@
 # Pombert lab, 2022
 
 my $name = 'run_syny.pl';
-my $version = '0.8g';
-my $updated = '2025-03-26';
+my $version = '0.9';
+my $updated = '2025-03-27';
 
 use strict;
 use warnings;
@@ -978,8 +978,13 @@ unless ($no_heatmap){
 	logs(\*LOG, 'paf_to_hm.py', 'start');
 
 	my $msize = 1;
+	my $size_label_flag = '';
+	my $size_prefix = '';
+
 	if ($min_asize){
 		$msize = $min_asize;
+		$size_label_flag = '--sizelab';
+		$size_prefix = ".m$msize";
 	}
 
 	system("
@@ -990,13 +995,14 @@ unless ($no_heatmap){
 		--height $hheight \\
 		--width $hwidth \\
 		--palette $hmpalette \\
-		--matrix $mmap_dir/paf_matrix.tsv \\
+		--matrix $mmap_dir/paf_matrix$size_prefix.tsv \\
 		--prefix 'colinear_bases' \\
 		--title '% of total bases in pairwise alignments' \\
 		--minsize $msize \\
 		--fontsize $hfsize \\
 		--vmax $hmax \\
 		--vmin $hmin \\
+		$size_label_flag \\
 		$hm_vauto_flag \\
 		2>> $log_err
 	") == 0 or checksig();
@@ -1400,6 +1406,61 @@ unless ($no_linemap){
 
 }
 
+### Heatmaps
+unless ($no_heatmap){
+
+	$tstart = time();
+	print ERROR "\n### paf_to_hm.py (gene clusters) ###\n";
+	print "\n# Heatmaps (gene clusters):\n";
+
+	logs(\*LOG, 'paf_to_hm.py', 'start');
+
+	foreach my $gap (@gaps){
+
+		my $clusdir = $cluster_synteny.'/gap_'.$gap.'/CLUSTERS';
+		my $cpafdir = $cluster_synteny.'/gap_'.$gap.'/PAF';
+		if ($min_asize){
+			$cpafdir = $cluster_synteny.'/gap_'.$gap.'/PAF_MINSIZE';
+		}
+
+		my $msize = 1;
+		my $size_label_flag = '';
+		my $size_prefix = '';
+
+		if ($min_asize){
+			$msize = $min_asize;
+			$size_label_flag = '--sizelab';
+			$size_prefix = ".m$msize";
+		}
+
+
+		system("
+			$plot_path/paf_to_heatmap.py \\
+			--paf $cpafdir/*.paf \\
+			--fasta $genome_dir/*.fasta \\
+			--outdir $paf_hm_dir \\
+			--height $hheight \\
+			--width $hwidth \\
+			--palette $hmpalette \\
+			--matrix $cluster_synteny/paf_matrix$size_prefix.gap_${gap}.tsv \\
+			--prefix proteins_in_clusters \\
+			--suffix gap_$gap \\
+			--title '% of bases in protein-coding gene clusters (gap = '$gap')' \\
+			--minsize $msize \\
+			--fontsize $hfsize \\
+			--vmax $hmax \\
+			--vmin $hmin \\
+			$hm_vauto_flag \\
+			$size_label_flag \\
+			2>> $log_err
+		") == 0 or checksig();
+
+		logs(\*LOG, 'paf_to_hm.py', 'end');
+
+	}
+
+}
+
 ### Create a cluster summary table
 
 print ERROR "\n### Cluster summary table ###\n";
@@ -1527,41 +1588,6 @@ foreach my $gap (keys %matrices){
 	}
 
 	close MM;
-
-}
-
-### Create cluster summary table as heatmap with matplotlib
-
-unless ($no_heatmap){
-
-	$tstart = time();
-	print ERROR "\n### protein_cluster_hm.py (gene clusters) ###\n";
-	print "\n# Heatmaps (gene clusters):\n";
-
-	my @hm_files;
-	foreach my $gap (@gaps){
-		my $matrix_file = $cluster_synteny."/gap_$gap"."/matrix_gap_$gap.tsv";
-		push (@hm_files, $matrix_file);
-	}
-
-	logs(\*LOG, 'protein_cluster_hm.py', 'start');
-
-	system("
-		$plot_path/protein_cluster_hm.py \\
-		--tsv @hm_files \\
-		--outdir $paf_hm_dir \\
-		--threads $pthreads \\
-		--height $hheight \\
-		--width $hwidth \\
-		--palette $hmpalette \\
-		--fontsize $hfsize \\
-		--vmax $hmax \\
-		--vmin $hmin \\
-		$hm_vauto_flag \\
-		2>> $log_err
-	") == 0 or checksig();
-
-	logs(\*LOG, 'protein_cluster_hm.py', 'end');
 
 }
 

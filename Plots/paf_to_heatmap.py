@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.2e'
-updated = '2025-03-26'
+version = '0.3'
+updated = '2025-03-27'
 name = 'paf_to_heatmap.py'
 
 import sys
@@ -39,9 +39,11 @@ OPTIONS:
 -c (--palette)  Seaborn color palette [Default: winter_r]
                 # See https://www.practicalpythonfordatascience.com/ap_seaborn_palette
                 # for a list of color palettes
---prefix        Heatmap file prefix
---title         Heatmap title
+--prefix        Heatmap file prefix [Default: colinear_bases]
+--suffix        Heatmap file prefix [Default: mmap]
+--title         Heatmap title [Default: % of total bases in pairwise alignments]
 --minsize       Minimum alignment size to plot [Default: 1]
+--sizelab       Add size label to output file(s)
 --fontsize      Font size [Default: 8]
 --vmax          Set maximum color bar value [Default: 100]
 --vmin          Set minimum color bar value [Default: 0]
@@ -67,6 +69,8 @@ cmd.add_argument("-w", "--width", default=10)
 cmd.add_argument("-c", "--palette", default='winter_r')
 cmd.add_argument("-x", "--matrix", default='matrix.tsv')
 cmd.add_argument("--prefix", default='colinear_bases')
+cmd.add_argument("--suffix", default='mmap')
+cmd.add_argument("--sizelab", action='store_true')
 cmd.add_argument("--title", default='% of total bases in pairwise alignments')
 cmd.add_argument("--minsize", type=int, default=1)
 cmd.add_argument("--fontsize", type=int, default=8)
@@ -84,6 +88,8 @@ width = args.width
 matrix_file = args.matrix
 color_palette = args.palette
 prefix = args.prefix
+suffix = args.suffix
+sizelab = args.sizelab
 title = args.title
 minsize = args.minsize
 fontsize = args.fontsize
@@ -237,10 +243,14 @@ with open (matrix_file) as f:
 
     data = pd.read_csv(matrix_file, sep="\t", header=0, index_col=0)
 
-    clustered_png = f"{pngdir}/colinear_bases.m{minsize}.mmap.clustered.png"
-    clustered_svg = f"{svgdir}/colinear_bases.m{minsize}.mmap.clustered.svg"
-    heatmap_png = f"{pngdir}/colinear_bases.m{minsize}.mmap.heatmap.png"
-    heatmap_svg = f"{svgdir}/colinear_bases.m{minsize}.mmap.heatmap.svg"
+    size_label = ''
+    if sizelab:
+        size_label = f".m{minsize}"
+
+    clustered_png = f"{pngdir}/{prefix}{size_label}.{suffix}.clustered.png"
+    clustered_svg = f"{svgdir}/{prefix}{size_label}.{suffix}.clustered.svg"
+    heatmap_png = f"{pngdir}/{prefix}{size_label}.{suffix}.heatmap.png"
+    heatmap_svg = f"{svgdir}/{prefix}{size_label}.{suffix}.heatmap.svg"
 
     ## Clustered heatmaps
     cm = None
