@@ -1,12 +1,10 @@
 # SYNY CHANGE LOG
 
 ## SYNY-v1.2b
-- `run_syny.pl`: Standardized heatmap plots. Both genome alignments and gene clusters heatmaps are now plotted with `paf_to_heatmap.py`. If --min_asize is requested, matrices and plots names are now adjusted accordingly.
 - `run_syny.pl`: Added the `--min_asize`command line option to filter out alignments/clusters smaller than integer value (e.g. --min_asize 5000)
 - `run_syny.pl`, `get_paf.pl`, `paf_metrics.py`: Added the `--no_sec` command line option to filter out secondary alignments from minimap2 alignments.
 - `gff3_to_gbff.pl`: Fixed a bug that crashed the script when dealing with contigs without annotations.
 - `jgi_to_ncbi_gff.pl`: Added a new script to convert JGI GFF files to a NCBI-like GFF3 format compatible with `gff3_to_gbff.pl`.
-- Removed deprecated `protein_cluster_hm.py`.
 
 ## SYNY-v1.2a
 - Now generates VCF files from minimap2 genome alignments (min. alignment length = 1000 bp) automatically. VCF file creation can be turned off with the new `--no_vcf` flag in `run_syny.pl` (and/or in `get_paf.pl`). Note that these files can become quite large depending on the size of the genomes being compared.
