@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'gff3_to_gbff.pl';
-my $version = '0.1b';
-my $updated = '2025-01-31';
+my $version = '0.1c';
+my $updated = '2025-04-01';
 
 use strict;
 use warnings;
@@ -26,8 +26,8 @@ SYNOPSIS    Converts GFF3 + FASTA files to pseudo-GenBank flat file (GBFF) forma
 REQS        GFF3 and FASTA files must have the same file prefixes; e.g.
             genome_1.fna genome_1.gff
 
-NOTE        Tested with NCBI GFF3 files; expects gene/mRNA/exon/CDS entries
-            in the 'type' column
+NOTE        Tested with NCBI/AGAT GFF3/GTF files;
+            expects gene/(mRNA|transcript)/exon/CDS entries in the 'type' column
 
 COMMAND     $name \\
               --fasta *.fasta \\
@@ -39,6 +39,7 @@ COMMAND     $name \\
 OPTIONS:
 -f (--fasta)    FASTA file(s) to convert (gziped files are supported)
 -g (--gff3)     GFF3 files to convert (gziped files are supported)
+-t (--type)     GFF3 type (ncbi, agat) [Default: ncbi]
 -o (--outdir)   Output directory [Default: GBFF]
 -z (--gzip)     Compress the GBFF output files
 -c (--gcode)    NCBI genetic code [Default: 1]
@@ -59,6 +60,7 @@ unless (@ARGV){
 
 my @fasta;
 my @gff3;
+my $gtype = 'ncbi';
 my $outdir = 'GBFF';
 my $gzip_flag;
 my $gc = 1;
@@ -67,6 +69,7 @@ my $sc_version;
 GetOptions(
     'f|fasta=s@{1,}' => \@fasta,
     'g|gff3=s@{1,}' => \@gff3,
+    't|type=s' => \$gtype,
     'o|outdir=s' => \$outdir,
     'z|gzip' => \$gzip_flag,
     'c|gcode=i' => \$gc,
@@ -83,6 +86,25 @@ if ($sc_version){
     print "Script:     $name\n";
     print "Version:    $version\n";
     print "Updated:    $updated\n\n";
+    exit(0);
+}
+
+#########################################################################
+### Checking gff3 type
+#########################################################################
+
+my %known_types = (
+    'ncbi' => '1',
+    'agat' => '1'
+);
+
+my $entry = lc($gtype);
+unless (exists $known_types{$entry}){
+    print ("\nFile type $entry is unknown. Possible entries are: ");
+    foreach my $key (sort (keys %known_types)){
+        print $key." ";
+    }
+    print "\n\n";
     exit(0);
 }
 
@@ -182,6 +204,8 @@ while (my $fasta = shift@fasta){
     my %rnas;
     my $gene_counter = 0;
 
+    my %agat_products;
+
     while (my $line = <GFF3>){
 
         chomp $line;
@@ -217,21 +241,52 @@ while (my $fasta = shift@fasta){
             my $product;
 
             foreach my $attribute (@attributes){
-                if ($attribute =~ /^ID=(.*)/){
-                    $feature_id = $1; 
+
+                if ($entry eq 'ncbi'){
+                    if ($attribute =~ /^ID=(.*)/){
+                        $feature_id = $1; 
+                    }
+                    if ($attribute =~ /^Parent=(.*)/){
+                        $parent_id = $1; 
+                    }
+                    if ($attribute =~ /^Name=(.*)/){
+                        $feature_name = $1; 
+                    }
+                    if ($attribute =~ /^locus_tag=(.*)/){
+                        $locus_tag = $1; 
+                    }
+                    if ($attribute =~ /^product=(.*)/){
+                        $product = $1; 
+                    }
                 }
-                if ($attribute =~ /^Parent=(.*)/){
-                    $parent_id = $1; 
+
+                elsif ($entry eq 'agat'){
+                    if ($attribute =~ /^\s?gene_id \"(.*)\"/){
+                        $locus_tag = $1;
+                        if ($type eq 'gene'){
+                            $feature_name = $locus_tag;
+                        }
+                    }
+                    if ($attribute =~ /^\s?ID \"(.*)\"/){
+                        $feature_id = $1;
+                        if  ($type ne 'gene'){
+                            $feature_name = $feature_id;
+                        }
+                    }
+                    if ($attribute =~ /^\s?Name \"(.*)\"/){
+                        $product = $1;
+                        $agat_products{$feature_id} = $product;
+                    }
+                    if ($attribute =~ /^\s?Parent \"(.*)\"/){
+                        $parent_id = $1; 
+                    }
                 }
-                if ($attribute =~ /^Name=(.*)/){
-                    $feature_name = $1; 
-                }
-                if ($attribute =~ /^locus_tag=(.*)/){
-                    $locus_tag = $1; 
-                }
-                if ($attribute =~ /^product=(.*)/){
-                    $product = $1; 
-                }
+
+            }
+
+            ## Renaming agat transcript key to mRNA
+            if ($type eq 'transcript'){
+                $type = 'mRNA';
             }
 
             if ($type eq 'gene'){
@@ -259,25 +314,53 @@ while (my $fasta = shift@fasta){
             }
 
             elsif ($type eq 'exon'){
+
                 my $coordinates = $start.'..'.$end;
                 push(@{$rnas{$parent_id}{'coordinates'}}, $coordinates);
-                if ($product){
-                    $rnas{$parent_id}{'product'} = $product;
+
+                ## AGAT doesn't put products on exon lines (in the files tested)
+                if ($entry eq 'agat'){
+                    if (exists $agat_products{$parent_id}){
+                        $rnas{$parent_id}{'product'} = $agat_products{$parent_id};
+                    }
+                    else{
+                        $rnas{$parent_id}{'product'} = 'undefined product';
+                    }
                 }
                 else{
-                    $rnas{$parent_id}{'product'} = 'undefined product';
+                    if ($product){
+                        $rnas{$parent_id}{'product'} = $product;
+                    }
+                    else{
+                        $rnas{$parent_id}{'product'} = 'undefined product';
+                    }
                 }
             }
 
             elsif ($type eq 'CDS'){
+
                 my $coordinates = $start.'..'.$end;
                 push(@{$rnas{$parent_id}{'coordinates_cds'}}, $coordinates);
-                if ($product){
-                    $rnas{$parent_id}{'product'} = $product;
+
+                ## AGAT doesn't put products on CDS lines (in the files tested)
+                if ($entry eq 'agat'){
+                    if (exists $agat_products{$parent_id}){
+                        $rnas{$parent_id}{'product'} = $agat_products{$parent_id};
+                    }
+                    else{
+                        $rnas{$parent_id}{'product'} = 'undefined product';
+                    }
                 }
+
                 else{
-                    $rnas{$parent_id}{'product'} = 'undefined product';
+                    if ($product){
+                        $rnas{$parent_id}{'product'} = $product;
+                    }
+                    else{
+                        $rnas{$parent_id}{'product'} = 'undefined product';
+                    }
                 }
+
             }
 
         }
