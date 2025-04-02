@@ -4,7 +4,7 @@ SYNY - Version 1.2b
 #############################################################
 
 # Main                                  Versions
-run_syny.pl                             0.9
+run_syny.pl                             0.9a
 setup_syny.pl                           0.3a
 
 # Alignments
@@ -25,12 +25,13 @@ nucleotide_biases.pl                    0.9
 paf_to_barplot.py                       0.4b
 paf_to_dotplot.py                       0.5e
 paf_to_heatmap.py                       0.3
+protein_cluster_hm.py                   0.3e
 
 # Utils
 check_mp_colors.py                      0.3
 check_versions.pl                       0.1c
 fasta_to_gbff.pl                        0.1a
-gff3_to_gbff.pl                         0.1b
+gff3_to_gbff.pl                         0.1c
 jgi_to_ncbi_gff.pl                      0.1a
 list_maker.pl                           0.6.0a
 orient_fastas_to_reference.py           0.3.5
