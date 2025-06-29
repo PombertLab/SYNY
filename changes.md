@@ -3,8 +3,10 @@
 ## SYNY-v1.2b
 - `run_syny.pl`: Added the `--min_asize`command line option to filter out alignments/clusters smaller than integer value (e.g. --min_asize 5000)
 - `run_syny.pl`: `get_paf.pl`, `paf_metrics.py`: Added the `--no_sec` command line option to filter out secondary alignments from minimap2 alignments.
+- `gff3_to_gbff.pl`: Annotations in the GFF3 files are now sorted by start positions => annots in GFF3 files can be out-of-order
 - `gff3_to_gbff.pl`: Fixed a bug that crashed the script when dealing with contigs without annotations.
 - `gff3_to_gbff.pl`: Added preliminary support for AGAT-converted files (tested on a few user-provided files).
+- `gff3_to_gbff.pl`: Added the `--id` command line option to label products by ID tags. Can be useful with GFF3 files that do not contain product descriptions.
 - `jgi_to_ncbi_gff.pl`: Added a new script to convert JGI GFF files to a NCBI-like GFF3 format compatible with `gff3_to_gbff.pl`.
 
 ## SYNY-v1.2a

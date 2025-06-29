@@ -31,7 +31,7 @@ protein_cluster_hm.py                   0.3e
 check_mp_colors.py                      0.3
 check_versions.pl                       0.1c
 fasta_to_gbff.pl                        0.1a
-gff3_to_gbff.pl                         0.1c
+gff3_to_gbff.pl                         0.1d
 jgi_to_ncbi_gff.pl                      0.1a
 list_maker.pl                           0.6.0a
 orient_fastas_to_reference.py           0.3.5

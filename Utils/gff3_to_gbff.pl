@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'gff3_to_gbff.pl';
-my $version = '0.1c';
-my $updated = '2025-04-01';
+my $version = '0.1d';
+my $updated = '2025-06-29';
 
 use strict;
 use warnings;
@@ -42,6 +42,7 @@ OPTIONS:
 -t (--type)     GFF3 type (ncbi, agat) [Default: ncbi]
 -o (--outdir)   Output directory [Default: GBFF]
 -z (--gzip)     Compress the GBFF output files
+-i (--id)       Use the ID field as /product ## Can be useful if GFF3 lacks product entries
 -c (--gcode)    NCBI genetic code [Default: 1]
                 1  - The Standard Code
                 2  - The Vertebrate Mitochondrial Code
@@ -63,6 +64,7 @@ my @gff3;
 my $gtype = 'ncbi';
 my $outdir = 'GBFF';
 my $gzip_flag;
+my $id_flag;
 my $gc = 1;
 my $verbose;
 my $sc_version;
@@ -72,6 +74,7 @@ GetOptions(
     't|type=s' => \$gtype,
     'o|outdir=s' => \$outdir,
     'z|gzip' => \$gzip_flag,
+    'i|id' => \$id_flag,
     'c|gcode=i' => \$gc,
     'v|verbose' => \$verbose,
     'version' => \$sc_version
@@ -385,7 +388,20 @@ while (my $fasta = shift@fasta){
         ## Annotations
         my @features = @{$contigs{$sequence}};
 
+        ## Sorting annotations by start positions => annotations in GFF3 files
+        ## can be out-of-order
+
+        my %feat;
         foreach my $feature (@features){
+            if (exists $feat{$feature}){
+                print "ID = $feature is not unique!\n";
+            }
+            $feat{$feature} = $genes{$feature}{'start'};
+        }
+
+        my @sorted_features = sort {$feat{$a} <=> $feat{$b}}(keys %feat);
+
+        foreach my $feature (@sorted_features){
 
             ## Gene features
             my $strand = $genes{$feature}{'strand'};
@@ -406,6 +422,10 @@ while (my $fasta = shift@fasta){
             foreach my $rchild (@{$genes{$feature}{'children'}}){
 
                 my $rproduct = $rnas{$rchild}{'product'};
+                if ($id_flag){
+                    $rproduct = $feature;
+                }
+
                 my @cd = @{$rnas{$rchild}{'coordinates'}};
 
                 my %hash;
