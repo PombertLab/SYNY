@@ -2,7 +2,7 @@
 ## Pombert Lab, 2024
 
 my $name = 'gff3_to_gbff.pl';
-my $version = '0.1d';
+my $version = '0.2';
 my $updated = '2025-06-29';
 
 use strict;
@@ -449,16 +449,19 @@ while (my $fasta = shift@fasta){
                     }
                 }
                 else{
+
                     if ($strand eq '+'){
                         print GBFF "     $ftype            ".'join('.$scd[0].")\n";
                     }
                     else {
                         print GBFF "     $ftype            ".'complement(join(';
-                        for (0..$#scd - 1){
-                            print GBFF "$scd[$_],";
-                        }
-                        print GBFF "$scd[-1]))\n";
                     }
+
+                    for (0..$#scd - 1){
+                        print GBFF "$scd[$_],";
+                    }
+                    print GBFF "$scd[-1]))\n";
+
                 }
                 
                 print GBFF "                     /locus_tag=\"$lc\"\n";
@@ -495,11 +498,13 @@ while (my $fasta = shift@fasta){
                         }
                         else {
                             print GBFF "     CDS             ".'complement(join(';
-                            for (0..$#scd - 1){
-                                print GBFF "$scd[$_],";
-                            }
-                            print GBFF "$scd[-1]))\n";
                         }
+
+                        for (0..$#scd - 1){
+                            print GBFF "$scd[$_],";
+                        }
+                        print GBFF "$scd[-1]))\n";
+
                     }
                     
                     print GBFF "                     /locus_tag=\"$lc\"\n";
