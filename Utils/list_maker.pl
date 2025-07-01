@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.6.0a';
-my $updated = '2024-12-18';
+my $version = '0.6.1';
+my $updated = '2025-07-01';
 
 use strict;
 use warnings;
@@ -298,19 +298,36 @@ foreach my $input_file (@input_files){
 					undef $CDS;
 				}
 
-				## Gather CDS metadata from locus tag (or GeneID if locus_tag is missing)
+				## Gather CDS metadata from locus tag (or GeneID/gene tag if locus_tag is missing)
 				if ($line =~ /^\s{21}\/locus_tag="(.*)"/){
 					$locus = $1;
 					$locus =~ s/\W/\_/g;
 					$locus_tag_flag = 1;
 				}
 
+				## From GeneID tag
 				if ($line =~ /^\s{21}\/db_xref="GeneID:(\d+)"/){
 
 					my $gene_id_locus = $1;
 
 					if ($locus_tag_flag == 0){
 						$locus = $gene_id_locus;
+					}
+
+					$locus_tag_flag = 0;
+
+				}
+
+				## From gene tag; gene tags can be dupllicated
+				## only to be used as last resort if locus_tags/GeneIDs are missing
+				elsif ($line =~ /^\s{21}\/gene="(\S+)\"/){
+
+					my $gene_id_locus = $1;
+					$gene_id_locus =~ s/\W/\_/g;
+
+					if ($locus_tag_flag == 0){
+						$locus = $gene_id_locus;
+						# print $locus."\t"; ## Debug
 					}
 
 					$locus_tag_flag = 0;
@@ -337,6 +354,7 @@ foreach my $input_file (@input_files){
 				elsif ($line =~ /^\s{21}\/translation="([a-zA-Z]+)"*/){
 					$sequence = $1;
 					$translate = 1;
+					# print $product."\t"; # Debug
 				}
 				elsif ($translate){
 					if ($line =~/^\s{21}([a-zA-Z]+)/){
@@ -344,18 +362,23 @@ foreach my $input_file (@input_files){
 					}
 					else{
 
+						# print $sequence."\n"; # Debug
+
 						my $tr_start,
 						my $tr_end;
 						my $tr_strand;
 
 						if (exists $location_data{$locus}){
 							($tr_start,$tr_end,$tr_strand) = @{$location_data{$locus}};
+							# print "$tr_start,$tr_end,$tr_strand\n"; # Debug
 						}
 						else{
 							next;
 						}
 
 						unless (exists $isoform{$locus}){ ## Keeping only the first isoform
+
+							# print "X\n"; # debug
 
 							$isoform{$locus} = 1;
 
@@ -526,6 +549,10 @@ foreach my $input_file (@input_files){
 				}
 				## or from gene_id (if no locus_tag)
 				elsif ($line =~ /^\s{21}\/db_xref="GeneID:(\d+)"/){
+					$locus = $1;
+					@{$location_data{$locus}} = ($start,$end,$strand);
+				}
+				elsif ($line =~ /^\s{21}\/gene="(\S+)\"/){
 					$locus = $1;
 					@{$location_data{$locus}} = ($start,$end,$strand);
 				}
