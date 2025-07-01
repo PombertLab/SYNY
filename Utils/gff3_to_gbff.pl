@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'gff3_to_gbff.pl';
-my $version = '0.2';
-my $updated = '2025-06-29';
+my $version = '0.2a';
+my $updated = '2025-07-01';
 
 use strict;
 use warnings;
@@ -451,7 +451,7 @@ while (my $fasta = shift@fasta){
                 else{
 
                     if ($strand eq '+'){
-                        print GBFF "     $ftype            ".'join('.$scd[0].")\n";
+                        print GBFF "     $ftype            ".'join(';
                     }
                     else {
                         print GBFF "     $ftype            ".'complement(join(';
@@ -460,7 +460,14 @@ while (my $fasta = shift@fasta){
                     for (0..$#scd - 1){
                         print GBFF "$scd[$_],";
                     }
-                    print GBFF "$scd[-1]))\n";
+                    print GBFF "$scd[-1]";
+
+                    if ($strand eq '+'){
+                        print GBFF ")\n";
+                    }
+                    else {
+                        print GBFF "))\n";
+                    }
 
                 }
                 
@@ -494,7 +501,7 @@ while (my $fasta = shift@fasta){
                     }
                     else{
                         if ($strand eq '+'){
-                            print GBFF "     CDS             ".'join('.$scd[0].")\n";
+                            print GBFF "     CDS             ".'join(';
                         }
                         else {
                             print GBFF "     CDS             ".'complement(join(';
@@ -503,7 +510,14 @@ while (my $fasta = shift@fasta){
                         for (0..$#scd - 1){
                             print GBFF "$scd[$_],";
                         }
-                        print GBFF "$scd[-1]))\n";
+                        print GBFF "$scd[-1]";
+                        
+                        if ($strand eq '+'){
+                            print GBFF ")\n";
+                        }
+                        else {
+                            print GBFF "))\n";
+                        }
 
                     }
                     
