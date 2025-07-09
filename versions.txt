@@ -16,7 +16,7 @@ paf_minsize.pl                          0.1b
 # Clusters
 clusters2links.pl                       0.3a
 clusters_to_paf.pl                      0.2a
-get_synteny.pl                          0.7.3a
+get_synteny.pl                          0.7.4
 id_conserved_regions.pl                 0.5.4
 
 # Plots
@@ -33,7 +33,7 @@ check_versions.pl                       0.1c
 fasta_to_gbff.pl                        0.1a
 gff3_to_gbff.pl                         0.2a
 jgi_to_ncbi_gff.pl                      0.1a
-list_maker.pl                           0.6.1
+list_maker.pl                           0.6.3
 orient_fastas_to_reference.py           0.3.5
 
 #############################################################
