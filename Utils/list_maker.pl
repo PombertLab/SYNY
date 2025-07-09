@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.6.1';
-my $updated = '2025-07-01';
+my $version = '0.6.2';
+my $updated = '2025-07-09';
 
 use strict;
 use warnings;
@@ -312,6 +312,7 @@ foreach my $input_file (@input_files){
 
 					if ($locus_tag_flag == 0){
 						$locus = $gene_id_locus;
+						$locus =~ s/\W/\_/g;
 					}
 
 					$locus_tag_flag = 0;
@@ -327,6 +328,7 @@ foreach my $input_file (@input_files){
 
 					if ($locus_tag_flag == 0){
 						$locus = $gene_id_locus;
+						$locus =~ s/\W/\_/g;
 						# print $locus."\t"; ## Debug
 					}
 
@@ -550,10 +552,12 @@ foreach my $input_file (@input_files){
 				## or from gene_id (if no locus_tag)
 				elsif ($line =~ /^\s{21}\/db_xref="GeneID:(\d+)"/){
 					$locus = $1;
+					$locus =~ s/\W/\_/g;
 					@{$location_data{$locus}} = ($start,$end,$strand);
 				}
 				elsif ($line =~ /^\s{21}\/gene="(\S+)\"/){
 					$locus = $1;
+					$locus =~ s/\W/\_/g;
 					@{$location_data{$locus}} = ($start,$end,$strand);
 				}
 			}
