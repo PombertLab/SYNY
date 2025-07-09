@@ -8,6 +8,8 @@
 - `gff3_to_gbff.pl`: Added preliminary support for AGAT-converted files (tested on a few user-provided files).
 - `gff3_to_gbff.pl`: Added the `--id` command line option to label products by ID tags. Can be useful with GFF3 files that do not contain product descriptions.
 - `jgi_to_ncbi_gff.pl`: Added a new script to convert JGI GFF files to a NCBI-like GFF3 format compatible with `gff3_to_gbff.pl`.
+- `list_maker.pl`: If locus_tags and GeneID tags are missing from GBFF files, now checks for gene tags and assign automatic locus_tags.
+- `get_synteny.pl`: Fixed a bug with median calculations if # of values < 2.
 
 ## SYNY-v1.2a
 - Now generates VCF files from minimap2 genome alignments (min. alignment length = 1000 bp) automatically. VCF file creation can be turned off with the new `--no_vcf` flag in `run_syny.pl` (and/or in `get_paf.pl`). Note that these files can become quite large depending on the size of the genomes being compared.
