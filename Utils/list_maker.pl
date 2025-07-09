@@ -2,7 +2,7 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.6.2';
+my $version = '0.6.3';
 my $updated = '2025-07-09';
 
 use strict;
@@ -219,6 +219,9 @@ foreach my $input_file (@input_files){
 
 		my $locus_tag_flag = 0;
 
+		my $autolocus_tag;
+		my $locus_counter = 0;
+
 		while (my $line = <GBK>){
 			
 			chomp $line;
@@ -319,17 +322,12 @@ foreach my $input_file (@input_files){
 
 				}
 
-				## From gene tag; gene tags can be dupllicated
-				## only to be used as last resort if locus_tags/GeneIDs are missing
+				## From gene tag; gene tags can be duplicated; using autolocus_tags instead
 				elsif ($line =~ /^\s{21}\/gene="(\S+)\"/){
 
-					my $gene_id_locus = $1;
-					$gene_id_locus =~ s/\W/\_/g;
-
 					if ($locus_tag_flag == 0){
-						$locus = $gene_id_locus;
+						$locus = $autolocus_tag;
 						$locus =~ s/\W/\_/g;
-						# print $locus."\t"; ## Debug
 					}
 
 					$locus_tag_flag = 0;
@@ -502,6 +500,10 @@ foreach my $input_file (@input_files){
 				if ($line =~ /complement/){
 					$strand = "-";
 				}
+
+				$locus_counter++;
+				$autolocus_tag = $contig.'_'.$locus_counter;
+
 			}
 			## Entering gene metadata when there is gene on the edge of a circular contig
 			elsif ($line =~ /^\s{5}gene\s{12}(?:complement\()*(?:order\()*(?:join\()*(.*)\)/){
@@ -515,15 +517,23 @@ foreach my $input_file (@input_files){
 				if ($line =~ /complement/){
 					$strand = "-";
 				}
+
+				$locus_counter++;
+				$autolocus_tag = $contig.'_'.$locus_counter;
+
 			}
 			elsif ($line =~ /^\s{5}gene\s{12}(?:complement\()*(?:order\()*(?:join\()*(.*)/){
 				$gene = 1;
 				$section = 1;
 				$sections = $1;
-			}
 
+				$locus_counter++;
+				$autolocus_tag = $contig.'_'.$locus_counter;
+
+			}
 			## Accessing gene metadata
 			elsif ($gene){
+
 				## Leaving gene metadata
 				if ($line !~ /^\s{21}/){
 					undef $gene;
@@ -555,8 +565,10 @@ foreach my $input_file (@input_files){
 					$locus =~ s/\W/\_/g;
 					@{$location_data{$locus}} = ($start,$end,$strand);
 				}
+
+				## Using autolocus_tags; gene tags create problems (duplicated names)
 				elsif ($line =~ /^\s{21}\/gene="(\S+)\"/){
-					$locus = $1;
+					$locus = $autolocus_tag;
 					$locus =~ s/\W/\_/g;
 					@{$location_data{$locus}} = ($start,$end,$strand);
 				}
