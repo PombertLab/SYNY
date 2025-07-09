@@ -2,8 +2,8 @@
 ## Pombert Lab 2022
 
 my $name = 'get_synteny.pl';
-my $version = '0.7.3a';
-my $updated = '2024-04-13';
+my $version = '0.7.4';
+my $updated = '2025-07-09';
 
 use strict;
 use warnings;
@@ -429,7 +429,17 @@ if ($median_pos =~ /^\d+$/){
 else {
 	my $med1 = int($median_pos);
 	my $med2 = $med1 + 1;
-	$median = (($len[$med1] + $len[$med2])/2);
+	## Calculate median if possible
+	if (scalar(@len) >= 2){
+		$median = (($len[$med1] + $len[$med2])/2);
+	}
+	## Otherwise set median value accordingly
+	elsif (scalar(@len) == 1){
+		$median = $len[$med1];
+	}
+	else {
+		$median = 0;
+	}
 }
 $median = sprintf("%.0f", $median);
 
