@@ -1,5 +1,9 @@
 # SYNY CHANGE LOG
 
+## SYNY-v1.3.1
+### Bugfix release
+- `paf_to_barplot.py`, `paf_to_dotplot.py`, `linear_maps.py`: Added a try/except to prevent (rare) multiprocessing pool crashes; if those are detected, plots will be generated using a single-threaded for loop instead. 
+
 ## SYNY-v1.3.0
 - Changed versioning to PEP 440
 - `run_syny.pl`: Added the `--min_asize`command line option to filter out alignments/clusters smaller than integer value (e.g. --min_asize 5000)
