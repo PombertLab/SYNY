@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
 
-version = '0.5e'
-updated = '2024-06-06'
+version = '0.6.0'
+updated = '2025-12-21'
 name = 'paf_to_dotplot.py'
 
 import sys
@@ -72,8 +72,8 @@ cmd.add_argument("-a", "--palette")
 cmd.add_argument("-n", "--noticks", action='store_true')
 cmd.add_argument("--wdis", default=0.05)
 cmd.add_argument("--hdis", default=0.1)
-cmd.add_argument("--fontsize", default=8)
-cmd.add_argument("--threads", default=16)
+cmd.add_argument("--fontsize", type=int, default=8)
+cmd.add_argument("--threads", type=int, default=16)
 cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
@@ -89,13 +89,13 @@ color_palette = args.palette
 noticks = args.noticks
 wdis = args.wdis
 hdis = args.hdis
-fontsize = int(args.fontsize)
-threads = int(args.threads)
+fontsize = args.fontsize
+threads = args.threads
 scversion = args.version
 
-#########################################################################
+################################################################################
 ### Version
-#########################################################################
+################################################################################
 
 if scversion:
     print ("")
@@ -389,6 +389,17 @@ def dotplot(paf):
     plt.cla()
     plt.close('all')
 
-## Run
-pool = Pool(threads)
-pool.map(dotplot, paf_files)
+################################################################################
+## Main
+################################################################################
+
+if __name__ == "__main__":
+    try:
+        pool = Pool(threads)
+        pool.map(dotplot, paf_files)
+        pool.close()
+        pool.join()
+    except:
+        print("Multiprocessing pool misbehaving. Running in single-threaded mode...")
+        for paf in paf_files:
+            dotplot(paf)

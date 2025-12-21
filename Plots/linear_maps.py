@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ## Pombert lab, 2024
-version = '0.1e'
-updated = '2024-06-21'
+version = '0.2.0'
+updated = '2025-12-21'
 name = 'linear_maps.py'
 
 import sys
@@ -60,11 +60,11 @@ cmd.add_argument("-p", "--paf", nargs='*')
 cmd.add_argument("-o", "--outdir", default='./')
 cmd.add_argument("-c", "--rpalette", default='Spectral')
 cmd.add_argument("-x", "--xpalette", default='Blues')
-cmd.add_argument("-r", "--rotation", default=90)
-cmd.add_argument("-h", "--height", default=5)
-cmd.add_argument("-w", "--width", default=20)
-cmd.add_argument("--fontsize", default=8)
-cmd.add_argument("--threads", default=16)
+cmd.add_argument("-r", "--rotation", type=int, default=90)
+cmd.add_argument("-h", "--height", type=int, default=5)
+cmd.add_argument("-w", "--width", type=int, default=20)
+cmd.add_argument("--fontsize", type=int, default=8)
+cmd.add_argument("--threads", type=int, default=16)
 cmd.add_argument("--version", action='store_true')
 args = cmd.parse_args()
 
@@ -73,11 +73,11 @@ paf_files = args.paf
 outdir = args.outdir
 rpalette = args.rpalette
 xpalette = args.xpalette
-rotation = int(args.rotation)
-height = int(args.height)
-width = int(args.width)
-fontsize = int(args.fontsize)
-threads = int(args.threads)
+rotation = args.rotation
+height = args.height
+width = args.width
+fontsize = args.fontsize
+threads = args.threads
 scversion = args.version
 
 #########################################################################
@@ -368,6 +368,17 @@ def linemap(paf):
     plt.cla()
     plt.close('all')
 
-## Run
-pool = Pool(threads)
-pool.map(linemap, paf_files)
+################################################################################
+## Main
+################################################################################
+
+if __name__ == "__main__":
+    try:
+        pool = Pool(threads)
+        pool.map(linemap, paf_files)
+        pool.close()
+        pool.join()
+    except:
+        print("Multiprocessing pool misbehaving. Running in single-threaded mode...")
+        for paf in paf_files:
+            linemap(paf)
