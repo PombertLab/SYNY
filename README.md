@@ -5,6 +5,7 @@
 The SYNY pipeline investigates gene collinearity (synteny) between genomes by reconstructing clusters from conserved pairs of protein-coding genes identified from [DIAMOND](https://github.com/bbuchfink/diamond) homology searches. It also infers collinearity from pairwise genome alignments with [minimap2](https://github.com/lh3/minimap2) or [MashMap3](https://github.com/marbl/MashMap).
 
 [![DOI](https://zenodo.org/badge/491274225.svg)](https://zenodo.org/doi/10.5281/zenodo.10790180)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/syny/README.html)
 
 <details open>
   <summary><b><i>Show/hide: TOC</i></b></summary>
