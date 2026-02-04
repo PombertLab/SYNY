@@ -288,7 +288,7 @@ while (my $fasta = shift@fasta){
             }
 
             ## Renaming agat transcript key to mRNA
-            if ($gtype eq 'agat'){
+            if ($entry eq 'agat'){
                 if ($type eq 'transcript'){
                     $type = 'mRNA';
                 }
