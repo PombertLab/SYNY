@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'gff3_to_gbff.pl';
-my $version = '0.2a';
-my $updated = '2025-07-01';
+my $version = '0.2b';
+my $updated = '2026-02-04';
 
 use strict;
 use warnings;
@@ -288,8 +288,10 @@ while (my $fasta = shift@fasta){
             }
 
             ## Renaming agat transcript key to mRNA
-            if ($type eq 'transcript'){
-                $type = 'mRNA';
+            if ($gtype eq 'agat'){
+                if ($type eq 'transcript'){
+                    $type = 'mRNA';
+                }
             }
 
             if ($type eq 'gene'){
