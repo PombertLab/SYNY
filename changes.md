@@ -1,5 +1,14 @@
 # SYNY CHANGE LOG
 
+## SYNY-v1.3.2
+### Bugfix release
+- `list_maker.pl`: Fixed an issue arising from LOCUS and ACCESSION tags being different in NCBI GBFF files, e.g.:<br>
+LOCUS JBLUPJ010000002<br>
+ACCESSION JBLUPJ010000002 JBLUPJ010000000<br>
+list_maker.pl now looks for the Accession base (located to the right) and comprehensively reassigns the missing NCBI accessions.
+- `gff3_to_gbff.pl`: Fixed an issue where transcript entries in all GBFF files were improperly reassigned as mRNA; this reassignment was intended only for AGAT GBFF files.
+- `gff3_to_gbff.pl` and `fasta_to_gbff.pl`: Added a fix for single contigs/chromosomes >= 1 Gbp.
+
 ## SYNY-v1.3.1
 ### Bugfix release
 - `paf_to_barplot.py`, `paf_to_dotplot.py`, `linear_maps.py`: Added a try/except to prevent (rare) multiprocessing pool crashes; if those are detected, plots will be generated using a single-threaded for loop instead. 
