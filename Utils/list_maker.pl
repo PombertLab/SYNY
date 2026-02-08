@@ -2,8 +2,8 @@
 # Pombert lab, 2020
 
 my $name = 'list_maker.pl';
-my $version = '0.6.3';
-my $updated = '2025-07-09';
+my $version = '0.7.0';
+my $updated = '2026-02-08';
 
 use strict;
 use warnings;
