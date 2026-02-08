@@ -2,8 +2,8 @@
 ## Pombert Lab, 2024
 
 my $name = 'fasta_to_gbff.pl';
-my $version = '0.1a';
-my $updated = '2024-05-27';
+my $version = '0.1b';
+my $updated = '2026-05-08';
 
 use strict;
 use warnings;
@@ -146,6 +146,10 @@ while (my $fasta = shift@fasta){
 
             my @wide_10 = unpack ("(A10)*", $wide_60);
             my $seq_counter_len = length($seq_counter);
+            ## Adjusting spacer length for seq_counter >= 1 billion
+            if ($seq_counter_len > 9){
+                $seq_counter_len = 9;
+            }
             my $spacer_len = 9 - $seq_counter_len;
             my $spacer = ' ' x $spacer_len;
 
