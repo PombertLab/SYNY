@@ -189,6 +189,56 @@ foreach my $input_file (@input_files){
 
 		open GBK, $diamond, $input_file or die "Can't open input file $input_file: $!\n";
 
+		my $accession_prefix;
+		my $base_accession;
+		my @accessions;
+		my %accession_links;
+
+		while (my $line = <GBK>){
+
+			if ($line =~ /^ACCESSION\s+(\w+)\s+([A-Z]+)(\d+)/){
+
+				unless ($accession_prefix){
+					unless($2){
+						last;
+					}
+					$accession_prefix = $2;
+					$base_accession = $3;
+				}
+				push(@accessions,$1);
+			}
+		}
+		close GBK;
+
+		if ($accession_prefix){
+
+			my %accessions;
+			my @temp_accessions;
+			while (my $accession = shift(@accessions)){
+				if ($accession =~ /$accession_prefix/){
+					$accessions{$accession} = 1;
+					next;
+				}
+				push(@temp_accessions,$accession);
+			}
+
+			@temp_accessions = sort(@temp_accessions);
+
+			$base_accession++;
+			while (@temp_accessions){
+				while($accessions{$accession_prefix.$base_accession}){
+					my $new_accession = $accession_prefix.$base_accession;
+					$accession_links{$new_accession} = $new_accession;
+					$base_accession++;
+				}
+				my $new_accession = $accession_prefix.$base_accession;
+				$accession_links{shift(@temp_accessions)} = $new_accession;
+				$accessions{$new_accession} = 1;
+			}
+		}
+
+		open GBK, $diamond, $input_file or die "Can't open input file $input_file: $!\n";
+
 		my %location_data;
 		my %genome;
 		my %isoform; ## Keeping track of isoforms with identical locus tags
@@ -228,7 +278,12 @@ foreach my $input_file (@input_files){
 
 			if ($line =~ /^LOCUS\s+(\S+).*?(\d+) bp/ ){
 
-				$contig = $1;
+				if ($accession_links{$1}){
+					$contig = $accession_links{$1};
+				}
+				else{
+					$contig = $1;
+				}
 				$contig_size = $2;
 				$contig_sum += $contig_size;
 
